@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+
+{% block categories %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>RESUMEN DE TU PEDIDO</h5>
+            </div>
+            <div class="card-body">
+                <div id="resumen-productos"></div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5>OPCIONES DE ENVÍO</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-2" style="cursor: pointer;" onclick="seleccionarEnvio('starken')">
+                            <div class="card-body text-center">
+                                <h6>STARKEN</h6>
+                                <p class="text-muted">2-3 días hábiles</p>
+                                <small class="text-info">Pago contra entrega</small>
+                                <input type="radio" name="envio" value="starken" id="starken">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card border-2" style="cursor: pointer;" onclick="seleccionarEnvio('bluexpress')">
+                            <div class="card-body text-center">
+                                <h6>BLUE EXPRESS</h6>
+                                <p class="text-muted">3-5 días hábiles</p>
+                                <small class="text-info">Pago contra entrega</small>
+                                <input type="radio" name="envio" value="bluexpress" id="bluexpress">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>DATOS DE ENVÍO</h5>
+            </div>
+            <div class="card-body">
+                <div id="datos-envio"></div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5>TOTAL A PAGAR</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="h5">TOTAL PRODUCTOS:</span>
+                    <span class="h5 text-primary">$<span id="subtotal-checkout">0</span></span>
+                </div>
+                <div class="alert alert-info">
+                    <small><strong>Envío:</strong> Se paga contra entrega según la agencia seleccionada</small>
+                </div>
+                <div class="d-grid">
+                    <button class="btn btn-primary btn-lg" onclick="confirmarPedido()">CONFIRMAR PEDIDO</button>
+                    <a href="{% url 'carrito' %}" class="btn btn-outline-secondary mt-2">VOLVER AL CARRITO</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let datosEnvio = {};
+let costoEnvio = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    cargarDatosCheckout();
+});
+
+function cargarDatosCheckout() {
+    // Cargar productos del carrito
+    const resumenProductos = document.getElementById('resumen-productos');
+    let subtotal = 0;
+    let html = '';
+    
+    if (carrito.length === 0) {
+        window.location.href = '/carrito/';
+        return;
+    }
+    
+    carrito.forEach(item => {
+        const itemTotal = item.precio * item.cantidad;
+        subtotal += itemTotal;
+        html += `
+            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                <div>
+                    <h6 class="mb-0">${item.nombre}</h6>
+                    <small class="text-muted">Cantidad: ${item.cantidad}</small>
+                </div>
+                <span>$${itemTotal}</span>
+            </div>
+        `;
+    });
+    
+    resumenProductos.innerHTML = html;
+    document.getElementById('subtotal-checkout').textContent = subtotal;
+    
+    // Cargar datos de envío desde localStorage
+    const datosGuardados = localStorage.getItem('datosEnvio');
+    if (datosGuardados) {
+        datosEnvio = JSON.parse(datosGuardados);
+        mostrarDatosEnvio();
+    }
+    
+    actualizarTotal();
+}
+
+function mostrarDatosEnvio() {
+    const datosEnvioDiv = document.getElementById('datos-envio');
+    datosEnvioDiv.innerHTML = `
+        <p><strong>NOMBRE:</strong> ${datosEnvio.nombre} ${datosEnvio.apellido}</p>
+        <p><strong>RUT:</strong> ${datosEnvio.rut}</p>
+        <p><strong>DIRECCIÓN:</strong> ${datosEnvio.direccion}</p>
+        <p><strong>COMUNA:</strong> ${datosEnvio.comuna}</p>
+        <p><strong>PAÍS:</strong> ${datosEnvio.pais}</p>
+    `;
+}
+
+function seleccionarEnvio(tipo) {
+    document.getElementById(tipo).checked = true;
+    
+    // Resaltar opción seleccionada
+    document.querySelectorAll('.card').forEach(card => {
+        card.classList.remove('border-primary');
+    });
+    document.querySelector(`#${tipo}`).closest('.card').classList.add('border-primary');
+}
+
+
+
+function confirmarPedido() {
+    const envioSeleccionado = document.querySelector('input[name="envio"]:checked');
+    if (!envioSeleccionado) {
+        Swal.fire({
+            title: 'Selecciona envío',
+            text: 'Por favor elige una opción de envío',
+            icon: 'warning',
+            confirmButtonColor: '#ffc1ea'
+        });
+        return;
+    }
+    
+    if (Object.keys(datosEnvio).length === 0) {
+        Swal.fire({
+            title: 'Datos faltantes',
+            text: 'Vuelve al carrito para completar los datos de envío',
+            icon: 'error',
+            confirmButtonColor: '#ffc1ea'
+        });
+        return;
+    }
+    
+    // Limpiar carrito
+    carrito = [];
+    localStorage.removeItem('carrito');
+    localStorage.removeItem('datosEnvio');
+    
+    window.location.href = '/';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h4 class="mb-4">Carrito de Compras</h4>
+
+<div id="carrito-items"></div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>DATOS DE ENVÍO</h5>
+            </div>
+            <div class="card-body">
+                <form id="form-envio">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">NOMBRE</label>
+                            <input type="text" class="form-control" id="nombre" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">APELLIDO</label>
+                            <input type="text" class="form-control" id="apellido" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">RUT</label>
+                        <input type="text" class="form-control" id="rut" placeholder="12.345.678-9" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">DIRECCIÓN</label>
+                        <input type="text" class="form-control" id="direccion" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">COMUNA</label>
+                            <select class="form-control" id="comuna" required>
+                                <option value="">Seleccionar comuna</option>
+                                <option value="Santiago">Santiago</option>
+                                <option value="Las Condes">Las Condes</option>
+                                <option value="Providencia">Providencia</option>
+                                <option value="Ñuñoa">Ñuñoa</option>
+                                <option value="La Reina">La Reina</option>
+                                <option value="Vitacura">Vitacura</option>
+                                <option value="Lo Barnechea">Lo Barnechea</option>
+                                <option value="Maipú">Maipú</option>
+                                <option value="Puente Alto">Puente Alto</option>
+                                <option value="La Florida">La Florida</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">PAÍS</label>
+                            <select class="form-control" id="pais" required>
+                                <option value="Chile">Chile</option>
+                                <option value="Argentina">Argentina</option>
+                                <option value="Perú">Perú</option>
+                                <option value="Bolivia">Bolivia</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5>RESUMEN DEL PEDIDO</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <span class="h5">TOTAL:</span>
+                    <span class="h5 text-primary">$<span id="total">0</span></span>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary btn-lg" onclick="procederPago()">PROCEDER AL PAGO</button>
+                    <button class="btn btn-outline-danger" onclick="vaciarCarrito()">VACIAR CARRITO</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function mostrarCarrito() {
+    const carritoItems = document.getElementById('carrito-items');
+    const totalElement = document.getElementById('total');
+    let total = 0;
+    
+    if (carrito.length === 0) {
+        carritoItems.innerHTML = '<p class="text-muted">El carrito está vacío</p>';
+        return;
+    }
+    
+    let html = '';
+    carrito.forEach((item, index) => {
+        const subtotal = item.precio * item.cantidad;
+        total += subtotal;
+        html += `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <h6 class="mb-0">${item.nombre}</h6>
+                        </div>
+                        <div class="col-md-2">$${item.precio}</div>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${index}, -1)">-</button>
+                                <span class="mx-2">${item.cantidad}</span>
+                                <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${index}, 1)">+</button>
+                            </div>
+                        </div>
+                        <div class="col-md-2">$${subtotal}</div>
+                        <div class="col-md-1">
+                            <button class="btn btn-sm btn-outline-danger" onclick="eliminarItem(${index})">×</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    carritoItems.innerHTML = html;
+    totalElement.textContent = total;
+}
+
+function cambiarCantidad(index, cambio) {
+    carrito[index].cantidad += cambio;
+    if (carrito[index].cantidad <= 0) {
+        carrito.splice(index, 1);
+    }
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+    if (typeof actualizarContadorCarrito === 'function') {
+        actualizarContadorCarrito();
+    }
+}
+
+function eliminarItem(index) {
+    carrito.splice(index, 1);
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+    if (typeof actualizarContadorCarrito === 'function') {
+        actualizarContadorCarrito();
+    }
+}
+
+function vaciarCarrito() {
+    carrito = [];
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+    if (typeof actualizarContadorCarrito === 'function') {
+        actualizarContadorCarrito();
+    }
+}
+
+function procederPago() {
+    if (carrito.length === 0) {
+        Swal.fire({
+            title: 'Carrito vacío',
+            text: 'Agrega productos antes de proceder',
+            icon: 'warning',
+            confirmButtonColor: '#ffc1ea'
+        });
+        return;
+    }
+    
+    // Validar datos de envío
+    const nombre = document.getElementById('nombre')?.value;
+    const apellido = document.getElementById('apellido')?.value;
+    const rut = document.getElementById('rut')?.value;
+    const direccion = document.getElementById('direccion')?.value;
+    const comuna = document.getElementById('comuna')?.value;
+    const pais = document.getElementById('pais')?.value;
+    
+    if (!nombre || !apellido || !rut || !direccion || !comuna || !pais) {
+        Swal.fire({
+            title: 'Datos incompletos',
+            text: 'Por favor completa todos los datos de envío',
+            icon: 'error',
+            confirmButtonColor: '#ffc1ea'
+        });
+        return;
+    }
+    
+    // Guardar datos de envío
+    const datosEnvio = {
+        nombre, apellido, rut, direccion, comuna, pais
+    };
+    localStorage.setItem('datosEnvio', JSON.stringify(datosEnvio));
+    
+    // Ir a checkout
+    window.location.href = '/checkout/';
+}
+
+document.addEventListener('DOMContentLoaded', mostrarCarrito);
+</script>
+{% endblock %}

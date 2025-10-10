@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block categories %}
+{% for categoria in categorias %}
+<a href="{% url 'productos_categoria' categoria.id %}" class="category-link">{{ categoria.nombre }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+<div id="carouselSlides" class="carousel slide mb-4" data-bs-ride="carousel">
+    {% if slides %}
+        <div class="carousel-indicators">
+            {% for slide in slides %}
+            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></button>
+            {% endfor %}
+        </div>
+        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
+            {% for slide in slides %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ slide.imagen.url }}" class="d-block w-100" style="height: 300px; object-fit: cover;">
+                {% if slide.titulo %}
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>{{ slide.titulo }}</h5>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSlides" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselSlides" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    {% else %}
+        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
+            <div class="carousel-item active">
+                <div class="d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-images fa-3x mb-3"></i>
+                        <h5>Slideshow</h5>
+                        <p>Agrega imágenes desde el panel de administración</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% if banners %}
+<section class="banners-fidelizacion-home mb-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            {% for banner in banners %}
+            <div class="col-lg-3 col-md-6 col-sm-6 mb-2">
+                <div class="banner-item-home d-flex align-items-start">
+                    <i class="{{ banner.icono }}" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 style="color: {{ banner.color_texto|default:'#6c757d' }}; font-size: 12px; margin: 0; font-weight: 500;">{{ banner.titulo }}</h6>
+                        {% if banner.descripcion %}
+                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">{{ banner.descripcion }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<div class="mb-5">
+    <h4 class="mb-4">RECIÉN LLEGADOS</h4>
+    <div class="row g-3">
+        {% for producto in productos %}
+        <div class="col-lg-3 col-md-4 col-sm-6">
+            <div class="card product-card h-100">
+                <div class="product-image">
+                    {% if producto.imagen_principal %}
+                    <a href="{% url 'detalle_producto' producto.id %}">
+                        <img src="{{ producto.imagen_principal.url }}" style="cursor: pointer;">
+                    </a>
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-light h-100">
+                        <i class="fas fa-image fa-2x text-muted"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="text-center">
+                    <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
+                        <h6 class="card-title mb-2">{{ producto.nombre }}</h6>
+                    </a>
+                    <p class="h5 text-primary mb-3">${{ producto.precio|floatformat:0 }}</p>
+                    <div class="quantity-controls justify-content-center">
+                        <div class="quantity-btn" onclick="cambiarCantidad({{ producto.id }}, -1)">-</div>
+                        <span id="qty-{{ producto.id }}">1</span>
+                        <div class="quantity-btn" onclick="cambiarCantidad({{ producto.id }}, 1)">+</div>
+                        <button class="cart-btn" onclick="agregarAlCarritoConCantidad({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
+                            <i class="fas fa-shopping-cart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted">No hay productos disponibles</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% for seccion_data in secciones_categorias %}
+<div class="mb-5">
+    <h4 class="mb-4">{{ seccion_data.seccion.categoria.nombre|upper }}</h4>
+    <div class="row g-3">
+        {% for producto in seccion_data.productos %}
+        <div class="col-lg-2 col-md-3 col-sm-4 col-6">
+            <div class="card product-card h-100">
+                <div class="product-image">
+                    {% if producto.imagen_principal %}
+                    <a href="{% url 'detalle_producto' producto.id %}">
+                        <img src="{{ producto.imagen_principal.url }}" style="cursor: pointer;">
+                    </a>
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center bg-light h-100">
+                        <i class="fas fa-image fa-2x text-muted"></i>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-body d-flex flex-column p-2">
+                    <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
+                        <h6 class="card-title small">{{ producto.nombre }}</h6>
+                    </a>
+                    <p class="h6 text-primary mb-2">${{ producto.precio|floatformat:0 }}</p>
+                    <button class="btn btn-primary btn-sm mt-auto" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
+                        Agregar
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

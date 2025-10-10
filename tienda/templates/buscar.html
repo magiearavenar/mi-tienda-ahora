@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block categories %}
+{% for categoria in categorias %}
+<a href="{% url 'productos_categoria' categoria.id %}" class="category-link">{{ categoria.nombre }}</a>
+{% endfor %}
+{% endblock %}
+
+{% block content %}
+{% if query %}
+    <h4 class="mb-4">Resultados para: "{{ query }}"</h4>
+    
+    {% if productos %}
+        <p class="text-muted">{{ productos|length }} producto{{ productos|length|pluralize }} encontrado{{ productos|length|pluralize }}</p>
+        
+        <div class="row g-3">
+            {% for producto in productos %}
+            <div class="col-lg-3 col-md-4 col-sm-6">
+                <div class="card product-card h-100">
+                    {% if producto.imagen %}
+                    <a href="{% url 'detalle_producto' producto.id %}">
+                        <img src="{{ producto.imagen.url }}" class="card-img-top" style="height: 200px; object-fit: cover; cursor: pointer;">
+                    </a>
+                    {% endif %}
+                    <div class="card-body d-flex flex-column">
+                        <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
+                            <h6 class="card-title">{{ producto.nombre }}</h6>
+                        </a>
+                        <p class="h5 text-primary mb-3">${{ producto.precio|floatformat:0 }}</p>
+                        <button class="btn btn-primary btn-sm mt-auto" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
+                            Agregar al Carrito
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h5 class="text-muted">No se encontraron productos</h5>
+            <p class="text-muted">Intenta con otros términos de búsqueda</p>
+        </div>
+    {% endif %}
+{% else %}
+    <div class="text-center py-5">
+        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">Buscar productos</h5>
+        <p class="text-muted">Escribe el nombre del producto que buscas</p>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administrador</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Panel de Administrador</h1>
+        <nav>
+            <a href="index.html">🏠 Tienda</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="admin-section">
+            <h2>Agregar Producto</h2>
+            <form id="product-form">
+                <input type="text" id="product-name" placeholder="Nombre del producto" required>
+                <input type="number" id="product-price" placeholder="Precio" step="0.01" required>
+                <input type="url" id="product-image" placeholder="URL de la imagen">
+                <textarea id="product-description" placeholder="Descripción"></textarea>
+                <button type="submit">Agregar Producto</button>
+            </form>
+        </section>
+
+        <section class="admin-section">
+            <h2>Productos Existentes</h2>
+            <div id="admin-products">
+                <!-- Lista de productos para administrar -->
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        loadAdminProducts();
+        document.getElementById('product-form').addEventListener('submit', addProduct);
+    </script>
+</body>
+</html>

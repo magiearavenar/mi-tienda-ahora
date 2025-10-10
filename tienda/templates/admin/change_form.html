@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+    input[type="color"] {
+        width: 80px !important;
+        height: 50px !important;
+        border: 2px solid #ddd !important;
+        border-radius: 8px !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+        margin-right: 10px !important;
+    }
+    
+    input[type="color"]:hover {
+        border-color: #007cba !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
+    }
+</style>
+{% endblock %}

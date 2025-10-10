@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mundo Magie{% endblock %}</title>
+    <link rel="icon" type="image/png" href="/static/images/mariposas.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <style>
+        :root {
+            --color-primario: {{ config.color_primario|default:'#ffc1ea' }};
+            --color-secundario: {{ config.color_secundario|default:'#d2a8dd' }};
+            --color-fondo: {{ config.color_fondo|default:'#fff' }};
+            --color-banner: {{ config.color_banner|default:'#95d4e8' }};
+            --color-cards: {{ config.color_cards|default:'#ffffff' }};
+            --color-hover: {{ config.color_hover|default:'#f4d875' }};
+        }
+        .footer {
+            background-color: {{ footer_config.color_fondo|default:'#2c3e50' }};
+            color: {{ footer_config.color_texto|default:'#ecf0f1' }};
+            border-top: 1px solid #dee2e6;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            text-transform: none;
+        }
+        .footer-link {
+            color: {{ footer_config.color_enlaces|default:'#3498db' }};
+            text-decoration: none;
+        }
+        .social-link {
+            color: {{ footer_config.color_redes|default:'#e74c3c' }};
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    {% if config and config.mensaje_envio %}
+    <div class="banner-envio">
+        <div class="container">
+            <i class="fas fa-shipping-fast me-2"></i>{{ config.mensaje_envio }}
+        </div>
+    </div>
+    {% endif %}
+    <header class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <a href="{% url 'buscar' %}" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;">
+                        <i class="fas fa-search"></i>
+                    </a>
+                </div>
+                
+                <div class="text-center">
+                    <a href="{% url 'home' %}">
+                        <img src="/static/images/logo.png" alt="Logo" class="logo" onerror="this.style.display='none'">
+                    </a>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'carrito' %}" class="me-3 position-relative" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: #ffc1ea; color: white; font-size: 10px; display: none;">0</span>
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'perfil' %}" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <a href="{% url 'logout' %}" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <a href="{% url 'registro' %}" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;">
+                            <i class="fas fa-user-plus"></i>
+                        </a>
+                    {% endif %}
+                    {% if user.is_staff %}
+                        <a href="/admin/" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;">
+                            <i class="fas fa-cog"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-categories">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-center">
+                <a href="{% url 'home' %}" class="category-link">Todos</a>
+                {% block categories %}{% endblock %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer mt-5">
+        <div class="container py-5">
+            <div class="row">
+                {% if sobre_mi %}
+                <div class="col-md-3 mb-4">
+                    <h5>{{ sobre_mi.titulo }}</h5>
+                    <p class="small">{{ sobre_mi.contenido|truncatewords:20 }}</p>
+                </div>
+                {% endif %}
+                
+                {% if contacto %}
+                <div class="col-md-3 mb-4">
+                    <h5>{{ contacto.titulo }}</h5>
+                    {% if contacto.telefono %}<p class="small mb-1"><i class="fas fa-phone me-2"></i>{{ contacto.telefono }}</p>{% endif %}
+                    {% if contacto.email %}<p class="small mb-1"><i class="fas fa-envelope me-2"></i>{{ contacto.email }}</p>{% endif %}
+                    {% if contacto.direccion %}<p class="small mb-1"><i class="fas fa-map-marker-alt me-2"></i>{{ contacto.direccion }}</p>{% endif %}
+                    {% if contacto.horarios %}<p class="small"><i class="fas fa-clock me-2"></i>{{ contacto.horarios }}</p>{% endif %}
+                </div>
+                {% endif %}
+                
+                {% if informacion %}
+                <div class="col-md-3 mb-4">
+                    <h5>Información</h5>
+                    {% for info in informacion %}
+                    <p class="small mb-1"><a href="#" class="footer-link">{{ info.titulo }}</a></p>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if suscripcion %}
+                <div class="col-md-3 mb-4">
+                    <h5>{{ suscripcion.titulo }}</h5>
+                    <p class="small mb-3">{{ suscripcion.descripcion }}</p>
+                    <div class="input-group input-group-sm">
+                        <input type="email" class="form-control" placeholder="Tu email">
+                        <button class="btn btn-primary" type="button">Suscribir</button>
+                    </div>
+                    {% if redes_sociales %}
+                    <div class="mt-3">
+                        <h6>Síguenos</h6>
+                        {% for red in redes_sociales %}
+                        <a href="{{ red.url }}" target="_blank" class="me-3 social-link">
+                            <i class="{{ red.icono }}"></i>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+            
+            <hr style="border-top: 1px solid #dee2e6; border-bottom: none; border-left: none; border-right: none; margin: 2rem 0 1rem 0;">
+            
+            <div class="row">
+                <div class="col-12 text-center">
+                    <p class="small mb-0">&copy; {% now "Y" %} Mundo Magie. Todos los derechos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        
+        let cantidades = {};
+        
+        function actualizarContadorCarrito() {
+            const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+            const contador = document.getElementById('cart-count');
+            if (totalItems > 0) {
+                contador.textContent = totalItems;
+                contador.style.display = 'inline-block';
+            } else {
+                contador.style.display = 'none';
+            }
+        }
+        
+        function cambiarCantidad(id, cambio) {
+            if (!cantidades[id]) cantidades[id] = 1;
+            cantidades[id] += cambio;
+            if (cantidades[id] < 1) cantidades[id] = 1;
+            document.getElementById('qty-' + id).textContent = cantidades[id];
+        }
+        
+        function agregarAlCarritoConCantidad(id, nombre, precio) {
+            const cantidad = cantidades[id] || 1;
+            const item = carrito.find(p => p.id === id);
+            if (item) {
+                item.cantidad += cantidad;
+            } else {
+                carrito.push({id, nombre, precio, cantidad});
+            }
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            actualizarContadorCarrito();
+            
+            Swal.fire({
+                title: '¡Agregado!',
+                text: `${cantidad} producto(s) agregado(s) al carrito`,
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#fff',
+                color: '#333',
+                iconColor: '#ffc1ea'
+            });
+            
+            cantidades[id] = 1;
+            document.getElementById('qty-' + id).textContent = 1;
+        }
+        
+        function agregarAlCarrito(id, nombre, precio) {
+            agregarAlCarritoConCantidad(id, nombre, precio);
+        }
+        
+        // Actualizar contador al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarContadorCarrito();
+        });
+    </script>
+</body>
+</html>

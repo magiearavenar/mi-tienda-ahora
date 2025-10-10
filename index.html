@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Tienda Online</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Mi Tienda Online</h1>
+        <nav>
+            <a href="cart.html">🛒 Carrito (<span id="cart-count">0</span>)</a>
+            <a href="admin.html">👤 Admin</a>
+        </nav>
+    </header>
+
+    <main>
+        <div id="products-container">
+            <!-- Los productos se cargan dinámicamente -->
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        loadProducts();
+        updateCartCount();
+    </script>
+</body>
+</html>
