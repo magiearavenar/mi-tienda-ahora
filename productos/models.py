@@ -221,3 +221,17 @@ class ImagenProducto(models.Model):
         ordering = ['orden']
         verbose_name = "Imagen de Producto"
         verbose_name_plural = "Imágenes de Productos"
+
+class OpcionProducto(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='opciones')
+    nombre = models.CharField(max_length=200, help_text='Ej: 200 hojas')
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    orden = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return f"{self.producto.nombre} - {self.nombre}: ${self.precio}"
+    
+    class Meta:
+        ordering = ['orden']
+        verbose_name = "Opción de Producto"
+        verbose_name_plural = "Opciones de Producto"

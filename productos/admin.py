@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Producto, Categoria, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
+from .models import Producto, Categoria, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto
 from .widgets import ColorPickerWidget
 
 @admin.register(Categoria)
@@ -13,13 +13,18 @@ class ImagenProductoInline(admin.TabularInline):
     extra = 1
     fields = ['imagen', 'orden', 'es_principal']
 
+class OpcionProductoInline(admin.TabularInline):
+    model = OpcionProducto
+    extra = 1
+    fields = ['nombre', 'precio', 'orden']
+
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'categoria', 'precio', 'stock', 'activo', 'fecha_creacion']
     list_filter = ['categoria', 'activo', 'fecha_creacion']
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
-    inlines = [ImagenProductoInline]
+    inlines = [ImagenProductoInline, OpcionProductoInline]
 
 @admin.register(Slide)
 class SlideAdmin(admin.ModelAdmin):

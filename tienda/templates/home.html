@@ -90,7 +90,7 @@
                     <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
                         <h6 class="card-title mb-2">{{ producto.nombre }}</h6>
                     </a>
-                    <p class="h5 text-primary mb-3">${{ producto.precio|floatformat:0 }}</p>
+                    <p class="h5 text-primary mb-3">${{ producto.precio|floatformat:0 }}{% if producto.opciones.all %}<small class="text-muted"> +</small>{% endif %}</p>
                     <div class="quantity-controls justify-content-center">
                         <div class="quantity-btn" onclick="cambiarCantidad({{ producto.id }}, -1)">-</div>
                         <span id="qty-{{ producto.id }}">1</span>
@@ -132,7 +132,7 @@
                     <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
                         <h6 class="card-title small">{{ producto.nombre }}</h6>
                     </a>
-                    <p class="h6 text-primary mb-2">${{ producto.precio|floatformat:0 }}</p>
+                    <p class="h6 text-primary mb-2">${{ producto.precio|floatformat:0 }}{% if producto.opciones.all %}<small class="text-muted"> +</small>{% endif %}</p>
                     <button class="btn btn-primary btn-sm mt-auto" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
                         Agregar
                     </button>

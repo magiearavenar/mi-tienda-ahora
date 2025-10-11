@@ -5,6 +5,7 @@ db.sqlite3
 media/
 .env
 *.log
+staticfiles/
 
 # IDE
 .vscode/
@@ -17,3 +18,9 @@ Thumbs.db
 # Virtual Environment
 venv/
 env/
+.venv/
+
+# Scripts temporales
+crear_*.py
+actualizar_*.py
+agregar_*.py
