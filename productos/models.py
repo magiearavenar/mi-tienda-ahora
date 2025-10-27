@@ -17,6 +17,7 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
+    imagen_url = models.URLField(blank=True, null=True, help_text='URL externa de la imagen')
     stock = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)

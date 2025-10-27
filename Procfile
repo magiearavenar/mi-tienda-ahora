@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn tienda.wsgi --log-file -
+web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn tienda.wsgi:application --port $PORT

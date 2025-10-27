@@ -107,3 +107,4 @@ def buscar(request):
 def checkout(request):
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     return render(request, 'checkout.html', {'config': config})
+

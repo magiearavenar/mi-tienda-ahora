@@ -1,0 +1,56 @@
+[
+{
+  "model": "productos.categoria",
+  "pk": 1,
+  "fields": {
+    "nombre": "Agendas",
+    "descripcion": "agenadsa"
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 2,
+  "fields": {
+    "nombre": "Colorear",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 3,
+  "fields": {
+    "nombre": "Navidad",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 4,
+  "fields": {
+    "nombre": "Accesorios",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 5,
+  "fields": {
+    "nombre": "Cotillón",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.configuracionsitio",
+  "pk": 1,
+  "fields": {
+    "mensaje_envio": "Envíos a domicilio en 3 días hábiles",
+    "activo": true,
+    "color_primario": "#495057",
+    "color_secundario": "#6c757d",
+    "color_fondo": "#FFFFFF",
+    "color_banner": "#8bd2ea",
+    "color_cards": "#ffffff",
+    "color_hover": "#F4C2C2"
+  }
+}
+]

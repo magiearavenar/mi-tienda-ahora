@@ -1,0 +1,61 @@
+[
+{
+  "model": "productos.categoria",
+  "pk": 1,
+  "fields": {
+    "nombre": "Agendas",
+    "descripcion": "agenadsa"
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 2,
+  "fields": {
+    "nombre": "Colorear",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 3,
+  "fields": {
+    "nombre": "Navidad",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 4,
+  "fields": {
+    "nombre": "Accesorios",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.categoria",
+  "pk": 5,
+  "fields": {
+    "nombre": "Cotillón",
+    "descripcion": ""
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 1,
+  "fields": {
+    "nombre": "Agenda linda",
+    "descripcion": "fweewr",
+    "precio": "33333.00",
+    "categoria": 1,
+    "imagen": "productos/Copia_de_Invitación_Vertical_Baby_Shower_Ilustrada_Azul_y_Marrón.png",
+    "stock": 4,
+    "activo": true,
+    "fecha_creacion": "2025-10-03T01:38:51.385Z"
+  }
+},
+{
+  "model": "productos.producto",
+  "pk": 2,
+  "fields": {
+    "nombre": "Libro Bobbie Goods",
+    "descripcion": 

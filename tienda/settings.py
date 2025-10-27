@@ -11,7 +11,14 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
+# Railway production settings
+if os.environ.get('RAILWAY_ENVIRONMENT'):
+    DEBUG = False
+
 ALLOWED_HOSTS = ['*']
+
+# Railway PORT
+PORT = os.environ.get('PORT', 8000)
 
 CSRF_TRUSTED_ORIGINS = [
     'https://*.railway.app',
@@ -25,8 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary_storage',
-    'cloudinary',
+    'storages',
     'crispy_forms',
     'crispy_bootstrap4',
     'productos',
@@ -65,19 +71,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'tienda.wsgi.application'
 
-if os.environ.get('DATABASE_URL'):
-    DATABASES = {
-        'default': dj_database_url.config(
-            conn_max_age=600
-        )
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+DATABASES = {
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -103,28 +103,31 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'tienda/static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Cloudinary configuration
-import cloudinary
-import cloudinary.uploader
-import cloudinary.api
-
-cloudinary.config(
-    cloud_name=os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    api_key=os.environ.get('CLOUDINARY_API_KEY'),
-    api_secret=os.environ.get('CLOUDINARY_API_SECRET')
-)
-
-if os.environ.get('CLOUDINARY_CLOUD_NAME'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = '/media/'
+# AWS S3 Configuration
+if os.environ.get('AWS_ACCESS_KEY_ID'):
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+    AWS_S3_FILE_OVERWRITE = False
+    AWS_QUERYSTRING_AUTH = False
+    
+    # Media files
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 else:
+    # Local media files
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
 
-# Servir archivos de media con WhiteNoise en producción
+# Servir archivos estáticos con WhiteNoise en producción
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    import os
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
 
