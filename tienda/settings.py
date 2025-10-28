@@ -11,9 +11,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# Railway production settings - DEBUG ENABLED FOR TROUBLESHOOTING
+# Railway production settings
 if os.environ.get('RAILWAY_ENVIRONMENT'):
-    DEBUG = True  # Temporarily enabled to see S3 errors
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -110,7 +110,7 @@ if os.environ.get('AWS_ACCESS_KEY_ID'):
     AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
     AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME', 'us-east-1')
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
-    AWS_DEFAULT_ACL = 'public-read'
+    AWS_DEFAULT_ACL = None
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',
     }
