@@ -5,8 +5,3 @@ class MediaStorage(S3Boto3Storage):
     file_overwrite = False
     default_acl = 'public-read'
     querystring_auth = False
-    
-    def _save(self, name, content):
-        # Force public-read ACL on save
-        self.object_parameters = {'ACL': 'public-read'}
-        return super()._save(name, content)
