@@ -11,9 +11,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-produc
 
 DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 
-# Railway production settings
+# Railway production settings - DEBUG ENABLED FOR TROUBLESHOOTING
 if os.environ.get('RAILWAY_ENVIRONMENT'):
-    DEBUG = False
+    DEBUG = True  # Temporarily enabled to see S3 errors
 
 ALLOWED_HOSTS = ['*']
 
