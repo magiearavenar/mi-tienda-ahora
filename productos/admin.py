@@ -105,6 +105,7 @@ class FooterConfigForm(forms.ModelForm):
             'color_fondo': ColorPickerWidget(),
             'color_texto': ColorPickerWidget(),
             'color_enlaces': ColorPickerWidget(),
+            'color_hover': ColorPickerWidget(),
             'color_redes': ColorPickerWidget(),
         }
 

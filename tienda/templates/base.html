@@ -34,7 +34,7 @@
             transition: color 0.3s ease;
         }
         .footer-link:hover {
-            opacity: 0.8;
+            color: {{ footer_config.color_hover|default:'#aeefff' }};
         }
         .social-link {
             color: {{ footer_config.color_redes|default:'#ffc1e3' }};

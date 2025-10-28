@@ -131,6 +131,7 @@ class FooterConfig(models.Model):
     color_fondo = models.CharField(max_length=7, default='#2c3e50', help_text='Color de fondo del footer')
     color_texto = models.CharField(max_length=7, default='#ecf0f1', help_text='Color del texto')
     color_enlaces = models.CharField(max_length=7, default='#3498db', help_text='Color de los enlaces')
+    color_hover = models.CharField(max_length=7, default='#aeefff', help_text='Color hover de enlaces')
     color_redes = models.CharField(max_length=7, default='#e74c3c', help_text='Color de los íconos de redes sociales')
     activo = models.BooleanField(default=True)
     
