@@ -271,7 +271,7 @@ div {
 
 /* Tooltip para WhatsApp */
 .whatsapp-float::before {
-    content: '¿Quieres consultar algo? Hablemos';
+    content: '¿Alguna duda? Háblanos';
     position: absolute;
     right: 70px;
     top: 50%;

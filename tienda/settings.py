@@ -21,9 +21,16 @@ ALLOWED_HOSTS = ['*']
 PORT = os.environ.get('PORT', 8000)
 
 CSRF_TRUSTED_ORIGINS = [
+    'https://mundomagie.cl',
+    'https://www.mundomagie.cl',
     'https://*.railway.app',
     'https://*.up.railway.app',
 ]
+
+# CSRF Settings
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = 'Lax'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
