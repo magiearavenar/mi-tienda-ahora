@@ -103,8 +103,8 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'tienda/static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# AWS S3 Configuration
-if os.environ.get('AWS_ACCESS_KEY_ID'):
+# AWS S3 Configuration - TEMPORARILY DISABLED
+if False and os.environ.get('AWS_ACCESS_KEY_ID'):
     AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
@@ -126,7 +126,7 @@ if os.environ.get('AWS_ACCESS_KEY_ID'):
     DEFAULT_FILE_STORAGE = 'productos.storage.MediaStorage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
     
-    # Logging for S3 errors
+    # Logging for all errors
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': False,
@@ -135,10 +135,15 @@ if os.environ.get('AWS_ACCESS_KEY_ID'):
                 'class': 'logging.StreamHandler',
             },
         },
+        'root': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+        },
         'loggers': {
-            'storages': {
+            'django': {
                 'handlers': ['console'],
-                'level': 'DEBUG',
+                'level': 'ERROR',
+                'propagate': False,
             },
         },
     }
