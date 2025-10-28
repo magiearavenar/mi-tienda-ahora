@@ -10,7 +10,7 @@ from .models import Producto, Categoria, Pedido, Slide, ConfiguracionSitio, Secc
 def home(request):
     productos = Producto.objects.filter(activo=True).order_by('-fecha_creacion')[:8]
     categorias = Categoria.objects.all()
-    slides = Slide.objects.filter(activo=True)[:6]
+    slides = Slide.objects.filter(activo=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
     
