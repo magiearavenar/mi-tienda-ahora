@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /carrito/
+Disallow: /checkout/
+
+Sitemap: https://mundo-magie-production.up.railway.app/sitemap.xml
