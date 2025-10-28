@@ -119,8 +119,9 @@ if os.environ.get('AWS_ACCESS_KEY_ID'):
     AWS_S3_SIGNATURE_VERSION = 's3v4'
     
     # File upload settings
-    FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
-    DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+    FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
+    DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
+    DATA_UPLOAD_MAX_NUMBER_FIELDS = 10240
     
     # Media files
     DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
