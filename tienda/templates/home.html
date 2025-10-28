@@ -17,7 +17,7 @@
         <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
             {% for slide in slides %}
             <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ slide.imagen.url }}" class="d-block w-100" style="height: 300px; object-fit: cover;">
+                <img src="{{ slide.imagen.url }}" class="d-block" style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
                 {% if slide.titulo %}
                 <div class="carousel-caption d-none d-md-block">
                     <h5>{{ slide.titulo }}</h5>
