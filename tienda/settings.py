@@ -118,6 +118,10 @@ if os.environ.get('AWS_ACCESS_KEY_ID'):
     AWS_QUERYSTRING_AUTH = False
     AWS_S3_SIGNATURE_VERSION = 's3v4'
     
+    # File upload settings
+    FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+    DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+    
     # Media files
     DEFAULT_FILE_STORAGE = 'productos.storage.MediaStorage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
