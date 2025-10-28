@@ -15,15 +15,50 @@ Sitemap: https://mundo-magie-production.up.railway.app/sitemap.xml"""
     return HttpResponse(content, content_type="text/plain")
 
 def sitemap_xml(request):
-    content = """<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    from productos.models import Producto, Categoria
+    from datetime import datetime
+    
+    # Obtener el dominio actual
+    domain = request.get_host()
+    protocol = 'https' if request.is_secure() else 'http'
+    base_url = f'{protocol}://{domain}'
+    
+    # Generar sitemap dinámico
+    urls = []
+    
+    # Página principal
+    urls.append(f'''
     <url>
-        <loc>https://mundo-magie-production.up.railway.app/</loc>
-        <lastmod>2025-01-01</lastmod>
+        <loc>{base_url}/</loc>
+        <lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod>
         <changefreq>daily</changefreq>
         <priority>1.0</priority>
-    </url>
-</urlset>"""
+    </url>''')
+    
+    # Categorías
+    for categoria in Categoria.objects.all():
+        urls.append(f'''
+    <url>
+        <loc>{base_url}/categoria/{categoria.id}/</loc>
+        <lastmod>{datetime.now().strftime('%Y-%m-%d')}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>''')
+    
+    # Productos
+    for producto in Producto.objects.filter(activo=True):
+        urls.append(f'''
+    <url>
+        <loc>{base_url}/producto/{producto.id}/</loc>
+        <lastmod>{producto.fecha_creacion.strftime('%Y-%m-%d')}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>''')
+    
+    content = f'''<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{''.join(urls)}
+</urlset>'''
+    
     return HttpResponse(content, content_type="application/xml")
 
 urlpatterns = [
