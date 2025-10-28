@@ -4,8 +4,9 @@ class MediaStorage(S3Boto3Storage):
     bucket_name = 'miapp-media-magie'
     file_overwrite = False
     default_acl = 'public-read'
+    querystring_auth = False
     
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.connection.meta.client.meta.config.read_timeout = 300
-        self.connection.meta.client.meta.config.connect_timeout = 60
+    def _save(self, name, content):
+        # Force public-read ACL on save
+        self.object_parameters = {'ACL': 'public-read'}
+        return super()._save(name, content)
