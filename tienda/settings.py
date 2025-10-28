@@ -121,6 +121,23 @@ if os.environ.get('AWS_ACCESS_KEY_ID'):
     # Media files
     DEFAULT_FILE_STORAGE = 'productos.storage.MediaStorage'
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+    
+    # Logging for S3 errors
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'loggers': {
+            'storages': {
+                'handlers': ['console'],
+                'level': 'DEBUG',
+            },
+        },
+    }
 else:
     # Local media files
     MEDIA_URL = '/media/'
