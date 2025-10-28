@@ -21,29 +21,28 @@
             --color-hover: {{ config.color_hover|default:'#f4d875' }};
         }
         .footer {
-            background: linear-gradient(135deg, #f8f4ff 0%, #f0f8ff 100%);
-            color: #4a4a4a;
+            background-color: {{ footer_config.color_fondo|default:'#f8f4ff' }};
+            color: {{ footer_config.color_texto|default:'#4a4a4a' }};
             border-top: 1px solid #dee2e6;
             font-family: 'Montserrat', sans-serif;
             font-size: 12px;
             text-transform: none;
         }
         .footer-link {
-            color: #d7b9ff;
+            color: {{ footer_config.color_enlaces|default:'#d7b9ff' }};
             text-decoration: none;
             transition: color 0.3s ease;
         }
         .footer-link:hover {
-            color: #aeefff;
+            opacity: 0.8;
         }
         .social-link {
-            color: #ffc1e3;
+            color: {{ footer_config.color_redes|default:'#ffc1e3' }};
             font-size: 1.2rem;
             transition: transform 0.3s ease;
         }
         .social-link:hover {
             transform: scale(1.2);
-            color: #d7b9ff;
         }
     </style>
 </head>
