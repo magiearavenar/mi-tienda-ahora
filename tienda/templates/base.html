@@ -365,11 +365,21 @@
         
         function agregarAlCarritoConCantidad(id, nombre, precio) {
             const cantidad = cantidades[id] || 1;
-            const item = carrito.find(p => p.id === id);
+            agregarAlCarrito(id, nombre, precio, cantidad);
+            
+            cantidades[id] = 1;
+            const qtyElement = document.getElementById('qty-' + id);
+            if (qtyElement) {
+                qtyElement.textContent = 1;
+            }
+        }
+        
+        function agregarAlCarrito(id, nombre, precio, cantidad = 1, personalizacion = '') {
+            const item = carrito.find(p => p.id === id && p.personalizacion === personalizacion);
             if (item) {
                 item.cantidad += cantidad;
             } else {
-                carrito.push({id, nombre, precio, cantidad});
+                carrito.push({id, nombre, precio, cantidad, personalizacion});
             }
             localStorage.setItem('carrito', JSON.stringify(carrito));
             actualizarContadorCarrito();
@@ -384,13 +394,6 @@
                 color: '#333',
                 iconColor: '#ffc1ea'
             });
-            
-            cantidades[id] = 1;
-            document.getElementById('qty-' + id).textContent = 1;
-        }
-        
-        function agregarAlCarrito(id, nombre, precio) {
-            agregarAlCarritoConCantidad(id, nombre, precio);
         }
         
         // Actualizar contador al cargar la página

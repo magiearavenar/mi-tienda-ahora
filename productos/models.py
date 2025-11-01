@@ -22,6 +22,11 @@ class Producto(models.Model):
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
+    # Campos de personalización
+    permite_personalizacion = models.BooleanField(default=False, help_text='¿Este producto permite personalización?')
+    texto_personalizacion = models.CharField(max_length=200, blank=True, help_text='Ej: ¿Quieres ponerle nombre personalizado?')
+    placeholder_personalizacion = models.CharField(max_length=100, blank=True, help_text='Texto de ejemplo para el campo')
+    
     def __str__(self):
         return self.nombre
     
@@ -61,6 +66,7 @@ class DetallePedido(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+    personalizacion = models.TextField(blank=True, help_text='Texto de personalización del cliente')
     
     def __str__(self):
         return f"{self.producto.nombre} x{self.cantidad}"

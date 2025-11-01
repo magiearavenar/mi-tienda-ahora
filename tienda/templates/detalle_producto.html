@@ -91,6 +91,14 @@
                 </div>
             </div>
             
+            {% if producto.permite_personalizacion %}
+            <div class="mb-4">
+                <label for="personalizacion" class="form-label">{{ producto.texto_personalizacion|default:"Personalización" }}</label>
+                <textarea id="personalizacion" class="form-control" rows="3" placeholder="{{ producto.placeholder_personalizacion|default:"Ingresa tu texto personalizado aquí..." }}"></textarea>
+                <small class="form-text text-muted">Este campo es opcional</small>
+            </div>
+            {% endif %}
+            
             <div class="mb-4">
                 <h5>Descripción</h5>
                 <p class="text-muted">{{ producto.descripcion|linebreaks }}</p>
@@ -158,7 +166,11 @@ function agregarAlCarritoConOpcion() {
         nombreProducto += ` - ${opcionNombre}`;
     }
     
-    agregarAlCarrito({{ producto.id }}, nombreProducto, parseFloat(precioActual), cantidad);
+    // Obtener personalización si existe
+    const personalizacionField = document.getElementById('personalizacion');
+    const personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
+    
+    agregarAlCarrito({{ producto.id }}, nombreProducto, parseFloat(precioActual), cantidad, personalizacion);
 }
 
 // Función para ir a un slide específico

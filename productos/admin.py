@@ -20,11 +20,24 @@ class OpcionProductoInline(admin.TabularInline):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'categoria', 'precio', 'stock', 'activo', 'fecha_creacion']
-    list_filter = ['categoria', 'activo', 'fecha_creacion']
+    list_display = ['nombre', 'categoria', 'precio', 'stock', 'permite_personalizacion', 'activo', 'fecha_creacion']
+    list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion']
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
     inlines = [ImagenProductoInline, OpcionProductoInline]
+    
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('nombre', 'descripcion', 'precio', 'categoria', 'stock', 'activo')
+        }),
+        ('Imágenes', {
+            'fields': ('imagen', 'imagen_url')
+        }),
+        ('Personalización', {
+            'fields': ('permite_personalizacion', 'texto_personalizacion', 'placeholder_personalizacion'),
+            'description': 'Configura si este producto permite personalización y qué texto mostrar al cliente.'
+        }),
+    )
 
 @admin.register(Slide)
 class SlideAdmin(admin.ModelAdmin):

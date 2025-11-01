@@ -102,6 +102,7 @@ function mostrarCarrito() {
                     <div class="row align-items-center">
                         <div class="col-md-4">
                             <h6 class="mb-0">${item.nombre}</h6>
+                            ${item.personalizacion ? `<small class="text-muted"><strong>Personalización:</strong> ${item.personalizacion}</small>` : ''}
                         </div>
                         <div class="col-md-2">$${item.precio}</div>
                         <div class="col-md-3">
