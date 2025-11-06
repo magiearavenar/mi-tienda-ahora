@@ -23,4 +23,5 @@ urlpatterns = [
     path('pago/exitoso/', views.pago_exitoso, name='pago_exitoso'),
     path('pago/fallido/', views.pago_fallido, name='pago_fallido'),
     path('pago/pendiente/', views.pago_pendiente, name='pago_pendiente'),
+    path('debug/config/', views.debug_config, name='debug_config'),
 ]

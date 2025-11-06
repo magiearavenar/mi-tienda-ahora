@@ -289,3 +289,16 @@ def pago_fallido(request):
 def pago_pendiente(request):
     return render(request, 'pago_pendiente.html')
 
+def debug_config(request):
+    if not request.user.is_staff:
+        return JsonResponse({'error': 'No autorizado'}, status=403)
+    
+    config = {
+        'FLOW_API_KEY': bool(getattr(settings, 'FLOW_API_KEY', '')),
+        'FLOW_SECRET_KEY': bool(getattr(settings, 'FLOW_SECRET_KEY', '')),
+        'MERCADOPAGO_ACCESS_TOKEN': bool(getattr(settings, 'MERCADOPAGO_ACCESS_TOKEN', '')),
+        'SITE_URL': getattr(settings, 'SITE_URL', 'No configurado'),
+        'DEBUG': settings.DEBUG
+    }
+    return JsonResponse(config)
+

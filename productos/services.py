@@ -12,7 +12,7 @@ class FlowService:
         self.sandbox = getattr(settings, 'FLOW_SANDBOX', True)
         self.base_url = "https://sandbox.flow.cl/api" if self.sandbox else "https://www.flow.cl/api"
         
-        if not self.api_key or not self.secret_key:
+        if not self.api_key or not self.secret_key or self.secret_key.startswith('tu_flow'):
             raise ValueError("Flow credentials not configured")
     
     def crear_pago(self, pedido, email):
@@ -77,7 +77,7 @@ class MercadoPagoService:
         self.access_token = getattr(settings, 'MERCADOPAGO_ACCESS_TOKEN', '')
         self.sandbox = getattr(settings, 'MERCADOPAGO_SANDBOX', True)
         
-        if not self.access_token:
+        if not self.access_token or self.access_token.startswith('tu_mercadopago'):
             raise ValueError("MercadoPago credentials not configured")
             
         self.sdk = mercadopago.SDK(self.access_token)
@@ -101,9 +101,9 @@ class MercadoPagoService:
                     "failure": settings.SITE_URL + reverse('pago_fallido'),
                     "pending": settings.SITE_URL + reverse('pago_pendiente')
                 },
-                "auto_return": "approved",
+
                 "external_reference": f"ORD-{pedido.id}",
-                "notification_url": settings.SITE_URL + reverse('mercadopago_webhook')
+
             }
             
             preference_response = self.sdk.preference().create(preference_data)
