@@ -175,7 +175,7 @@ LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Configuración de pagos
+# Configuración de pagos - Producción
 FLOW_API_KEY = os.environ.get('FLOW_API_KEY', '')
 FLOW_SECRET_KEY = os.environ.get('FLOW_SECRET_KEY', '')
 FLOW_SANDBOX = os.environ.get('FLOW_SANDBOX', 'True').lower() == 'true'
