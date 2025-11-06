@@ -7,8 +7,46 @@
 {% endblock %}
 
 {% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <form method="get" action="{% url 'buscar' %}">
+            <div class="input-group">
+                <input type="text" class="form-control" name="q" placeholder="Buscar productos..." value="{{ query }}">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-6">
+        <form method="get" action="{% url 'buscar' %}">
+            <div class="input-group">
+                <input type="text" class="form-control" name="tag" placeholder="Buscar por tag..." value="{{ tag_query }}">
+                <button class="btn btn-outline-primary" type="submit">
+                    <i class="fas fa-tag"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if tags %}
+<div class="mb-4">
+    <h6>Tags disponibles:</h6>
+    <div class="d-flex flex-wrap gap-2">
+        {% for tag in tags %}
+            <a href="{% url 'productos_tag' tag.nombre %}" class="badge text-decoration-none" style="background-color: {{ tag.color }}; color: white;">
+                <i class="fas fa-tag me-1"></i>{{ tag.nombre }}
+            </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
 {% if query %}
     <h4 class="mb-4">Resultados para: "{{ query }}"</h4>
+{% elif tag_query %}
+    <h4 class="mb-4">Productos con tag: "{{ tag_query }}"</h4>
     
     {% if productos %}
         <p class="text-muted">{{ productos|length }} producto{{ productos|length|pluralize }} encontrado{{ productos|length|pluralize }}</p>

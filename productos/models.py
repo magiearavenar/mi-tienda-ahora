@@ -1,12 +1,29 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-class Categoria(models.Model):
-    nombre = models.CharField(max_length=100)
-    descripcion = models.TextField(blank=True)
+class Tag(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    color = models.CharField(max_length=7, default='#6c757d', help_text='Color del tag en formato hex')
+    activo = models.BooleanField(default=True)
     
     def __str__(self):
         return self.nombre
+    
+    class Meta:
+        verbose_name_plural = "Tags"
+        ordering = ['nombre']
+
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, help_text='Tags asociados a esta categoría')
+    visible_navegacion = models.BooleanField(default=True, help_text='¿Mostrar en el menú de navegación?')
+    
+    def __str__(self):
+        return self.nombre
+    
+    def get_tags_display(self):
+        return ' > '.join([tag.nombre for tag in self.tags.filter(activo=True)])
     
     class Meta:
         verbose_name_plural = "Categorías"
@@ -15,7 +32,8 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    tags_adicionales = models.ManyToManyField(Tag, blank=True, help_text='Tags adicionales para este producto')
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
     imagen_url = models.URLField(blank=True, null=True, help_text='URL externa de la imagen')
     stock = models.IntegerField(default=0)
@@ -103,7 +121,7 @@ class ConfiguracionSitio(models.Model):
         verbose_name_plural = "Configuración del Sitio"
 
 class SeccionCategoria(models.Model):
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
     orden = models.IntegerField(default=1, help_text='Orden de aparición (1, 2, 3)')
     activo = models.BooleanField(default=True)
     

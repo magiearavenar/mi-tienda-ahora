@@ -1,12 +1,22 @@
 from django.contrib import admin
 from django import forms
-from .models import Producto, Categoria, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto
 from .widgets import ColorPickerWidget
+
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'color', 'activo']
+    list_editable = ['color', 'activo']
+    search_fields = ['nombre']
+    list_filter = ['activo']
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'descripcion']
+    list_display = ['nombre', 'descripcion', 'visible_navegacion']
+    list_editable = ['visible_navegacion']
     search_fields = ['nombre']
+    list_filter = ['visible_navegacion']
+    filter_horizontal = ['tags']
 
 class ImagenProductoInline(admin.TabularInline):
     model = ImagenProducto
@@ -21,14 +31,15 @@ class OpcionProductoInline(admin.TabularInline):
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
     list_display = ['nombre', 'categoria', 'precio', 'stock', 'permite_personalizacion', 'activo', 'fecha_creacion']
-    list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion']
+    list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion', 'tags_adicionales']
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
     inlines = [ImagenProductoInline, OpcionProductoInline]
+    filter_horizontal = ['tags_adicionales']
     
     fieldsets = (
         ('Información Básica', {
-            'fields': ('nombre', 'descripcion', 'precio', 'categoria', 'stock', 'activo')
+            'fields': ('nombre', 'descripcion', 'precio', 'categoria', 'tags_adicionales', 'stock', 'activo')
         }),
         ('Imágenes', {
             'fields': ('imagen', 'imagen_url')
@@ -77,7 +88,7 @@ class ConfiguracionSitioAdmin(admin.ModelAdmin):
         return not ConfiguracionSitio.objects.exists()
     
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
 class BannerFidelizacionForm(forms.ModelForm):
     class Meta:
@@ -131,7 +142,7 @@ class FooterConfigAdmin(admin.ModelAdmin):
         return not FooterConfig.objects.exists()
     
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
 @admin.register(SobreMi)
 class SobreMiAdmin(admin.ModelAdmin):
@@ -142,7 +153,7 @@ class SobreMiAdmin(admin.ModelAdmin):
         return not SobreMi.objects.exists()
     
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
 @admin.register(Contacto)
 class ContactoAdmin(admin.ModelAdmin):
@@ -153,7 +164,7 @@ class ContactoAdmin(admin.ModelAdmin):
         return not Contacto.objects.exists()
     
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
 @admin.register(Informacion)
 class InformacionAdmin(admin.ModelAdmin):
@@ -170,7 +181,7 @@ class SuscripcionAdmin(admin.ModelAdmin):
         return not Suscripcion.objects.exists()
     
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True
 
 @admin.register(RedSocial)
 class RedSocialAdmin(admin.ModelAdmin):

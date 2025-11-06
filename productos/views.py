@@ -5,11 +5,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
-from .models import Producto, Categoria, Pedido, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
+from .models import Producto, Categoria, Tag, Pedido, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
 
 def home(request):
     productos = Producto.objects.filter(activo=True).order_by('-fecha_creacion')[:8]
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.filter(visible_navegacion=True)
     slides = Slide.objects.filter(activo=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
@@ -40,7 +40,7 @@ def home(request):
 def productos_por_categoria(request, categoria_id):
     categoria = get_object_or_404(Categoria, id=categoria_id)
     productos = Producto.objects.filter(categoria=categoria, activo=True)
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.filter(visible_navegacion=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
     return render(request, 'productos.html', {
@@ -53,7 +53,7 @@ def productos_por_categoria(request, categoria_id):
 
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id, activo=True)
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.filter(visible_navegacion=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     return render(request, 'detalle_producto.html', {'producto': producto, 'categorias': categorias, 'config': config})
 
@@ -85,8 +85,10 @@ def detalle_pedido(request, pedido_id):
 
 def buscar(request):
     query = request.GET.get('q', '')
+    tag_query = request.GET.get('tag', '')
     productos = []
-    categorias = Categoria.objects.all()
+    categorias = Categoria.objects.filter(visible_navegacion=True)
+    tags = Tag.objects.filter(activo=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
     
@@ -95,10 +97,34 @@ def buscar(request):
             nombre__icontains=query,
             activo=True
         )
+    elif tag_query:
+        productos = Producto.objects.filter(
+            tags_adicionales__nombre__icontains=tag_query,
+            activo=True
+        ).distinct()
     
     return render(request, 'buscar.html', {
         'productos': productos,
         'query': query,
+        'tag_query': tag_query,
+        'categorias': categorias,
+        'tags': tags,
+        'config': config,
+        'banners': banners
+    })
+
+def productos_por_tag(request, tag_nombre):
+    tag = get_object_or_404(Tag, nombre=tag_nombre, activo=True)
+    productos = Producto.objects.filter(
+        tags_adicionales=tag,
+        activo=True
+    ).distinct()
+    categorias = Categoria.objects.filter(visible_navegacion=True)
+    config = ConfiguracionSitio.objects.filter(activo=True).first()
+    banners = BannerFidelizacion.objects.filter(activo=True)
+    return render(request, 'productos.html', {
+        'productos': productos,
+        'tag': tag,
         'categorias': categorias,
         'config': config,
         'banners': banners

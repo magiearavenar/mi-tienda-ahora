@@ -248,16 +248,32 @@
                 {% for categoria in categorias %}
                     {% if categoria.producto_set.exists %}
                         <div class="dropdown">
-                            <a href="{% url 'productos_categoria' categoria.id %}" class="category-link has-dropdown">{{ categoria.nombre }}</a>
+                            <a href="{% url 'productos_categoria' categoria.id %}" class="category-link has-dropdown">
+                                {{ categoria.nombre }}
+                                {% if categoria.get_tags_display %}
+                                    <small class="text-muted ms-1">({{ categoria.get_tags_display }})</small>
+                                {% endif %}
+                            </a>
                             <div class="dropdown-content">
                                 <a href="{% url 'productos_categoria' categoria.id %}">Ver todos en {{ categoria.nombre }}</a>
-                                {% for producto in categoria.producto_set.all|slice:":5" %}
+                                {% for tag in categoria.tags.all %}
+                                    <a href="{% url 'productos_tag' tag.nombre %}" style="color: {{ tag.color }}; font-weight: 500;">
+                                        <i class="fas fa-tag me-1"></i>{{ tag.nombre }}
+                                    </a>
+                                {% endfor %}
+                                <hr class="my-1">
+                                {% for producto in categoria.producto_set.all|slice:":3" %}
                                     <a href="{% url 'detalle_producto' producto.id %}">{{ producto.nombre }}</a>
                                 {% endfor %}
                             </div>
                         </div>
                     {% else %}
-                        <a href="{% url 'productos_categoria' categoria.id %}" class="category-link">{{ categoria.nombre }}</a>
+                        <a href="{% url 'productos_categoria' categoria.id %}" class="category-link">
+                            {{ categoria.nombre }}
+                            {% if categoria.get_tags_display %}
+                                <small class="text-muted ms-1">({{ categoria.get_tags_display }})</small>
+                            {% endif %}
+                        </a>
                     {% endif %}
                 {% endfor %}
                 {% block categories %}{% endblock %}
