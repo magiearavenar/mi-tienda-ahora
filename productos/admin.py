@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido
 from .widgets import ColorPickerWidget
 
 @admin.register(Tag)
@@ -200,3 +200,23 @@ class SeccionCategoriaAdmin(admin.ModelAdmin):
     list_editable = ['orden', 'activo']
     list_filter = ['activo']
     ordering = ['orden']
+
+class DetallePedidoInline(admin.TabularInline):
+    model = DetallePedido
+    extra = 0
+    readonly_fields = ['producto', 'cantidad', 'precio', 'personalizacion']
+
+@admin.register(Pedido)
+class PedidoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'usuario', 'total', 'estado', 'fecha']
+    list_filter = ['estado', 'fecha']
+    search_fields = ['id', 'usuario__username']
+    readonly_fields = ['fecha']
+    inlines = [DetallePedidoInline]
+
+@admin.register(Pago)
+class PagoAdmin(admin.ModelAdmin):
+    list_display = ['id', 'pedido', 'metodo', 'estado', 'monto', 'fecha_creacion']
+    list_filter = ['metodo', 'estado', 'fecha_creacion']
+    search_fields = ['pedido__id', 'token_pago', 'id_transaccion']
+    readonly_fields = ['fecha_creacion', 'fecha_pago', 'datos_respuesta']

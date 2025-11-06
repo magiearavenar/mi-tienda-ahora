@@ -15,4 +15,12 @@ urlpatterns = [
     path('buscar/', views.buscar, name='buscar'),
     path('tag/<str:tag_nombre>/', views.productos_por_tag, name='productos_tag'),
     path('checkout/', views.checkout, name='checkout'),
+    
+    # Pagos
+    path('procesar-pago/', views.procesar_pago, name='procesar_pago'),
+    path('flow/confirmar/', views.flow_confirmar, name='flow_confirmar'),
+    path('mercadopago/webhook/', views.mercadopago_webhook, name='mercadopago_webhook'),
+    path('pago/exitoso/', views.pago_exitoso, name='pago_exitoso'),
+    path('pago/fallido/', views.pago_fallido, name='pago_fallido'),
+    path('pago/pendiente/', views.pago_pendiente, name='pago_pendiente'),
 ]

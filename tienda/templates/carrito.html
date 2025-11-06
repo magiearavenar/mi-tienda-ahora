@@ -72,6 +72,21 @@
                     <span class="h5">TOTAL:</span>
                     <span class="h5 text-primary">$<span id="total">0</span></span>
                 </div>
+                <div class="mb-3">
+                    <label class="form-label">Método de Pago:</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="metodoPago" id="flow" value="flow" checked>
+                        <label class="form-check-label" for="flow">
+                            <i class="fas fa-credit-card me-2"></i>Flow (Chile)
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="metodoPago" id="mercadopago" value="mercadopago">
+                        <label class="form-check-label" for="mercadopago">
+                            <i class="fab fa-cc-mastercard me-2"></i>MercadoPago
+                        </label>
+                    </div>
+                </div>
                 <div class="d-grid gap-2">
                     <button class="btn btn-primary btn-lg" onclick="procederPago()">PROCEDER AL PAGO</button>
                     <button class="btn btn-outline-danger" onclick="vaciarCarrito()">VACIAR CARRITO</button>
@@ -185,14 +200,81 @@ function procederPago() {
         return;
     }
     
-    // Guardar datos de envío
-    const datosEnvio = {
-        nombre, apellido, rut, direccion, comuna, pais
-    };
-    localStorage.setItem('datosEnvio', JSON.stringify(datosEnvio));
+    // Obtener método de pago
+    const metodoPago = document.querySelector('input[name="metodoPago"]:checked')?.value;
+    if (!metodoPago) {
+        Swal.fire({
+            title: 'Método de pago',
+            text: 'Selecciona un método de pago',
+            icon: 'error',
+            confirmButtonColor: '#ffc1ea'
+        });
+        return;
+    }
     
-    // Ir a checkout
-    window.location.href = '/checkout/';
+    // Preparar datos
+    const datosEnvio = {
+        nombre, apellido, rut, direccion, comuna, pais,
+        email: `${nombre.toLowerCase()}@correo.cl` // Email temporal
+    };
+    
+    // Mostrar loading
+    Swal.fire({
+        title: 'Procesando pago...',
+        text: 'Por favor espera',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+    
+    // Enviar al backend
+    fetch('/procesar-pago/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            carrito: carrito,
+            datosEnvio: datosEnvio,
+            metodoPago: metodoPago
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.url) {
+            // Limpiar carrito y redirigir
+            localStorage.removeItem('carrito');
+            window.location.href = data.url;
+        } else {
+            throw new Error(data.error || 'Error al procesar el pago');
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonColor: '#ffc1ea'
+        });
+    });
+}
+
+// Función para obtener cookie CSRF
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 
 document.addEventListener('DOMContentLoaded', mostrarCarrito);

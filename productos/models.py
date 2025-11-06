@@ -89,6 +89,35 @@ class DetallePedido(models.Model):
     def __str__(self):
         return f"{self.producto.nombre} x{self.cantidad}"
 
+class Pago(models.Model):
+    METODOS_PAGO = [
+        ('flow', 'Flow'),
+        ('mercadopago', 'MercadoPago'),
+    ]
+    
+    ESTADOS_PAGO = [
+        ('pendiente', 'Pendiente'),
+        ('pagado', 'Pagado'),
+        ('fallido', 'Fallido'),
+        ('cancelado', 'Cancelado'),
+    ]
+    
+    pedido = models.OneToOneField(Pedido, on_delete=models.CASCADE, related_name='pago')
+    metodo = models.CharField(max_length=20, choices=METODOS_PAGO)
+    estado = models.CharField(max_length=20, choices=ESTADOS_PAGO, default='pendiente')
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    token_pago = models.CharField(max_length=200, blank=True)
+    id_transaccion = models.CharField(max_length=200, blank=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_pago = models.DateTimeField(null=True, blank=True)
+    datos_respuesta = models.JSONField(blank=True, null=True)
+    
+    def __str__(self):
+        return f"Pago {self.id} - {self.pedido} - {self.estado}"
+    
+    class Meta:
+        ordering = ['-fecha_creacion']
+
 class Slide(models.Model):
     titulo = models.CharField(max_length=200, blank=True)
     imagen = models.ImageField(upload_to='slides/')

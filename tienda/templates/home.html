@@ -111,36 +111,311 @@
 </div>
 
 {% for seccion_data in secciones_categorias %}
-<div class="mb-5">
-    <h4 class="mb-4">{{ seccion_data.seccion.categoria.nombre|upper }}</h4>
-    <div class="row g-3">
-        {% for producto in seccion_data.productos %}
-        <div class="col-lg-2 col-md-3 col-sm-4 col-6">
-            <div class="card product-card h-100">
-                <div class="product-image">
-                    {% if producto.imagen_principal %}
-                    <a href="{% url 'detalle_producto' producto.id %}">
-                        <img src="{{ producto.imagen_principal.url }}" style="cursor: pointer;">
-                    </a>
-                    {% else %}
-                    <div class="d-flex align-items-center justify-content-center bg-light h-100">
-                        <i class="fas fa-image fa-2x text-muted"></i>
+<div class="category-section mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="category-title">{{ seccion_data.seccion.categoria.nombre|upper }}</h4>
+        <a href="{% url 'productos_categoria' seccion_data.seccion.categoria.id %}" class="ver-mas-link">Ver más productos →</a>
+    </div>
+    
+    <div class="position-relative">
+        <div class="carousel-container" id="carousel-{{ seccion_data.seccion.categoria.id }}">
+            <div class="carousel-track">
+                {% for producto in seccion_data.productos %}
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            {% if producto.imagen_principal %}
+                            <a href="{% url 'detalle_producto' producto.id %}">
+                                <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}">
+                            </a>
+                            {% else %}
+                            <div class="no-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">{{ producto.nombre }}</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">${{ producto.precio|floatformat:0 }}</p>
+                                <button class="add-to-cart-btn" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})" title="Agregar al carrito">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    {% endif %}
                 </div>
-                <div class="card-body d-flex flex-column p-2">
-                    <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
-                        <h6 class="card-title small">{{ producto.nombre }}</h6>
-                    </a>
-                    <p class="h6 text-primary mb-2">${{ producto.precio|floatformat:0 }}{% if producto.opciones.all %}<small class="text-muted"> +</small>{% endif %}</p>
-                    <button class="btn btn-primary btn-sm mt-auto" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
-                        Agregar
-                    </button>
-                </div>
+                {% endfor %}
             </div>
         </div>
-        {% endfor %}
+        
+        <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', -1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', 1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <div class="carousel-dots" id="dots-{{ seccion_data.seccion.categoria.id }}">
+            {% for i in "12345" %}
+            <span class="dot {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-{{ seccion_data.seccion.categoria.id }}', {{ forloop.counter }})"></span>
+            {% endfor %}
+        </div>
     </div>
 </div>
 {% endfor %}
+
+<style>
+.category-section {
+    margin-bottom: 3rem;
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 8px;
+    display: inline-block;
+}
+
+.ver-mas-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.ver-mas-link:hover {
+    color: #007bff;
+}
+
+.carousel-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.3s ease;
+    gap: 1rem;
+}
+
+.carousel-item-custom {
+    flex: 0 0 calc(25% - 0.75rem);
+    min-width: 250px;
+}
+
+.product-card-carousel {
+    background: var(--color-cards);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+.product-card-carousel:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.product-image-carousel {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    background: #f8f9fa;
+    aspect-ratio: 1;
+    border-radius: 20px 20px 0 0;
+}
+
+.product-image-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #ccc;
+    font-size: 2rem;
+}
+
+.product-info-carousel {
+    padding: 1rem;
+    text-align: center;
+}
+
+.product-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    color: #333;
+    line-height: 1.3;
+}
+
+.product-price-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.product-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin: 0;
+}
+
+.add-to-cart-btn {
+    background: var(--color-primario);
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.add-to-cart-btn:hover {
+    background: var(--color-hover);
+    transform: scale(1.1);
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.carousel-btn:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.carousel-prev {
+    left: -20px;
+}
+
+.carousel-next {
+    right: -20px;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 1rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.dot.active {
+    background: #333;
+}
+
+@media (max-width: 768px) {
+    .carousel-item-custom {
+        flex: 0 0 calc(50% - 0.5rem);
+        min-width: 180px;
+    }
+    
+    .category-title {
+        font-size: 1.2rem;
+    }
+    
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-item-custom {
+        flex: 0 0 calc(100% - 0.5rem);
+        min-width: 200px;
+    }
+}
+</style>
+
+<script>
+let carouselPositions = {};
+
+function moveCarousel(carouselId, direction) {
+    const container = document.getElementById(carouselId);
+    const track = container.querySelector('.carousel-track');
+    const items = track.querySelectorAll('.carousel-item-custom');
+    const itemWidth = items[0].offsetWidth + 16; // width + gap
+    const visibleItems = Math.floor(container.offsetWidth / itemWidth);
+    const maxPosition = Math.max(0, items.length - visibleItems);
+    
+    if (!carouselPositions[carouselId]) {
+        carouselPositions[carouselId] = 0;
+    }
+    
+    carouselPositions[carouselId] += direction;
+    
+    if (carouselPositions[carouselId] < 0) {
+        carouselPositions[carouselId] = 0;
+    }
+    if (carouselPositions[carouselId] > maxPosition) {
+        carouselPositions[carouselId] = maxPosition;
+    }
+    
+    const translateX = -carouselPositions[carouselId] * itemWidth;
+    track.style.transform = `translateX(${translateX}px)`;
+    
+    updateDots(carouselId);
+}
+
+function currentSlide(carouselId, slideIndex) {
+    const container = document.getElementById(carouselId);
+    const track = container.querySelector('.carousel-track');
+    const items = track.querySelectorAll('.carousel-item-custom');
+    const itemWidth = items[0].offsetWidth + 16;
+    
+    carouselPositions[carouselId] = slideIndex - 1;
+    const translateX = -carouselPositions[carouselId] * itemWidth;
+    track.style.transform = `translateX(${translateX}px)`;
+    
+    updateDots(carouselId);
+}
+
+function updateDots(carouselId) {
+    const dotsContainer = document.getElementById('dots-' + carouselId.replace('carousel-', ''));
+    const dots = dotsContainer.querySelectorAll('.dot');
+    
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === carouselPositions[carouselId]);
+    });
+}
+</script>
 {% endblock %}

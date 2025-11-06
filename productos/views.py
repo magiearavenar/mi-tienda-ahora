@@ -5,7 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.models import User
-from .models import Producto, Categoria, Tag, Pedido, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+from django.utils import timezone
+import json
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
+from .services import FlowService, MercadoPagoService
 
 def home(request):
     productos = Producto.objects.filter(activo=True).order_by('-fecha_creacion')[:8]
@@ -133,4 +138,133 @@ def productos_por_tag(request, tag_nombre):
 def checkout(request):
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     return render(request, 'checkout.html', {'config': config})
+
+@require_POST
+def procesar_pago(request):
+    try:
+        data = json.loads(request.body)
+        carrito = data.get('carrito', [])
+        datos_envio = data.get('datosEnvio', {})
+        metodo_pago = data.get('metodoPago')
+        email = datos_envio.get('email', '')
+        
+        if not carrito or not metodo_pago:
+            return JsonResponse({'error': 'Datos incompletos'}, status=400)
+        
+        # Crear pedido
+        total = sum(item['precio'] * item['cantidad'] for item in carrito)
+        pedido = Pedido.objects.create(
+            usuario=request.user if request.user.is_authenticated else None,
+            total=total,
+            estado='pendiente'
+        )
+        
+        # Crear detalles del pedido
+        for item in carrito:
+            producto = Producto.objects.get(id=item['id'])
+            DetallePedido.objects.create(
+                pedido=pedido,
+                producto=producto,
+                cantidad=item['cantidad'],
+                precio=item['precio'],
+                personalizacion=item.get('personalizacion', '')
+            )
+        
+        # Procesar pago según método
+        if metodo_pago == 'flow':
+            flow_service = FlowService()
+            url_pago = flow_service.crear_pago(pedido, email)
+            if url_pago:
+                return JsonResponse({'url': url_pago})
+        elif metodo_pago == 'mercadopago':
+            mp_service = MercadoPagoService()
+            url_pago = mp_service.crear_pago(pedido, email)
+            if url_pago:
+                return JsonResponse({'url': url_pago})
+        
+        return JsonResponse({'error': 'Error al procesar el pago'}, status=500)
+        
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+@require_POST
+def flow_confirmar(request):
+    token = request.POST.get('token')
+    
+    if token:
+        flow_service = FlowService()
+        resultado = flow_service.verificar_pago(token)
+        
+        if resultado and resultado.get('status') == 2:  # Pagado
+            try:
+                pago = Pago.objects.get(token_pago=token)
+                pago.estado = 'pagado'
+                pago.fecha_pago = timezone.now()
+                pago.datos_respuesta = resultado
+                pago.save()
+                
+                pago.pedido.estado = 'procesando'
+                pago.pedido.save()
+                
+                return HttpResponse('OK')
+            except Pago.DoesNotExist:
+                pass
+    
+    return HttpResponse('ERROR', status=400)
+
+@csrf_exempt
+@require_POST
+def mercadopago_webhook(request):
+    try:
+        data = json.loads(request.body)
+        
+        if data.get('type') == 'payment':
+            payment_id = data['data']['id']
+            
+            mp_service = MercadoPagoService()
+            payment_info = mp_service.verificar_pago(payment_id)
+            
+            if payment_info and payment_info.get('status') == 'approved':
+                external_reference = payment_info.get('external_reference')
+                if external_reference:
+                    pedido_id = external_reference.replace('ORD-', '')
+                    try:
+                        pedido = Pedido.objects.get(id=pedido_id)
+                        pago, created = Pago.objects.get_or_create(
+                            pedido=pedido,
+                            defaults={
+                                'metodo': 'mercadopago',
+                                'monto': pedido.total,
+                                'estado': 'pagado',
+                                'fecha_pago': timezone.now(),
+                                'id_transaccion': str(payment_id),
+                                'datos_respuesta': payment_info
+                            }
+                        )
+                        
+                        if not created:
+                            pago.estado = 'pagado'
+                            pago.fecha_pago = timezone.now()
+                            pago.datos_respuesta = payment_info
+                            pago.save()
+                        
+                        pedido.estado = 'procesando'
+                        pedido.save()
+                        
+                    except Pedido.DoesNotExist:
+                        pass
+        
+        return HttpResponse('OK')
+    except Exception as e:
+        return HttpResponse('ERROR', status=400)
+
+def pago_exitoso(request):
+    return render(request, 'pago_exitoso.html')
+
+def pago_fallido(request):
+    return render(request, 'pago_fallido.html')
+
+def pago_pendiente(request):
+    return render(request, 'pago_pendiente.html')
 
