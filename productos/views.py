@@ -201,6 +201,9 @@ def procesar_pago(request):
             else:
                 return JsonResponse({'error': 'Método de pago no válido'}, status=400)
         except Exception as payment_error:
+            # Si Flow falla, sugerir MercadoPago
+            if metodo_pago == 'flow':
+                return JsonResponse({'error': 'Flow temporalmente no disponible. Por favor usa MercadoPago.'}, status=500)
             return JsonResponse({'error': f'Error en pasarela: {str(payment_error)}'}, status=500)
         
     except json.JSONDecodeError:

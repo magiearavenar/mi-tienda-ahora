@@ -29,8 +29,8 @@ class FlowService:
                 "urlReturn": settings.SITE_URL + reverse('pago_exitoso'),
             }
             
-            # Crear firma
-            cadena = "|".join([str(params[k]) for k in sorted(params)])
+            # Crear firma - Flow requiere orden específico
+            cadena = f"{params['apiKey']}|{params['commerceOrder']}|{params['subject']}|{params['amount']}|{params['email']}|{params['urlConfirmation']}|{params['urlReturn']}"
             params["s"] = hashlib.sha256((cadena + self.secret_key).encode()).hexdigest()
             
             response = requests.post(url, data=params, timeout=30)
@@ -62,7 +62,7 @@ class FlowService:
             "token": token
         }
         
-        cadena = "|".join([str(params[k]) for k in sorted(params)])
+        cadena = f"{params['apiKey']}|{params['token']}"
         params["s"] = hashlib.sha256((cadena + self.secret_key).encode()).hexdigest()
         
         response = requests.post(url, data=params)
