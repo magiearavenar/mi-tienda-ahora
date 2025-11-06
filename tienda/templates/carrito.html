@@ -32,29 +32,37 @@
                         <input type="text" class="form-control" id="direccion" required>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">REGIÓN</label>
+                            <select class="form-control" id="region" required onchange="cargarComunas()">
+                                <option value="">Seleccionar región</option>
+                                <option value="Metropolitana">Región Metropolitana</option>
+                                <option value="Valparaíso">Región de Valparaíso</option>
+                                <option value="Biobío">Región del Biobío</option>
+                                <option value="Araucanía">Región de La Araucanía</option>
+                                <option value="Los Lagos">Región de Los Lagos</option>
+                                <option value="Antofagasta">Región de Antofagasta</option>
+                                <option value="Coquimbo">Región de Coquimbo</option>
+                                <option value="O'Higgins">Región del Libertador General Bernardo O'Higgins</option>
+                                <option value="Maule">Región del Maule</option>
+                                <option value="Los Ríos">Región de Los Ríos</option>
+                                <option value="Tarapacá">Región de Tarapacá</option>
+                                <option value="Arica y Parinacota">Región de Arica y Parinacota</option>
+                                <option value="Atacama">Región de Atacama</option>
+                                <option value="Aysén">Región Aysén del General Carlos Ibáñez del Campo</option>
+                                <option value="Magallanes">Región de Magallanes y de la Antártica Chilena</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">COMUNA</label>
                             <select class="form-control" id="comuna" required>
                                 <option value="">Seleccionar comuna</option>
-                                <option value="Santiago">Santiago</option>
-                                <option value="Las Condes">Las Condes</option>
-                                <option value="Providencia">Providencia</option>
-                                <option value="Ñuñoa">Ñuñoa</option>
-                                <option value="La Reina">La Reina</option>
-                                <option value="Vitacura">Vitacura</option>
-                                <option value="Lo Barnechea">Lo Barnechea</option>
-                                <option value="Maipú">Maipú</option>
-                                <option value="Puente Alto">Puente Alto</option>
-                                <option value="La Florida">La Florida</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label">PAÍS</label>
                             <select class="form-control" id="pais" required>
-                                <option value="Chile">Chile</option>
-                                <option value="Argentina">Argentina</option>
-                                <option value="Perú">Perú</option>
-                                <option value="Bolivia">Bolivia</option>
+                                <option value="Chile" selected>Chile</option>
                             </select>
                         </div>
                     </div>
@@ -187,10 +195,11 @@ function procederPago() {
     const apellido = document.getElementById('apellido')?.value;
     const rut = document.getElementById('rut')?.value;
     const direccion = document.getElementById('direccion')?.value;
+    const region = document.getElementById('region')?.value;
     const comuna = document.getElementById('comuna')?.value;
     const pais = document.getElementById('pais')?.value;
     
-    if (!nombre || !apellido || !rut || !direccion || !comuna || !pais) {
+    if (!nombre || !apellido || !rut || !direccion || !region || !comuna || !pais) {
         Swal.fire({
             title: 'Datos incompletos',
             text: 'Por favor completa todos los datos de envío',
@@ -214,7 +223,7 @@ function procederPago() {
     
     // Preparar datos
     const datosEnvio = {
-        nombre, apellido, rut, direccion, comuna, pais,
+        nombre, apellido, rut, direccion, region, comuna, pais,
         email: `${nombre.toLowerCase()}@correo.cl` // Email temporal
     };
     
@@ -283,6 +292,42 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// Función para cargar comunas según región
+function cargarComunas() {
+    const region = document.getElementById('region').value;
+    const comunaSelect = document.getElementById('comuna');
+    
+    // Limpiar comunas
+    comunaSelect.innerHTML = '<option value="">Seleccionar comuna</option>';
+    
+    const comunasPorRegion = {
+        'Metropolitana': ['Santiago', 'Las Condes', 'Providencia', 'Ñuñoa', 'La Reina', 'Vitacura', 'Lo Barnechea', 'Maipú', 'Puente Alto', 'La Florida', 'San Miguel', 'La Cisterna', 'El Bosque', 'Pedro Aguirre Cerda', 'Lo Espejo', 'Cerrillos', 'Estación Central', 'Quinta Normal', 'Renca', 'Conchalí', 'Huechuraba', 'Quilicura', 'Pudahuel', 'Lo Prado', 'Cerro Navia', 'Peñalolén', 'Macul', 'San Joaquín', 'La Granja', 'San Ramón', 'La Pintana', 'El Bosque'],
+        'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Concón', 'Quilpué', 'Villa Alemana', 'Casablanca', 'San Antonio', 'Cartagena', 'El Quisco', 'Algarrobo'],
+        'Biobío': ['Concepción', 'Talcahuano', 'Chillán', 'Los Ángeles', 'Coronel', 'San Pedro de la Paz', 'Hualqui', 'Penco', 'Tomé', 'Lota'],
+        'Araucanía': ['Temuco', 'Padre Las Casas', 'Villarrica', 'Pucón', 'Angol', 'Victoria', 'Lautaro', 'Nueva Imperial'],
+        'Los Lagos': ['Puerto Montt', 'Osorno', 'Castro', 'Ancud', 'Puerto Varas', 'Frutillar', 'Llanquihue'],
+        'Antofagasta': ['Antofagasta', 'Calama', 'Tocopilla', 'Mejillones', 'Taltal'],
+        'Coquimbo': ['La Serena', 'Coquimbo', 'Ovalle', 'Illapel', 'Vicuña'],
+        "O'Higgins": ['Rancagua', 'San Fernando', 'Rengo', 'Machalí', 'Graneros'],
+        'Maule': ['Talca', 'Curicó', 'Linares', 'Molina', 'Constitución'],
+        'Los Ríos': ['Valdivia', 'La Unión', 'Río Bueno', 'Panguipulli'],
+        'Tarapacá': ['Iquique', 'Alto Hospicio', 'Pozo Almonte'],
+        'Arica y Parinacota': ['Arica', 'Putre'],
+        'Atacama': ['Copiapó', 'Caldera', 'Vallenar', 'Chañaral'],
+        'Aysén': ['Coyhaique', 'Puerto Aysén', 'Chile Chico'],
+        'Magallanes': ['Punta Arenas', 'Puerto Natales', 'Porvenir']
+    };
+    
+    if (region && comunasPorRegion[region]) {
+        comunasPorRegion[region].forEach(comuna => {
+            const option = document.createElement('option');
+            option.value = comuna;
+            option.textContent = comuna;
+            comunaSelect.appendChild(option);
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', mostrarCarrito);
