@@ -241,7 +241,14 @@ function procederPago() {
             metodoPago: metodoPago
         })
     })
-    .then(response => response.json())
+    .then(response => {
+        // Verificar si la respuesta es JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Respuesta no es JSON válido');
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.url) {
             // Limpiar carrito y redirigir
@@ -252,9 +259,10 @@ function procederPago() {
         }
     })
     .catch(error => {
+        console.error('Error en procesar pago:', error);
         Swal.fire({
             title: 'Error',
-            text: error.message,
+            text: error.message || 'Error al procesar el pago',
             icon: 'error',
             confirmButtonColor: '#ffc1ea'
         });

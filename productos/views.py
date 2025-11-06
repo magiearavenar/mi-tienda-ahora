@@ -139,20 +139,29 @@ def checkout(request):
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     return render(request, 'checkout.html', {'config': config})
 
+@csrf_exempt
 @require_POST
 def procesar_pago(request):
     try:
+        # Verificar que el contenido sea JSON
+        if request.content_type != 'application/json':
+            return JsonResponse({'error': 'Content-Type debe ser application/json'}, status=400)
+            
         data = json.loads(request.body)
         carrito = data.get('carrito', [])
         datos_envio = data.get('datosEnvio', {})
         metodo_pago = data.get('metodoPago')
         email = datos_envio.get('email', '')
         
-        if not carrito or not metodo_pago:
-            return JsonResponse({'error': 'Datos incompletos'}, status=400)
+        if not carrito:
+            return JsonResponse({'error': 'Carrito vacío'}, status=400)
+        if not metodo_pago:
+            return JsonResponse({'error': 'Método de pago no seleccionado'}, status=400)
+        if not email:
+            return JsonResponse({'error': 'Email requerido'}, status=400)
         
         # Crear pedido
-        total = sum(item['precio'] * item['cantidad'] for item in carrito)
+        total = sum(float(item['precio']) * int(item['cantidad']) for item in carrito)
         pedido = Pedido.objects.create(
             usuario=request.user if request.user.is_authenticated else None,
             total=total,
@@ -161,31 +170,43 @@ def procesar_pago(request):
         
         # Crear detalles del pedido
         for item in carrito:
-            producto = Producto.objects.get(id=item['id'])
-            DetallePedido.objects.create(
-                pedido=pedido,
-                producto=producto,
-                cantidad=item['cantidad'],
-                precio=item['precio'],
-                personalizacion=item.get('personalizacion', '')
-            )
+            try:
+                producto = Producto.objects.get(id=item['id'])
+                DetallePedido.objects.create(
+                    pedido=pedido,
+                    producto=producto,
+                    cantidad=int(item['cantidad']),
+                    precio=float(item['precio']),
+                    personalizacion=item.get('personalizacion', '')
+                )
+            except Producto.DoesNotExist:
+                return JsonResponse({'error': f'Producto {item["id"]} no encontrado'}, status=400)
         
         # Procesar pago según método
-        if metodo_pago == 'flow':
-            flow_service = FlowService()
-            url_pago = flow_service.crear_pago(pedido, email)
-            if url_pago:
-                return JsonResponse({'url': url_pago})
-        elif metodo_pago == 'mercadopago':
-            mp_service = MercadoPagoService()
-            url_pago = mp_service.crear_pago(pedido, email)
-            if url_pago:
-                return JsonResponse({'url': url_pago})
+        try:
+            if metodo_pago == 'flow':
+                flow_service = FlowService()
+                url_pago = flow_service.crear_pago(pedido, email)
+                if url_pago:
+                    return JsonResponse({'url': url_pago})
+                else:
+                    return JsonResponse({'error': 'Error al crear pago con Flow'}, status=500)
+            elif metodo_pago == 'mercadopago':
+                mp_service = MercadoPagoService()
+                url_pago = mp_service.crear_pago(pedido, email)
+                if url_pago:
+                    return JsonResponse({'url': url_pago})
+                else:
+                    return JsonResponse({'error': 'Error al crear pago con MercadoPago'}, status=500)
+            else:
+                return JsonResponse({'error': 'Método de pago no válido'}, status=400)
+        except Exception as payment_error:
+            return JsonResponse({'error': f'Error en pasarela: {str(payment_error)}'}, status=500)
         
-        return JsonResponse({'error': 'Error al procesar el pago'}, status=500)
-        
+    except json.JSONDecodeError:
+        return JsonResponse({'error': 'JSON inválido'}, status=400)
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
+        return JsonResponse({'error': f'Error interno: {str(e)}'}, status=500)
 
 @csrf_exempt
 @require_POST
