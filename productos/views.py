@@ -293,15 +293,15 @@ def pago_pendiente(request):
     return render(request, 'pago_pendiente.html')
 
 def debug_config(request):
-    if not request.user.is_staff:
-        return JsonResponse({'error': 'No autorizado'}, status=403)
-    
+    import os
     config = {
-        'FLOW_API_KEY': bool(getattr(settings, 'FLOW_API_KEY', '')),
-        'FLOW_SECRET_KEY': bool(getattr(settings, 'FLOW_SECRET_KEY', '')),
-        'MERCADOPAGO_ACCESS_TOKEN': bool(getattr(settings, 'MERCADOPAGO_ACCESS_TOKEN', '')),
-        'SITE_URL': getattr(settings, 'SITE_URL', 'No configurado'),
-        'DEBUG': settings.DEBUG
+        'FLOW_API_KEY': bool(os.environ.get('FLOW_API_KEY', '')),
+        'FLOW_SECRET_KEY': bool(os.environ.get('FLOW_SECRET_KEY', '')),
+        'MERCADOPAGO_ACCESS_TOKEN': bool(os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')),
+        'MERCADOPAGO_SANDBOX': os.environ.get('MERCADOPAGO_SANDBOX', 'Not set'),
+        'SITE_URL': os.environ.get('SITE_URL', 'Not set'),
+        'DEBUG': os.environ.get('DEBUG', 'Not set'),
+        'RAILWAY_ENVIRONMENT': os.environ.get('RAILWAY_ENVIRONMENT', 'Not set')
     }
     return JsonResponse(config)
 
