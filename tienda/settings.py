@@ -14,6 +14,22 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 # Railway production settings
 if os.environ.get('RAILWAY_ENVIRONMENT'):
     DEBUG = False
+    
+# Logging para debug en producción
+if not DEBUG:
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'console': {
+                'class': 'logging.StreamHandler',
+            },
+        },
+        'root': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    }
 
 ALLOWED_HOSTS = ['*']
 
