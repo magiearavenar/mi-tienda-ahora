@@ -145,6 +145,8 @@
     height: 100%;
     object-fit: cover;
     border-radius: 4px;
+    transition: opacity 0.3s ease;
+    background: #f0f0f0;
 }
 
 .item-name {
@@ -313,14 +315,22 @@ function cargarImagenesCarrito() {
     imagenes.forEach(img => {
         const productId = img.getAttribute('data-product-id');
         fetch(`/obtener-imagen/${productId}/`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Network error');
+                return response.json();
+            })
             .then(data => {
                 if (data.imagen) {
+                    img.onload = function() {
+                        this.style.opacity = '1';
+                    };
+                    img.style.opacity = '0.5';
                     img.src = data.imagen;
                 }
             })
-            .catch(() => {
-                // Mantener placeholder si falla
+            .catch(error => {
+                console.log('Error cargando imagen:', error);
+                img.style.opacity = '1';
             });
     });
 }
