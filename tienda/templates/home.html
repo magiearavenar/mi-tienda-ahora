@@ -71,43 +71,62 @@
 
 <div class="mb-5">
     <h4 class="mb-4">RECIÉN LLEGADOS</h4>
-    <div class="row g-3">
-        {% for producto in productos %}
-        <div class="col-lg-3 col-md-4 col-sm-6">
-            <div class="card product-card h-100">
-                <div class="product-image">
-                    {% if producto.imagen_principal %}
-                    <a href="{% url 'detalle_producto' producto.id %}">
-                        <img src="{{ producto.imagen_principal.url }}" style="cursor: pointer;">
-                    </a>
-                    {% else %}
-                    <div class="d-flex align-items-center justify-content-center bg-light h-100">
-                        <i class="fas fa-image fa-2x text-muted"></i>
+    {% if productos %}
+    <div class="position-relative">
+        <div class="carousel-container" id="carousel-recien-llegados">
+            <div class="carousel-track">
+                {% for producto in productos %}
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            {% if producto.imagen_principal %}
+                            <a href="{% url 'detalle_producto' producto.id %}">
+                                <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}">
+                            </a>
+                            {% else %}
+                            <div class="no-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">{{ producto.nombre }}</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">${{ producto.precio|floatformat:0 }}</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, -1)">-</div>
+                                    <span id="qty-{{ producto.id }}">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    {% endif %}
                 </div>
-                <div class="text-center">
-                    <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
-                        <h6 class="card-title mb-2">{{ producto.nombre }}</h6>
-                    </a>
-                    <p class="h5 text-primary mb-3">${{ producto.precio|floatformat:0 }}{% if producto.opciones.all %}<small class="text-muted"> +</small>{% endif %}</p>
-                    <div class="quantity-controls justify-content-center">
-                        <div class="quantity-btn" onclick="cambiarCantidad({{ producto.id }}, -1)">-</div>
-                        <span id="qty-{{ producto.id }}">1</span>
-                        <div class="quantity-btn" onclick="cambiarCantidad({{ producto.id }}, 1)">+</div>
-                        <button class="cart-btn" onclick="agregarAlCarritoConCantidad({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
-                            <i class="fas fa-shopping-cart"></i>
-                        </button>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
-        {% empty %}
-        <div class="col-12 text-center py-5">
-            <p class="text-muted">No hay productos disponibles</p>
+        
+        <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-recien-llegados', -1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-recien-llegados', 1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <div class="carousel-dots" id="dots-recien-llegados">
+            {% for i in "12" %}
+            <span class="dot {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-recien-llegados', {{ forloop.counter }})"></span>
+            {% endfor %}
         </div>
-        {% endfor %}
     </div>
+    {% else %}
+    <div class="text-center py-5">
+        <p class="text-muted">No hay productos disponibles</p>
+    </div>
+    {% endif %}
 </div>
 
 {% for seccion_data in secciones_categorias %}
@@ -207,6 +226,12 @@
     min-width: 250px;
 }
 
+#carousel-recien-llegados .carousel-item-custom {
+    flex: 0 0 calc(25% - 0.75rem);
+    min-width: 200px;
+    max-width: 280px;
+}
+
 .product-card-carousel {
     background: var(--color-cards);
     border-radius: 20px;
@@ -262,6 +287,41 @@
     justify-content: center;
     gap: 0.5rem;
     margin-bottom: 0.8rem;
+    flex-direction: column;
+}
+
+.quantity-controls-mini {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+}
+
+.quantity-btn-mini {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.quantity-btn-mini:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.quantity-controls-mini span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
 }
 
 .product-price {
@@ -275,15 +335,15 @@
     background: var(--color-primario);
     border: none;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .add-to-cart-btn:hover {
@@ -348,6 +408,11 @@
         min-width: 180px;
     }
     
+    #carousel-recien-llegados .carousel-item-custom {
+        flex: 0 0 calc(50% - 0.5rem);
+        min-width: 160px;
+    }
+    
     .category-title {
         font-size: 1.2rem;
     }
@@ -363,6 +428,11 @@
         flex: 0 0 calc(100% - 0.5rem);
         min-width: 200px;
     }
+    
+    #carousel-recien-llegados .carousel-item-custom {
+        flex: 0 0 calc(100% - 0.5rem);
+        min-width: 180px;
+    }
 }
 </style>
 
@@ -374,8 +444,10 @@ function moveCarousel(carouselId, direction) {
     const track = container.querySelector('.carousel-track');
     const items = track.querySelectorAll('.carousel-item-custom');
     const itemWidth = items[0].offsetWidth + 16; // width + gap
-    const visibleItems = Math.floor(container.offsetWidth / itemWidth);
-    const maxPosition = Math.max(0, items.length - visibleItems);
+    
+    // Para recién llegados, mostrar 4 productos por página
+    const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : Math.floor(container.offsetWidth / itemWidth);
+    const maxPosition = Math.max(0, Math.ceil(items.length / itemsPerPage) - 1);
     
     if (!carouselPositions[carouselId]) {
         carouselPositions[carouselId] = 0;
@@ -390,7 +462,7 @@ function moveCarousel(carouselId, direction) {
         carouselPositions[carouselId] = maxPosition;
     }
     
-    const translateX = -carouselPositions[carouselId] * itemWidth;
+    const translateX = -carouselPositions[carouselId] * itemWidth * itemsPerPage;
     track.style.transform = `translateX(${translateX}px)`;
     
     updateDots(carouselId);
@@ -402,8 +474,11 @@ function currentSlide(carouselId, slideIndex) {
     const items = track.querySelectorAll('.carousel-item-custom');
     const itemWidth = items[0].offsetWidth + 16;
     
+    // Para recién llegados, mostrar 4 productos por página
+    const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : 1;
+    
     carouselPositions[carouselId] = slideIndex - 1;
-    const translateX = -carouselPositions[carouselId] * itemWidth;
+    const translateX = -carouselPositions[carouselId] * itemWidth * itemsPerPage;
     track.style.transform = `translateX(${translateX}px)`;
     
     updateDots(carouselId);
@@ -411,6 +486,8 @@ function currentSlide(carouselId, slideIndex) {
 
 function updateDots(carouselId) {
     const dotsContainer = document.getElementById('dots-' + carouselId.replace('carousel-', ''));
+    if (!dotsContainer) return;
+    
     const dots = dotsContainer.querySelectorAll('.dot');
     
     dots.forEach((dot, index) => {

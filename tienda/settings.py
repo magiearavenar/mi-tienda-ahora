@@ -102,6 +102,16 @@ DATABASES = {
     )
 }
 
+# Configuración adicional para PostgreSQL en Railway
+if 'postgresql' in DATABASES['default']['ENGINE']:
+    DATABASES['default'].update({
+        'OPTIONS': {
+            'connect_timeout': 10,
+            'options': '-c default_transaction_isolation=serializable'
+        },
+        'CONN_MAX_AGE': 0,  # Desactivar pooling persistente
+    })
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
