@@ -397,32 +397,23 @@
                 localStorage.setItem('carrito', JSON.stringify(carrito));
                 actualizarContadorCarrito();
             } else {
-                // Buscar imagen del producto en el DOM
-                let imagenUrl = null;
-                
-                // Buscar por el botón que se clickeó
-                const clickedButton = event ? event.target.closest('.product-card, .product-card-carousel, .carousel-item-custom') : null;
-                if (clickedButton) {
-                    const img = clickedButton.querySelector('img');
-                    if (img && img.src && !img.src.includes('placeholder') && !img.src.includes('text=')) {
-                        imagenUrl = img.src;
-                    }
-                }
-                
-                // Si no encontró imagen, buscar por nombre
-                if (!imagenUrl) {
-                    document.querySelectorAll('.product-card, .product-card-carousel').forEach(card => {
-                        const cardTitle = card.querySelector('h6, .product-name, .card-title');
-                        if (cardTitle && cardTitle.textContent.trim() === nombre) {
-                            const img = card.querySelector('img');
-                            if (img && img.src && !img.src.includes('placeholder') && !img.src.includes('text=')) {
-                                imagenUrl = img.src;
+                // Obtener imagen usando fetch del endpoint
+                fetch(`/obtener-imagen/${id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.imagen) {
+                            // Actualizar el item en el carrito con la imagen
+                            const itemIndex = carrito.findIndex(p => p.id === id && p.personalizacion === personalizacion);
+                            if (itemIndex !== -1) {
+                                carrito[itemIndex].imagen = data.imagen;
+                                localStorage.setItem('carrito', JSON.stringify(carrito));
                             }
                         }
-                    });
-                }
+                    })
+                    .catch(error => console.log('Error obteniendo imagen:', error));
                 
-                console.log('Imagen capturada:', imagenUrl);
+                let imagenUrl = null;
+                
                 carrito.push({id, nombre, precio, cantidad, personalizacion, imagen: imagenUrl});
                 localStorage.setItem('carrito', JSON.stringify(carrito));
                 actualizarContadorCarrito();
