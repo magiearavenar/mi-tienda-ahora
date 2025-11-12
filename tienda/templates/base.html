@@ -395,35 +395,29 @@
             if (item) {
                 item.cantidad += cantidad;
             } else {
-                // Obtener imagen del endpoint y agregar al carrito
-                fetch(`/obtener-imagen/${id}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        carrito.push({
-                            id: id,
-                            nombre: nombre,
-                            precio: precio,
-                            cantidad: cantidad,
-                            personalizacion: personalizacion,
-                            imagen: data.imagen || null
-                        });
-                        localStorage.setItem('carrito', JSON.stringify(carrito));
-                        actualizarContadorCarrito();
-                    })
-                    .catch(error => {
-                        // Si falla, agregar sin imagen
-                        carrito.push({
-                            id: id,
-                            nombre: nombre,
-                            precio: precio,
-                            cantidad: cantidad,
-                            personalizacion: personalizacion,
-                            imagen: null
-                        });
-                        localStorage.setItem('carrito', JSON.stringify(carrito));
-                        actualizarContadorCarrito();
-                    });
-                return;
+                // Buscar imagen en la página actual
+                let imagenUrl = null;
+                const allImages = document.querySelectorAll('img');
+                allImages.forEach(img => {
+                    if (img.src && img.src.includes('productos/') && !img.src.includes('placeholder')) {
+                        const card = img.closest('.product-card, .product-card-carousel, .carousel-item-custom');
+                        if (card) {
+                            const title = card.querySelector('h6, .product-name, .card-title');
+                            if (title && title.textContent.trim() === nombre) {
+                                imagenUrl = img.src;
+                            }
+                        }
+                    }
+                });
+                
+                carrito.push({
+                    id: id,
+                    nombre: nombre,
+                    precio: precio,
+                    cantidad: cantidad,
+                    personalizacion: personalizacion,
+                    imagen: imagenUrl
+                });
             }
             localStorage.setItem('carrito', JSON.stringify(carrito));
             actualizarContadorCarrito();
