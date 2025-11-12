@@ -28,18 +28,24 @@
 
                 <!-- 2. Envío -->
                 <div class="form-section">
-                    <h4 class="section-title">2. Envío</h4>
+                    <h4 class="section-title">2. Método de Envío</h4>
                     <div class="shipping-options">
                         <div class="form-check mb-3">
-                            <input class="form-check-input" type="radio" name="tipoEnvio" id="envioDir" value="direccion" checked>
-                            <label class="form-check-label" for="envioDir">
-                                <i class="fas fa-truck me-2"></i>Envío a una dirección
+                            <input class="form-check-input" type="radio" name="tipoEnvio" id="starken" value="starken" checked>
+                            <label class="form-check-label" for="starken">
+                                <i class="fas fa-shipping-fast me-2"></i>Starken - <span class="shipping-price" id="precio-starken">Calculando...</span>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="tipoEnvio" id="bluexpress" value="bluexpress">
+                            <label class="form-check-label" for="bluexpress">
+                                <i class="fas fa-truck me-2"></i>BlueExpress - <span class="shipping-price" id="precio-bluexpress">Calculando...</span>
                             </label>
                         </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="tipoEnvio" id="retiroTienda" value="retiro">
                             <label class="form-check-label" for="retiroTienda">
-                                <i class="fas fa-store me-2"></i>Retiro en tienda
+                                <i class="fas fa-store me-2"></i>Retiro en tienda - Gratis
                             </label>
                         </div>
                     </div>
@@ -89,27 +95,6 @@
                                 <option value="boleta">Boleta</option>
                                 <option value="factura">Factura</option>
                             </select>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-check mt-4">
-                                <input class="form-check-input" type="checkbox" id="esEmpresa">
-                                <label class="form-check-label" for="esEmpresa">
-                                    Soy empresa
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="datosEmpresa" style="display: none;">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Razón social</label>
-                                <input type="text" class="form-control" id="razonSocial">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label">Giro</label>
-                                <input type="text" class="form-control" id="giro">
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -276,6 +261,15 @@
 .shipping-options .form-check-label {
     font-weight: 500;
     cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.shipping-price {
+    font-weight: 600;
+    color: var(--color-primario);
 }
 
 .payment-methods .form-check-label {
@@ -397,10 +391,8 @@ let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 document.addEventListener('DOMContentLoaded', function() {
     mostrarResumenPedido();
     
-    // Toggle datos empresa
-    document.getElementById('esEmpresa').addEventListener('change', function() {
-        document.getElementById('datosEmpresa').style.display = this.checked ? 'block' : 'none';
-    });
+    // Calcular costos de envío
+    calcularCostosEnvio();
     
     // Toggle sección dirección
     document.querySelectorAll('input[name="tipoEnvio"]').forEach(radio => {
@@ -517,6 +509,12 @@ function procesarPedido() {
         console.error('Error:', error);
         alert('Error al procesar el pago');
     });
+}
+
+function calcularCostosEnvio() {
+    // Simular cálculo de costos (implementar con API de Starken)
+    document.getElementById('precio-starken').textContent = '$3.500';
+    document.getElementById('precio-bluexpress').textContent = '$4.200';
 }
 
 function getCookie(name) {
