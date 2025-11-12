@@ -107,27 +107,7 @@ div {
     position: relative;
     background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
     box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-    border: 3px solid transparent;
-    background-clip: padding-box;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.product-image::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    background: linear-gradient(135deg, var(--color-primario), var(--color-secundario), var(--color-hover));
-    border-radius: 23px;
-    z-index: -1;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.product-card:hover .product-image::before {
-    opacity: 1;
 }
 
 .product-card:hover .product-image {
@@ -145,7 +125,7 @@ div {
 }
 
 .product-card:hover .product-image img {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 /* Estilos para cards de productos en home */
