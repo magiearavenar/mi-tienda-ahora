@@ -305,3 +305,53 @@ def debug_config(request):
     }
     return JsonResponse(config)
 
+def obtener_imagen_producto(request, producto_id):
+    try:
+        producto = Producto.objects.get(id=producto_id)
+        if not producto.imagen_principal:
+            return JsonResponse({'imagen': None})
+        
+        # En local, devolver imagen original directamente
+        import os
+        if not os.environ.get('AWS_ACCESS_KEY_ID'):
+            return JsonResponse({'imagen': producto.imagen_principal.url})
+        
+        # En producción con S3, generar miniatura
+        try:
+            from PIL import Image
+            import io
+            from django.core.files.storage import default_storage
+            from django.core.files.base import ContentFile
+            
+            # Generar nombre para miniatura
+            original_name = producto.imagen_principal.name
+            name_parts = original_name.rsplit('.', 1)
+            thumb_name = f"{name_parts[0]}_thumb.{name_parts[1] if len(name_parts) > 1 else 'jpg'}"
+            
+            # Verificar si ya existe la miniatura
+            if default_storage.exists(thumb_name):
+                thumb_url = default_storage.url(thumb_name)
+                return JsonResponse({'imagen': thumb_url})
+            
+            # Crear miniatura
+            with default_storage.open(producto.imagen_principal.name, 'rb') as f:
+                image = Image.open(f)
+                image = image.convert('RGB')
+                image.thumbnail((80, 80), Image.Resampling.LANCZOS)
+                
+                thumb_io = io.BytesIO()
+                image.save(thumb_io, format='JPEG', quality=85)
+                thumb_file = ContentFile(thumb_io.getvalue())
+                
+                saved_path = default_storage.save(thumb_name, thumb_file)
+                thumb_url = default_storage.url(saved_path)
+                
+                return JsonResponse({'imagen': thumb_url})
+        except Exception:
+            return JsonResponse({'imagen': producto.imagen_principal.url})
+            
+    except Producto.DoesNotExist:
+        return JsonResponse({'imagen': None})
+    except Exception:
+        return JsonResponse({'imagen': None})
+

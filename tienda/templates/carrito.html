@@ -1,108 +1,262 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h4 class="mb-4">Carrito de Compras</h4>
-
-<div id="carrito-items"></div>
-
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>DATOS DE ENVÍO</h5>
-            </div>
-            <div class="card-body">
-                <form id="form-envio">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">NOMBRE</label>
-                            <input type="text" class="form-control" id="nombre" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">APELLIDO</label>
-                            <input type="text" class="form-control" id="apellido" required>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">RUT</label>
-                        <input type="text" class="form-control" id="rut" placeholder="12.345.678-9" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">DIRECCIÓN</label>
-                        <input type="text" class="form-control" id="direccion" required>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">REGIÓN</label>
-                            <select class="form-control" id="region" required onchange="cargarComunas()">
-                                <option value="">Seleccionar región</option>
-                                <option value="Metropolitana">Región Metropolitana</option>
-                                <option value="Valparaíso">Región de Valparaíso</option>
-                                <option value="Biobío">Región del Biobío</option>
-                                <option value="Araucanía">Región de La Araucanía</option>
-                                <option value="Los Lagos">Región de Los Lagos</option>
-                                <option value="Antofagasta">Región de Antofagasta</option>
-                                <option value="Coquimbo">Región de Coquimbo</option>
-                                <option value="O'Higgins">Región del Libertador General Bernardo O'Higgins</option>
-                                <option value="Maule">Región del Maule</option>
-                                <option value="Los Ríos">Región de Los Ríos</option>
-                                <option value="Tarapacá">Región de Tarapacá</option>
-                                <option value="Arica y Parinacota">Región de Arica y Parinacota</option>
-                                <option value="Atacama">Región de Atacama</option>
-                                <option value="Aysén">Región Aysén del General Carlos Ibáñez del Campo</option>
-                                <option value="Magallanes">Región de Magallanes y de la Antártica Chilena</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">COMUNA</label>
-                            <select class="form-control" id="comuna" required>
-                                <option value="">Seleccionar comuna</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">PAÍS</label>
-                            <select class="form-control" id="pais" required>
-                                <option value="Chile" selected>Chile</option>
-                            </select>
-                        </div>
-                    </div>
-                </form>
+<div class="row">
+    <div class="col-lg-8">
+        <div class="cart-section">
+            <h4 class="cart-title">Carrito de Compras</h4>
+            
+            <div class="cart-table">
+                <div class="cart-header">
+                    <div>PRODUCTO</div>
+                    <div>CANTIDAD</div>
+                    <div>PRECIO UNITARIO</div>
+                    <div>SUBTOTAL</div>
+                    <div></div>
+                </div>
+                <div id="carrito-items"></div>
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h5>RESUMEN DEL PEDIDO</h5>
+    
+    <div class="col-lg-4">
+        <div class="sidebar-section">
+            <h5>Código de descuento</h5>
+            <input type="text" class="form-control mb-3" placeholder="Ingresa tu código">
+            <button class="btn btn-dark w-100 mb-4">APLICAR</button>
+            
+            <h5>Pago</h5>
+            <div class="total-row">
+                <span>TOTAL</span>
+                <span class="total-amount">$<span id="total">0</span></span>
             </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    <span class="h5">TOTAL:</span>
-                    <span class="h5 text-primary">$<span id="total">0</span></span>
+            
+            <button class="btn btn-checkout w-100 mb-3" onclick="procederPago()">IR AL CHECKOUT</button>
+            <div class="text-center">
+                <a href="{% url 'home' %}" class="continue-link">← Continúa Comprando</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="checkoutModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Datos de Envío</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">NOMBRE</label>
+                    <input type="text" class="form-control" id="nombre" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">EMAIL</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">DIRECCIÓN</label>
+                    <input type="text" class="form-control" id="direccion" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Método de Pago:</label>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="metodoPago" id="flow" value="flow" checked>
-                        <label class="form-check-label" for="flow">
-                            <i class="fas fa-credit-card me-2"></i>Flow (Chile)
-                        </label>
+                        <label class="form-check-label" for="flow">Flow (Chile)</label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="metodoPago" id="mercadopago" value="mercadopago">
-                        <label class="form-check-label" for="mercadopago">
-                            <i class="fab fa-cc-mastercard me-2"></i>MercadoPago
-                        </label>
+                        <label class="form-check-label" for="mercadopago">MercadoPago</label>
                     </div>
                 </div>
-                <div class="d-grid gap-2">
-                    <button class="btn btn-primary btn-lg" onclick="procederPago()">PROCEDER AL PAGO</button>
-                    <button class="btn btn-outline-danger" onclick="vaciarCarrito()">VACIAR CARRITO</button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="confirmarPago()">CONFIRMAR PAGO</button>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+.cart-section {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.cart-title {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.cart-header {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1.2fr 1.2fr 60px;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.cart-item {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr 1.2fr 1.2fr 60px;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+}
+
+.cart-item:hover {
+    background-color: #fafafa;
+}
+
+.item-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.item-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    flex-shrink: 0;
+}
+
+.item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+}
+
+.item-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.quantity-select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.4rem 0.6rem;
+    background: white;
+    width: 80px;
+    font-size: 0.9rem;
+}
+
+.item-price, .item-subtotal {
+    font-weight: 600;
+    color: #333;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+}
+
+.remove-btn:hover {
+    color: #dc3545;
+}
+
+.sidebar-section {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.sidebar-section h5 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 1.5rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.total-amount {
+    color: #333;
+    font-size: 1.3rem;
+}
+
+.btn-checkout {
+    background: #c8a8e9;
+    border: none;
+    color: white;
+    padding: 0.9rem;
+    border-radius: 6px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+
+.btn-checkout:hover {
+    background: #b899d9;
+    color: white;
+}
+
+.continue-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.continue-link:hover {
+    color: #333;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .cart-header {
+        display: none;
+    }
+    
+    .cart-item {
+        display: block;
+        padding: 1rem;
+    }
+    
+    .item-info {
+        margin-bottom: 1rem;
+    }
+}
+</style>
 
 <script>
 function mostrarCarrito() {
@@ -111,7 +265,8 @@ function mostrarCarrito() {
     let total = 0;
     
     if (carrito.length === 0) {
-        carritoItems.innerHTML = '<p class="text-muted">El carrito está vacío</p>';
+        carritoItems.innerHTML = '<div class="empty-cart">El carrito está vacío</div>';
+        totalElement.textContent = '0';
         return;
     }
     
@@ -119,41 +274,59 @@ function mostrarCarrito() {
     carrito.forEach((item, index) => {
         const subtotal = item.precio * item.cantidad;
         total += subtotal;
+        
         html += `
-            <div class="card mb-2">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-md-4">
-                            <h6 class="mb-0">${item.nombre}</h6>
-                            ${item.personalizacion ? `<small class="text-muted"><strong>Personalización:</strong> ${item.personalizacion}</small>` : ''}
-                        </div>
-                        <div class="col-md-2">$${item.precio}</div>
-                        <div class="col-md-3">
-                            <div class="d-flex align-items-center">
-                                <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${index}, -1)">-</button>
-                                <span class="mx-2">${item.cantidad}</span>
-                                <button class="btn btn-sm btn-outline-secondary" onclick="cambiarCantidad(${index}, 1)">+</button>
-                            </div>
-                        </div>
-                        <div class="col-md-2">$${subtotal}</div>
-                        <div class="col-md-1">
-                            <button class="btn btn-sm btn-outline-danger" onclick="eliminarItem(${index})">×</button>
-                        </div>
+            <div class="cart-item">
+                <div class="item-info">
+                    <div class="item-image">
+                        <img src="https://via.placeholder.com/80x80/f0f0f0/999?text=IMG" alt="${item.nombre}" data-product-id="${item.id}">
                     </div>
+                    <div class="item-name">${item.nombre}</div>
+                </div>
+                <div class="item-quantity">
+                    <select class="quantity-select" onchange="actualizarCantidad(${index}, this.value)">
+                        ${[1,2,3,4,5,6,7,8,9,10].map(i => 
+                            `<option value="${i}" ${i === item.cantidad ? 'selected' : ''}>${i}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div class="item-price">$${item.precio.toLocaleString()}</div>
+                <div class="item-subtotal">$${subtotal.toLocaleString()}</div>
+                <div class="item-remove">
+                    <button class="remove-btn" onclick="eliminarItem(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         `;
     });
     
     carritoItems.innerHTML = html;
-    totalElement.textContent = total;
+    totalElement.textContent = total.toLocaleString();
+    
+    // Cargar imágenes después
+    cargarImagenesCarrito();
 }
 
-function cambiarCantidad(index, cambio) {
-    carrito[index].cantidad += cambio;
-    if (carrito[index].cantidad <= 0) {
-        carrito.splice(index, 1);
-    }
+function cargarImagenesCarrito() {
+    const imagenes = document.querySelectorAll('.item-image img[data-product-id]');
+    imagenes.forEach(img => {
+        const productId = img.getAttribute('data-product-id');
+        fetch(`/obtener-imagen/${productId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.imagen) {
+                    img.src = data.imagen;
+                }
+            })
+            .catch(() => {
+                // Mantener placeholder si falla
+            });
+    });
+}
+
+function actualizarCantidad(index, nuevaCantidad) {
+    carrito[index].cantidad = parseInt(nuevaCantidad);
     localStorage.setItem('carrito', JSON.stringify(carrito));
     mostrarCarrito();
     if (typeof actualizarContadorCarrito === 'function') {
@@ -170,74 +343,34 @@ function eliminarItem(index) {
     }
 }
 
-function vaciarCarrito() {
-    carrito = [];
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    mostrarCarrito();
-    if (typeof actualizarContadorCarrito === 'function') {
-        actualizarContadorCarrito();
-    }
-}
-
 function procederPago() {
     if (carrito.length === 0) {
-        Swal.fire({
-            title: 'Carrito vacío',
-            text: 'Agrega productos antes de proceder',
-            icon: 'warning',
-            confirmButtonColor: '#ffc1ea'
-        });
+        alert('Agrega productos antes de proceder');
         return;
     }
     
-    // Validar datos de envío
+    const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
+    modal.show();
+}
+
+function confirmarPago() {
     const nombre = document.getElementById('nombre')?.value;
-    const apellido = document.getElementById('apellido')?.value;
-    const rut = document.getElementById('rut')?.value;
+    const email = document.getElementById('email')?.value;
     const direccion = document.getElementById('direccion')?.value;
-    const region = document.getElementById('region')?.value;
-    const comuna = document.getElementById('comuna')?.value;
-    const pais = document.getElementById('pais')?.value;
     
-    if (!nombre || !apellido || !rut || !direccion || !region || !comuna || !pais) {
-        Swal.fire({
-            title: 'Datos incompletos',
-            text: 'Por favor completa todos los datos de envío',
-            icon: 'error',
-            confirmButtonColor: '#ffc1ea'
-        });
+    if (!nombre || !email || !direccion) {
+        alert('Por favor completa todos los datos');
         return;
     }
     
-    // Obtener método de pago
     const metodoPago = document.querySelector('input[name="metodoPago"]:checked')?.value;
     if (!metodoPago) {
-        Swal.fire({
-            title: 'Método de pago',
-            text: 'Selecciona un método de pago',
-            icon: 'error',
-            confirmButtonColor: '#ffc1ea'
-        });
+        alert('Selecciona un método de pago');
         return;
     }
     
-    // Preparar datos
-    const datosEnvio = {
-        nombre, apellido, rut, direccion, region, comuna, pais,
-        email: `${nombre.toLowerCase()}@correo.cl` // Email temporal
-    };
+    const datosEnvio = { nombre, email, direccion };
     
-    // Mostrar loading
-    Swal.fire({
-        title: 'Procesando pago...',
-        text: 'Por favor espera',
-        allowOutsideClick: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-    
-    // Enviar al backend
     fetch('/procesar-pago/', {
         method: 'POST',
         headers: {
@@ -250,35 +383,21 @@ function procederPago() {
             metodoPago: metodoPago
         })
     })
-    .then(response => {
-        // Verificar si la respuesta es JSON
-        const contentType = response.headers.get('content-type');
-        if (!contentType || !contentType.includes('application/json')) {
-            throw new Error('Respuesta no es JSON válido');
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
         if (data.url) {
-            // Limpiar carrito y redirigir
             localStorage.removeItem('carrito');
             window.location.href = data.url;
         } else {
-            throw new Error(data.error || 'Error al procesar el pago');
+            alert(data.error || 'Error al procesar el pago');
         }
     })
     .catch(error => {
-        console.error('Error en procesar pago:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'Error al procesar el pago',
-            icon: 'error',
-            confirmButtonColor: '#ffc1ea'
-        });
+        console.error('Error:', error);
+        alert('Error al procesar el pago');
     });
 }
 
-// Función para obtener cookie CSRF
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -292,42 +411,6 @@ function getCookie(name) {
         }
     }
     return cookieValue;
-}
-
-// Función para cargar comunas según región
-function cargarComunas() {
-    const region = document.getElementById('region').value;
-    const comunaSelect = document.getElementById('comuna');
-    
-    // Limpiar comunas
-    comunaSelect.innerHTML = '<option value="">Seleccionar comuna</option>';
-    
-    const comunasPorRegion = {
-        'Metropolitana': ['Santiago', 'Las Condes', 'Providencia', 'Ñuñoa', 'La Reina', 'Vitacura', 'Lo Barnechea', 'Maipú', 'Puente Alto', 'La Florida', 'San Miguel', 'La Cisterna', 'El Bosque', 'Pedro Aguirre Cerda', 'Lo Espejo', 'Cerrillos', 'Estación Central', 'Quinta Normal', 'Renca', 'Conchalí', 'Huechuraba', 'Quilicura', 'Pudahuel', 'Lo Prado', 'Cerro Navia', 'Peñalolén', 'Macul', 'San Joaquín', 'La Granja', 'San Ramón', 'La Pintana', 'El Bosque'],
-        'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Concón', 'Quilpué', 'Villa Alemana', 'Casablanca', 'San Antonio', 'Cartagena', 'El Quisco', 'Algarrobo'],
-        'Biobío': ['Concepción', 'Talcahuano', 'Chillán', 'Los Ángeles', 'Coronel', 'San Pedro de la Paz', 'Hualqui', 'Penco', 'Tomé', 'Lota'],
-        'Araucanía': ['Temuco', 'Padre Las Casas', 'Villarrica', 'Pucón', 'Angol', 'Victoria', 'Lautaro', 'Nueva Imperial'],
-        'Los Lagos': ['Puerto Montt', 'Osorno', 'Castro', 'Ancud', 'Puerto Varas', 'Frutillar', 'Llanquihue'],
-        'Antofagasta': ['Antofagasta', 'Calama', 'Tocopilla', 'Mejillones', 'Taltal'],
-        'Coquimbo': ['La Serena', 'Coquimbo', 'Ovalle', 'Illapel', 'Vicuña'],
-        "O'Higgins": ['Rancagua', 'San Fernando', 'Rengo', 'Machalí', 'Graneros'],
-        'Maule': ['Talca', 'Curicó', 'Linares', 'Molina', 'Constitución'],
-        'Los Ríos': ['Valdivia', 'La Unión', 'Río Bueno', 'Panguipulli'],
-        'Tarapacá': ['Iquique', 'Alto Hospicio', 'Pozo Almonte'],
-        'Arica y Parinacota': ['Arica', 'Putre'],
-        'Atacama': ['Copiapó', 'Caldera', 'Vallenar', 'Chañaral'],
-        'Aysén': ['Coyhaique', 'Puerto Aysén', 'Chile Chico'],
-        'Magallanes': ['Punta Arenas', 'Puerto Natales', 'Porvenir']
-    };
-    
-    if (region && comunasPorRegion[region]) {
-        comunasPorRegion[region].forEach(comuna => {
-            const option = document.createElement('option');
-            option.value = comuna;
-            option.textContent = comuna;
-            comunaSelect.appendChild(option);
-        });
-    }
 }
 
 document.addEventListener('DOMContentLoaded', mostrarCarrito);
