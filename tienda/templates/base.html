@@ -397,7 +397,20 @@
                 localStorage.setItem('carrito', JSON.stringify(carrito));
                 actualizarContadorCarrito();
             } else {
-                carrito.push({id, nombre, precio, cantidad, personalizacion, imagen: null});
+                // Obtener imagen del producto desde el DOM
+                let imagenUrl = null;
+                const productCards = document.querySelectorAll('.product-card, .product-card-carousel');
+                productCards.forEach(card => {
+                    const cardTitle = card.querySelector('h6, .product-name, .card-title');
+                    if (cardTitle && cardTitle.textContent.trim() === nombre) {
+                        const img = card.querySelector('img');
+                        if (img && img.src && !img.src.includes('placeholder')) {
+                            imagenUrl = img.src;
+                        }
+                    }
+                });
+                
+                carrito.push({id, nombre, precio, cantidad, personalizacion, imagen: imagenUrl});
                 localStorage.setItem('carrito', JSON.stringify(carrito));
                 actualizarContadorCarrito();
             }

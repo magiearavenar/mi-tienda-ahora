@@ -281,7 +281,7 @@ function mostrarCarrito() {
             <div class="cart-item">
                 <div class="item-info">
                     <div class="item-image">
-                        <img src="https://via.placeholder.com/80x80/f0f0f0/999?text=IMG" alt="${item.nombre}" data-product-id="${item.id}">
+                        <img src="${item.imagen || 'https://via.placeholder.com/80x80/f0f0f0/999?text=IMG'}" alt="${item.nombre}" onerror="this.src='https://via.placeholder.com/80x80/f0f0f0/999?text=IMG'">
                     </div>
                     <div class="item-name">${item.nombre}</div>
                 </div>
@@ -306,34 +306,7 @@ function mostrarCarrito() {
     carritoItems.innerHTML = html;
     totalElement.textContent = total.toLocaleString();
     
-    // Cargar imágenes después
-    cargarImagenesCarrito();
-}
 
-function cargarImagenesCarrito() {
-    const imagenes = document.querySelectorAll('.item-image img[data-product-id]');
-    imagenes.forEach(img => {
-        const productId = img.getAttribute('data-product-id');
-        fetch(`/obtener-imagen/${productId}/`)
-            .then(response => {
-                if (!response.ok) throw new Error('Network error');
-                return response.json();
-            })
-            .then(data => {
-                if (data.imagen) {
-                    img.onload = function() {
-                        this.style.opacity = '1';
-                    };
-                    img.style.opacity = '0.5';
-                    img.src = data.imagen;
-                }
-            })
-            .catch(error => {
-                console.log('Error cargando imagen:', error);
-                img.style.opacity = '1';
-            });
-    });
-}
 
 function actualizarCantidad(index, nuevaCantidad) {
     carrito[index].cantidad = parseInt(nuevaCantidad);
