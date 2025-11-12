@@ -308,6 +308,22 @@ function mostrarCarrito() {
     
     carritoItems.innerHTML = html;
     totalElement.textContent = total.toLocaleString();
+    
+    // Cargar imágenes que faltan
+    carrito.forEach((item, index) => {
+        if (!item.imagen) {
+            fetch(`/obtener-imagen/${item.id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.imagen) {
+                        carrito[index].imagen = data.imagen;
+                        localStorage.setItem('carrito', JSON.stringify(carrito));
+                        mostrarCarrito(); // Refrescar carrito
+                    }
+                })
+                .catch(error => console.log('Error cargando imagen:', error));
+        }
+    });
 }
 
 function actualizarCantidad(index, nuevaCantidad) {

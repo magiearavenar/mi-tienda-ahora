@@ -395,20 +395,21 @@
             if (item) {
                 item.cantidad += cantidad;
             } else {
-                // Buscar imagen en la página actual
+                // Obtener imagen del endpoint
                 let imagenUrl = null;
-                const allImages = document.querySelectorAll('img');
-                allImages.forEach(img => {
-                    if (img.src && img.src.includes('productos/') && !img.src.includes('placeholder')) {
-                        const card = img.closest('.product-card, .product-card-carousel, .carousel-item-custom');
-                        if (card) {
-                            const title = card.querySelector('h6, .product-name, .card-title');
-                            if (title && title.textContent.trim() === nombre) {
-                                imagenUrl = img.src;
+                fetch(`/obtener-imagen/${id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.imagen) {
+                            // Actualizar el item en el carrito con la imagen
+                            const itemIndex = carrito.findIndex(p => p.id === id && p.personalizacion === personalizacion);
+                            if (itemIndex !== -1) {
+                                carrito[itemIndex].imagen = data.imagen;
+                                localStorage.setItem('carrito', JSON.stringify(carrito));
                             }
                         }
-                    }
-                });
+                    })
+                    .catch(error => console.log('Error obteniendo imagen:', error));
                 
                 carrito.push({
                     id: id,
@@ -416,7 +417,7 @@
                     precio: precio,
                     cantidad: cantidad,
                     personalizacion: personalizacion,
-                    imagen: imagenUrl
+                    imagen: null
                 });
             }
             localStorage.setItem('carrito', JSON.stringify(carrito));
