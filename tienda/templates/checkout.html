@@ -33,13 +33,13 @@
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="tipoEnvio" id="starken" value="starken" checked>
                             <label class="form-check-label" for="starken">
-                                <i class="fas fa-shipping-fast me-2"></i>Starken - <span class="shipping-price" id="precio-starken">Calculando...</span>
+                                <i class="fas fa-shipping-fast me-2"></i>Starken - <span class="shipping-price" id="precio-starken">Ingresa dirección</span>
                             </label>
                         </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="tipoEnvio" id="bluexpress" value="bluexpress">
                             <label class="form-check-label" for="bluexpress">
-                                <i class="fas fa-truck me-2"></i>BlueExpress - <span class="shipping-price" id="precio-bluexpress">Calculando...</span>
+                                <i class="fas fa-truck me-2"></i>BlueExpress - <span class="shipping-price" id="precio-bluexpress">Ingresa dirección</span>
                             </label>
                         </div>
                         <div class="form-check mb-3">
@@ -66,6 +66,19 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
+                            <label class="form-label">RUT *</label>
+                            <input type="text" class="form-control" id="rut" placeholder="12.345.678-9" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Teléfono *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">+56</span>
+                                <input type="tel" class="form-control" id="telefonoEnvio" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Estado / Región *</label>
                             <select class="form-control" id="region" required>
                                 <option value="">Seleccionar región</option>
@@ -87,16 +100,7 @@
                         <label class="form-label">Apartamento, casa, puerta, etc. (opcional)</label>
                         <input type="text" class="form-control" id="complemento">
                     </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Documento electrónico</label>
-                            <select class="form-control" id="tipoDocumento">
-                                <option value="boleta">Boleta</option>
-                                <option value="factura">Factura</option>
-                            </select>
-                        </div>
-                    </div>
+
                 </div>
 
                 <!-- 4. Confirmaciones -->
@@ -175,6 +179,10 @@
                     <div class="summary-row">
                         <span>Subtotal:</span>
                         <span id="subtotal">$0</span>
+                    </div>
+                    <div class="summary-row" id="envio-row" style="display: none;">
+                        <span>Envío:</span>
+                        <span id="costo-envio">$0</span>
                     </div>
                     <div class="summary-row">
                         <span>Descuento:</span>
@@ -382,15 +390,20 @@ let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 document.addEventListener('DOMContentLoaded', function() {
     mostrarResumenPedido();
     
-    // Calcular costos de envío
-    calcularCostosEnvio();
-    
     // Toggle sección dirección
     document.querySelectorAll('input[name="tipoEnvio"]').forEach(radio => {
         radio.addEventListener('change', function() {
             document.getElementById('direccionSection').style.display = 
-                this.value === 'direccion' ? 'block' : 'none';
+                this.value === 'retiro' ? 'none' : 'block';
+            actualizarTotal();
         });
+    });
+    
+    // Auto-calcular envíos cuando se complete la dirección
+    const direccionInputs = ['region', 'ciudad', 'direccion'];
+    direccionInputs.forEach(inputId => {
+        document.getElementById(inputId).addEventListener('change', calcularEnviosAutomatico);
+        document.getElementById(inputId).addEventListener('input', debounce(calcularEnviosAutomatico, 1000));
     });
 });
 
@@ -450,12 +463,14 @@ function procesarPedido() {
     
     const tipoEnvio = document.querySelector('input[name="tipoEnvio"]:checked').value;
     
-    if (tipoEnvio === 'direccion') {
+    if (tipoEnvio !== 'retiro') {
         const nombre = document.getElementById('nombre').value;
         const apellido = document.getElementById('apellido').value;
+        const rut = document.getElementById('rut').value;
+        const telefonoEnvio = document.getElementById('telefonoEnvio').value;
         const direccion = document.getElementById('direccion').value;
         
-        if (!nombre || !apellido || !direccion) {
+        if (!nombre || !apellido || !rut || !telefonoEnvio || !direccion) {
             alert('Por favor completa todos los datos de envío');
             return;
         }
@@ -470,6 +485,8 @@ function procesarPedido() {
         tipoEnvio: tipoEnvio,
         nombre: document.getElementById('nombre').value,
         apellido: document.getElementById('apellido').value,
+        rut: document.getElementById('rut').value,
+        telefonoEnvio: document.getElementById('telefonoEnvio').value,
         direccion: document.getElementById('direccion').value,
         notas: document.getElementById('notas').value
     };
@@ -502,10 +519,98 @@ function procesarPedido() {
     });
 }
 
-function calcularCostosEnvio() {
-    // Simular cálculo de costos (implementar con API de Starken)
-    document.getElementById('precio-starken').textContent = '$3.500';
-    document.getElementById('precio-bluexpress').textContent = '$4.200';
+function calcularEnviosAutomatico() {
+    const region = document.getElementById('region').value;
+    const ciudad = document.getElementById('ciudad').value;
+    const direccion = document.getElementById('direccion').value;
+    
+    if (region && ciudad && direccion) {
+        document.getElementById('precio-starken').textContent = 'Calculando...';
+        document.getElementById('precio-bluexpress').textContent = 'Calculando...';
+        
+        // Calcular peso total del carrito
+        const pesoTotal = carrito.reduce((total, item) => total + (item.peso || 1) * item.cantidad, 0);
+        
+        fetch('/calcular-envio/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                region: region,
+                ciudad: ciudad,
+                direccion: direccion,
+                peso: pesoTotal
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.starken) {
+                document.getElementById('precio-starken').textContent = `$${data.starken.toLocaleString()}`;
+            } else {
+                document.getElementById('precio-starken').textContent = 'No disponible';
+            }
+            
+            if (data.bluexpress) {
+                document.getElementById('precio-bluexpress').textContent = `$${data.bluexpress.toLocaleString()}`;
+            } else {
+                document.getElementById('precio-bluexpress').textContent = 'No disponible';
+            }
+            
+            actualizarTotal();
+        })
+        .catch(error => {
+            console.error('Error calculando envío:', error);
+            document.getElementById('precio-starken').textContent = 'Error';
+            document.getElementById('precio-bluexpress').textContent = 'Error';
+        });
+    }
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function actualizarTotal() {
+    const subtotalElement = document.getElementById('subtotal');
+    const totalElement = document.getElementById('total');
+    const costoEnvioElement = document.getElementById('costo-envio');
+    const envioRow = document.getElementById('envio-row');
+    
+    let subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
+    let costoEnvio = 0;
+    
+    const tipoEnvioSeleccionado = document.querySelector('input[name="tipoEnvio"]:checked')?.value;
+    if (tipoEnvioSeleccionado === 'starken') {
+        const precioTexto = document.getElementById('precio-starken').textContent;
+        if (precioTexto.includes('$')) {
+            costoEnvio = parseInt(precioTexto.replace(/[^0-9]/g, ''));
+        }
+    } else if (tipoEnvioSeleccionado === 'bluexpress') {
+        const precioTexto = document.getElementById('precio-bluexpress').textContent;
+        if (precioTexto.includes('$')) {
+            costoEnvio = parseInt(precioTexto.replace(/[^0-9]/g, ''));
+        }
+    }
+    
+    // Mostrar/ocultar fila de envío
+    if (costoEnvio > 0) {
+        costoEnvioElement.textContent = `$${costoEnvio.toLocaleString()}`;
+        envioRow.style.display = 'flex';
+    } else {
+        envioRow.style.display = 'none';
+    }
+    
+    totalElement.textContent = `$${(subtotal + costoEnvio).toLocaleString()}`;
 }
 
 function getCookie(name) {

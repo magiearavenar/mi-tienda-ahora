@@ -25,4 +25,5 @@ urlpatterns = [
     path('pago/pendiente/', views.pago_pendiente, name='pago_pendiente'),
     path('debug/config/', views.debug_config, name='debug_config'),
     path('obtener-imagen/<int:producto_id>/', views.obtener_imagen_producto, name='obtener_imagen_producto'),
+    path('calcular-envio/', views.calcular_envio, name='calcular_envio'),
 ]

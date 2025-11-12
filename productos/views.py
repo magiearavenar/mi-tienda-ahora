@@ -9,6 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 import json
+import requests
+import os
 from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
 from .services import FlowService, MercadoPagoService
 
@@ -321,4 +323,80 @@ def obtener_imagen_producto(request, producto_id):
         import logging
         logging.error(f'Error obteniendo imagen: {str(e)}')
         return JsonResponse({'imagen': None})
+
+@csrf_exempt
+@require_POST
+def calcular_envio(request):
+    try:
+        data = json.loads(request.body)
+        region = data.get('region')
+        ciudad = data.get('ciudad')
+        direccion = data.get('direccion')
+        peso = data.get('peso', 1)
+        
+        # Token de Starken desde variables de entorno
+        starken_token = os.environ.get('STARKEN_TOKEN')
+        
+        if not starken_token:
+            return JsonResponse({
+                'starken': 3500,  # Precio fijo si no hay token
+                'bluexpress': 4200
+            })
+        
+        # Calcular envío con Starken
+        starken_precio = calcular_starken(region, ciudad, direccion, peso, starken_token)
+        
+        # BlueExpress (simulado por ahora)
+        bluexpress_precio = int(starken_precio * 1.2) if starken_precio else 4200
+        
+        return JsonResponse({
+            'starken': starken_precio,
+            'bluexpress': bluexpress_precio
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'starken': 3500,  # Fallback
+            'bluexpress': 4200
+        })
+
+def calcular_starken(region, ciudad, direccion, peso, token):
+    try:
+        # API de Starken para cotización
+        url = 'https://api.starken.cl/v1/cotizacion'
+        
+        headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            'origen': {
+                'region': 'Metropolitana',
+                'ciudad': 'Santiago',
+                'direccion': 'Av. Providencia 1234'
+            },
+            'destino': {
+                'region': region,
+                'ciudad': ciudad,
+                'direccion': direccion
+            },
+            'paquete': {
+                'peso': peso,
+                'largo': 30,
+                'ancho': 20,
+                'alto': 10
+            }
+        }
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return data.get('precio', 3500)
+        else:
+            return 3500  # Precio por defecto
+            
+    except Exception as e:
+        return 3500  # Precio por defecto en caso de error
 
