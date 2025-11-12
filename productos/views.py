@@ -308,11 +308,12 @@ def debug_config(request):
 def obtener_imagen_producto(request, producto_id):
     try:
         producto = Producto.objects.get(id=producto_id)
-        if not producto.imagen_principal:
+        imagen_principal = producto.imagen_principal()
+        
+        if not imagen_principal:
             return JsonResponse({'imagen': None})
         
-        # Siempre devolver imagen original por ahora
-        return JsonResponse({'imagen': producto.imagen_principal.url})
+        return JsonResponse({'imagen': imagen_principal.url})
             
     except Producto.DoesNotExist:
         return JsonResponse({'imagen': None})
