@@ -394,32 +394,39 @@
             const item = carrito.find(p => p.id === id && p.personalizacion === personalizacion);
             if (item) {
                 item.cantidad += cantidad;
-                localStorage.setItem('carrito', JSON.stringify(carrito));
-                actualizarContadorCarrito();
             } else {
-                // Obtener imagen usando fetch del endpoint
+                // Obtener imagen del endpoint y agregar al carrito
                 fetch(`/obtener-imagen/${id}/`)
                     .then(response => response.json())
                     .then(data => {
-                        if (data.imagen) {
-                            // Actualizar el item en el carrito con la imagen
-                            const itemIndex = carrito.findIndex(p => p.id === id && p.personalizacion === personalizacion);
-                            if (itemIndex !== -1) {
-                                carrito[itemIndex].imagen = data.imagen;
-                                localStorage.setItem('carrito', JSON.stringify(carrito));
-                            }
-                        }
+                        carrito.push({
+                            id: id,
+                            nombre: nombre,
+                            precio: precio,
+                            cantidad: cantidad,
+                            personalizacion: personalizacion,
+                            imagen: data.imagen || null
+                        });
+                        localStorage.setItem('carrito', JSON.stringify(carrito));
+                        actualizarContadorCarrito();
                     })
-                    .catch(error => console.log('Error obteniendo imagen:', error));
-                
-                let imagenUrl = null;
-                
-                carrito.push({id, nombre, precio, cantidad, personalizacion, imagen: imagenUrl});
-                localStorage.setItem('carrito', JSON.stringify(carrito));
-                actualizarContadorCarrito();
+                    .catch(error => {
+                        // Si falla, agregar sin imagen
+                        carrito.push({
+                            id: id,
+                            nombre: nombre,
+                            precio: precio,
+                            cantidad: cantidad,
+                            personalizacion: personalizacion,
+                            imagen: null
+                        });
+                        localStorage.setItem('carrito', JSON.stringify(carrito));
+                        actualizarContadorCarrito();
+                    });
+                return;
             }
-            
-            console.log(`${cantidad} producto(s) agregado(s) al carrito`);
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            actualizarContadorCarrito();
         }
         
         // Actualizar contador al cargar la página
