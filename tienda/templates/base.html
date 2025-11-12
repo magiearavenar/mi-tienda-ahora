@@ -379,9 +379,9 @@
             document.getElementById('qty-' + id).textContent = cantidades[id];
         }
         
-        function agregarAlCarritoConCantidad(id, nombre, precio) {
+        function agregarAlCarritoConCantidad(id, nombre, precio, event) {
             const cantidad = cantidades[id] || 1;
-            agregarAlCarrito(id, nombre, precio, cantidad);
+            agregarAlCarrito(id, nombre, precio, cantidad, '', event);
             
             cantidades[id] = 1;
             const qtyElement = document.getElementById('qty-' + id);
@@ -390,26 +390,39 @@
             }
         }
         
-        function agregarAlCarrito(id, nombre, precio, cantidad = 1, personalizacion = '') {
+        function agregarAlCarrito(id, nombre, precio, cantidad = 1, personalizacion = '', event = null) {
             const item = carrito.find(p => p.id === id && p.personalizacion === personalizacion);
             if (item) {
                 item.cantidad += cantidad;
                 localStorage.setItem('carrito', JSON.stringify(carrito));
                 actualizarContadorCarrito();
             } else {
-                // Obtener imagen del producto desde el DOM
+                // Buscar imagen del producto en el DOM
                 let imagenUrl = null;
-                const productCards = document.querySelectorAll('.product-card, .product-card-carousel');
-                productCards.forEach(card => {
-                    const cardTitle = card.querySelector('h6, .product-name, .card-title');
-                    if (cardTitle && cardTitle.textContent.trim() === nombre) {
-                        const img = card.querySelector('img');
-                        if (img && img.src && !img.src.includes('placeholder')) {
-                            imagenUrl = img.src;
-                        }
-                    }
-                });
                 
+                // Buscar por el botón que se clickeó
+                const clickedButton = event ? event.target.closest('.product-card, .product-card-carousel, .carousel-item-custom') : null;
+                if (clickedButton) {
+                    const img = clickedButton.querySelector('img');
+                    if (img && img.src && !img.src.includes('placeholder') && !img.src.includes('text=')) {
+                        imagenUrl = img.src;
+                    }
+                }
+                
+                // Si no encontró imagen, buscar por nombre
+                if (!imagenUrl) {
+                    document.querySelectorAll('.product-card, .product-card-carousel').forEach(card => {
+                        const cardTitle = card.querySelector('h6, .product-name, .card-title');
+                        if (cardTitle && cardTitle.textContent.trim() === nombre) {
+                            const img = card.querySelector('img');
+                            if (img && img.src && !img.src.includes('placeholder') && !img.src.includes('text=')) {
+                                imagenUrl = img.src;
+                            }
+                        }
+                    });
+                }
+                
+                console.log('Imagen capturada:', imagenUrl);
                 carrito.push({id, nombre, precio, cantidad, personalizacion, imagen: imagenUrl});
                 localStorage.setItem('carrito', JSON.stringify(carrito));
                 actualizarContadorCarrito();
