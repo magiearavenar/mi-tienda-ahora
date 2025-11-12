@@ -39,46 +39,7 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="checkoutModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Datos de Envío</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">NOMBRE</label>
-                    <input type="text" class="form-control" id="nombre" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">EMAIL</label>
-                    <input type="email" class="form-control" id="email" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">DIRECCIÓN</label>
-                    <input type="text" class="form-control" id="direccion" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Método de Pago:</label>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="metodoPago" id="flow" value="flow" checked>
-                        <label class="form-check-label" for="flow">Flow (Chile)</label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="metodoPago" id="mercadopago" value="mercadopago">
-                        <label class="form-check-label" for="mercadopago">MercadoPago</label>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="confirmarPago()">CONFIRMAR PAGO</button>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <style>
 .cart-section {
@@ -350,8 +311,7 @@ function procederPago() {
         return;
     }
     
-    const modal = new bootstrap.Modal(document.getElementById('checkoutModal'));
-    modal.show();
+    window.location.href = '/checkout/';
 }
 
 function confirmarPago() {

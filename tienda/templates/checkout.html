@@ -1,178 +1,537 @@
 {% extends 'base.html' %}
 
-{% block categories %}{% endblock %}
-
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5>RESUMEN DE TU PEDIDO</h5>
-            </div>
-            <div class="card-body">
-                <div id="resumen-productos"></div>
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="card-header">
-                <h5>OPCIONES DE ENVÍO</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="card border-2" style="cursor: pointer;" onclick="seleccionarEnvio('starken')">
-                            <div class="card-body text-center">
-                                <h6>STARKEN</h6>
-                                <p class="text-muted">2-3 días hábiles</p>
-                                <small class="text-info">Pago contra entrega</small>
-                                <input type="radio" name="envio" value="starken" id="starken">
-                            </div>
+<div class="checkout-container">
+    <div class="row">
+        <!-- Columna izquierda: Formulario -->
+        <div class="col-lg-8">
+            <div class="checkout-form">
+                <h2 class="checkout-title">Finalizar Compra</h2>
+                
+                <!-- 1. Contacto -->
+                <div class="form-section">
+                    <h4 class="section-title">1. Contacto</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">E-mail *</label>
+                            <input type="email" class="form-control" id="email" required>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="card border-2" style="cursor: pointer;" onclick="seleccionarEnvio('bluexpress')">
-                            <div class="card-body text-center">
-                                <h6>BLUE EXPRESS</h6>
-                                <p class="text-muted">3-5 días hábiles</p>
-                                <small class="text-info">Pago contra entrega</small>
-                                <input type="radio" name="envio" value="bluexpress" id="bluexpress">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Número telefónico *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">+56</span>
+                                <input type="tel" class="form-control" id="telefono" required>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- 2. Envío -->
+                <div class="form-section">
+                    <h4 class="section-title">2. Envío</h4>
+                    <div class="shipping-options">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="tipoEnvio" id="envioDir" value="direccion" checked>
+                            <label class="form-check-label" for="envioDir">
+                                <i class="fas fa-truck me-2"></i>Envío a una dirección
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="tipoEnvio" id="retiroTienda" value="retiro">
+                            <label class="form-check-label" for="retiroTienda">
+                                <i class="fas fa-store me-2"></i>Retiro en tienda
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Dirección de envío -->
+                <div class="form-section" id="direccionSection">
+                    <h4 class="section-title">3. Dirección de envío</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Nombre *</label>
+                            <input type="text" class="form-control" id="nombre" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Apellido *</label>
+                            <input type="text" class="form-control" id="apellido" required>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Estado / Región *</label>
+                            <select class="form-control" id="region" required>
+                                <option value="">Seleccionar región</option>
+                                <option value="Metropolitana">Región Metropolitana</option>
+                                <option value="Valparaíso">Región de Valparaíso</option>
+                                <option value="Biobío">Región del Biobío</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Ciudad *</label>
+                            <input type="text" class="form-control" id="ciudad" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Dirección *</label>
+                        <input type="text" class="form-control" id="direccion" placeholder="Calle y número" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Apartamento, casa, puerta, etc. (opcional)</label>
+                        <input type="text" class="form-control" id="complemento">
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Documento electrónico</label>
+                            <select class="form-control" id="tipoDocumento">
+                                <option value="boleta">Boleta</option>
+                                <option value="factura">Factura</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check mt-4">
+                                <input class="form-check-input" type="checkbox" id="esEmpresa">
+                                <label class="form-check-label" for="esEmpresa">
+                                    Soy empresa
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="datosEmpresa" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Razón social</label>
+                                <input type="text" class="form-control" id="razonSocial">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Giro</label>
+                                <input type="text" class="form-control" id="giro">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Confirmaciones -->
+                <div class="form-section">
+                    <h4 class="section-title">4. Confirmaciones</h4>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="confirmarTiempo" required>
+                        <label class="form-check-label" for="confirmarTiempo">
+                            Confirmo que el pedido será preparado y despachado en 3-5 días hábiles
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="aceptarCondiciones" required>
+                        <label class="form-check-label" for="aceptarCondiciones">
+                            Acepto las condiciones de envío y términos de servicio
+                        </label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="autorizarDatos">
+                        <label class="form-check-label" for="autorizarDatos">
+                            Autorizo el uso de mis datos para seguimiento y contacto
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 5. Notas -->
+                <div class="form-section">
+                    <h4 class="section-title">5. Notas o comentarios</h4>
+                    <textarea class="form-control" id="notas" rows="3" placeholder="Deja un mensaje para el vendedor (opcional)"></textarea>
+                </div>
+
+                <!-- 6. Método de Pago -->
+                <div class="form-section">
+                    <h4 class="section-title">6. Método de Pago</h4>
+                    <div class="payment-methods">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="metodoPago" id="flow" value="flow" checked>
+                            <label class="form-check-label" for="flow">
+                                <i class="fas fa-credit-card me-2"></i>Flow (Chile)
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="metodoPago" id="mercadopago" value="mercadopago">
+                            <label class="form-check-label" for="mercadopago">
+                                <i class="fab fa-cc-mastercard me-2"></i>MercadoPago
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón de acción -->
+                <div class="form-section">
+                    <button class="btn btn-checkout btn-lg w-100" onclick="procesarPedido()">
+                        FINALIZAR COMPRA
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">
-                <h5>DATOS DE ENVÍO</h5>
-            </div>
-            <div class="card-body">
-                <div id="datos-envio"></div>
-            </div>
-        </div>
-        
-        <div class="card mt-3">
-            <div class="card-header">
-                <h5>TOTAL A PAGAR</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between mb-3">
-                    <span class="h5">TOTAL PRODUCTOS:</span>
-                    <span class="h5 text-primary">$<span id="subtotal-checkout">0</span></span>
+
+        <!-- Columna derecha: Resumen del pedido -->
+        <div class="col-lg-4">
+            <div class="order-summary">
+                <h4 class="summary-title">Resumen del pedido</h4>
+                
+                <div id="productos-resumen"></div>
+                
+                <div class="discount-section">
+                    <label class="form-label">Código de descuento</label>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="codigoDescuento" placeholder="Ingresa tu código">
+                        <button class="btn btn-outline-secondary" onclick="aplicarDescuento()">APLICAR</button>
+                    </div>
                 </div>
-                <div class="alert alert-info">
-                    <small><strong>Envío:</strong> Se paga contra entrega según la agencia seleccionada</small>
-                </div>
-                <div class="d-grid">
-                    <button class="btn btn-primary btn-lg" onclick="confirmarPedido()">CONFIRMAR PEDIDO</button>
-                    <a href="{% url 'carrito' %}" class="btn btn-outline-secondary mt-2">VOLVER AL CARRITO</a>
+                
+                <div class="summary-totals">
+                    <div class="summary-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">$0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Descuento:</span>
+                        <span id="descuento">$0</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total:</span>
+                        <span id="total">$0</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<style>
+.checkout-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.checkout-form {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.checkout-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.form-section {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.section-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: var(--color-primario);
+    margin-right: 10px;
+    border-radius: 2px;
+}
+
+.form-label {
+    font-weight: 500;
+    color: #555;
+    margin-bottom: 0.5rem;
+}
+
+.form-control {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.75rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--color-primario);
+    box-shadow: 0 0 0 0.2rem rgba(255,193,234,0.25);
+}
+
+.shipping-options .form-check-label {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.payment-methods .form-check-label {
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-checkout {
+    background: var(--color-primario);
+    border: none;
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-checkout:hover {
+    background: var(--color-hover);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.order-summary {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    position: sticky;
+    top: 2rem;
+}
+
+.summary-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.product-summary {
+    display: flex;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.product-summary img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-right: 1rem;
+}
+
+.product-info h6 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.product-info .quantity {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.product-price {
+    margin-left: auto;
+    font-weight: 600;
+    color: #333;
+}
+
+.discount-section {
+    margin: 1.5rem 0;
+}
+
+.summary-totals {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f0f0;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.8rem;
+    font-size: 0.95rem;
+}
+
+.total-row {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+    padding-top: 0.8rem;
+    border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+    .checkout-container {
+        padding: 1rem;
+    }
+    
+    .checkout-form, .order-summary {
+        padding: 1.5rem;
+    }
+    
+    .order-summary {
+        margin-top: 2rem;
+        position: static;
+    }
+}
+</style>
+
 <script>
-let datosEnvio = {};
-let costoEnvio = 0;
+let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
 
 document.addEventListener('DOMContentLoaded', function() {
-    cargarDatosCheckout();
+    mostrarResumenPedido();
+    
+    // Toggle datos empresa
+    document.getElementById('esEmpresa').addEventListener('change', function() {
+        document.getElementById('datosEmpresa').style.display = this.checked ? 'block' : 'none';
+    });
+    
+    // Toggle sección dirección
+    document.querySelectorAll('input[name="tipoEnvio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            document.getElementById('direccionSection').style.display = 
+                this.value === 'direccion' ? 'block' : 'none';
+        });
+    });
 });
 
-function cargarDatosCheckout() {
-    // Cargar productos del carrito
-    const resumenProductos = document.getElementById('resumen-productos');
+function mostrarResumenPedido() {
+    const productosResumen = document.getElementById('productos-resumen');
+    const subtotalElement = document.getElementById('subtotal');
+    const totalElement = document.getElementById('total');
+    
     let subtotal = 0;
     let html = '';
-    
-    if (carrito.length === 0) {
-        window.location.href = '/carrito/';
-        return;
-    }
     
     carrito.forEach(item => {
         const itemTotal = item.precio * item.cantidad;
         subtotal += itemTotal;
+        
         html += `
-            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                <div>
-                    <h6 class="mb-0">${item.nombre}</h6>
-                    <small class="text-muted">Cantidad: ${item.cantidad}</small>
+            <div class="product-summary">
+                ${item.imagen ? 
+                    `<img src="${item.imagen}" alt="${item.nombre}">` :
+                    `<div style="width: 60px; height: 60px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 12px;">IMG</div>`
+                }
+                <div class="product-info">
+                    <h6>${item.nombre}</h6>
+                    <div class="quantity">Cantidad: ${item.cantidad}</div>
                 </div>
-                <span>$${itemTotal}</span>
+                <div class="product-price">$${itemTotal.toLocaleString()}</div>
             </div>
         `;
     });
     
-    resumenProductos.innerHTML = html;
-    document.getElementById('subtotal-checkout').textContent = subtotal;
+    productosResumen.innerHTML = html;
+    subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
+    totalElement.textContent = `$${subtotal.toLocaleString()}`;
+}
+
+function aplicarDescuento() {
+    // Implementar lógica de descuento
+    alert('Función de descuento por implementar');
+}
+
+function procesarPedido() {
+    // Validar campos obligatorios
+    const email = document.getElementById('email').value;
+    const telefono = document.getElementById('telefono').value;
     
-    // Cargar datos de envío desde localStorage
-    const datosGuardados = localStorage.getItem('datosEnvio');
-    if (datosGuardados) {
-        datosEnvio = JSON.parse(datosGuardados);
-        mostrarDatosEnvio();
+    if (!email || !telefono) {
+        alert('Por favor completa todos los campos obligatorios');
+        return;
     }
     
-    actualizarTotal();
-}
-
-function mostrarDatosEnvio() {
-    const datosEnvioDiv = document.getElementById('datos-envio');
-    datosEnvioDiv.innerHTML = `
-        <p><strong>NOMBRE:</strong> ${datosEnvio.nombre} ${datosEnvio.apellido}</p>
-        <p><strong>RUT:</strong> ${datosEnvio.rut}</p>
-        <p><strong>DIRECCIÓN:</strong> ${datosEnvio.direccion}</p>
-        <p><strong>COMUNA:</strong> ${datosEnvio.comuna}</p>
-        <p><strong>PAÍS:</strong> ${datosEnvio.pais}</p>
-    `;
-}
-
-function seleccionarEnvio(tipo) {
-    document.getElementById(tipo).checked = true;
+    // Validar términos y condiciones
+    if (!document.getElementById('confirmarTiempo').checked || 
+        !document.getElementById('aceptarCondiciones').checked) {
+        alert('Debes aceptar las confirmaciones obligatorias');
+        return;
+    }
     
-    // Resaltar opción seleccionada
-    document.querySelectorAll('.card').forEach(card => {
-        card.classList.remove('border-primary');
+    const tipoEnvio = document.querySelector('input[name="tipoEnvio"]:checked').value;
+    
+    if (tipoEnvio === 'direccion') {
+        const nombre = document.getElementById('nombre').value;
+        const apellido = document.getElementById('apellido').value;
+        const direccion = document.getElementById('direccion').value;
+        
+        if (!nombre || !apellido || !direccion) {
+            alert('Por favor completa todos los datos de envío');
+            return;
+        }
+    }
+    
+    const metodoPago = document.querySelector('input[name="metodoPago"]:checked').value;
+    
+    // Preparar datos para envío
+    const datosEnvio = {
+        email: email,
+        telefono: telefono,
+        tipoEnvio: tipoEnvio,
+        nombre: document.getElementById('nombre').value,
+        apellido: document.getElementById('apellido').value,
+        direccion: document.getElementById('direccion').value,
+        notas: document.getElementById('notas').value
+    };
+    
+    // Procesar pago
+    fetch('/procesar-pago/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            carrito: carrito,
+            datosEnvio: datosEnvio,
+            metodoPago: metodoPago
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.url) {
+            localStorage.removeItem('carrito');
+            window.location.href = data.url;
+        } else {
+            alert(data.error || 'Error al procesar el pago');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al procesar el pago');
     });
-    document.querySelector(`#${tipo}`).closest('.card').classList.add('border-primary');
 }
 
-
-
-function confirmarPedido() {
-    const envioSeleccionado = document.querySelector('input[name="envio"]:checked');
-    if (!envioSeleccionado) {
-        Swal.fire({
-            title: 'Selecciona envío',
-            text: 'Por favor elige una opción de envío',
-            icon: 'warning',
-            confirmButtonColor: '#ffc1ea'
-        });
-        return;
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
     }
-    
-    if (Object.keys(datosEnvio).length === 0) {
-        Swal.fire({
-            title: 'Datos faltantes',
-            text: 'Vuelve al carrito para completar los datos de envío',
-            icon: 'error',
-            confirmButtonColor: '#ffc1ea'
-        });
-        return;
-    }
-    
-    // Limpiar carrito
-    carrito = [];
-    localStorage.removeItem('carrito');
-    localStorage.removeItem('datosEnvio');
-    
-    window.location.href = '/';
+    return cookieValue;
 }
 </script>
 {% endblock %}
