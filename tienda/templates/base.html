@@ -1,4 +1,3 @@
-{% load dict_extras %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -246,20 +245,66 @@
         <div class="container">
             <div class="d-flex flex-wrap justify-content-center">
                 <a href="{% url 'home' %}" class="category-link">INICIO</a>
-                {% for codigo_madre, nombre_madre in categorias_madre %}
-                    {% if categorias_por_madre|get_item:codigo_madre %}
-                        <div class="dropdown">
-                            <span class="category-link has-dropdown">{{ nombre_madre }}</span>
-                            <div class="dropdown-content">
-                                {% for subcategoria in categorias_por_madre|get_item:codigo_madre %}
-                                    <a href="{% url 'productos_categoria' subcategoria.id %}">{{ subcategoria.nombre }}</a>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% else %}
-                        <span class="category-link">{{ nombre_madre }}</span>
-                    {% endif %}
-                {% endfor %}
+                
+                <!-- PAPELERÍA -->
+                <div class="dropdown">
+                    <span class="category-link has-dropdown">PAPELERÍA</span>
+                    <div class="dropdown-content">
+                        {% for categoria in categorias %}
+                            {% if "planner" in categoria.nombre|lower or "agenda" in categoria.nombre|lower or "organizador" in categoria.nombre|lower or "cuaderno" in categoria.nombre|lower or "libreta" in categoria.nombre|lower %}
+                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- COTILLÓN -->
+                <div class="dropdown">
+                    <span class="category-link has-dropdown">COTILLÓN</span>
+                    <div class="dropdown-content">
+                        {% for categoria in categorias %}
+                            {% if "cotillón" in categoria.nombre|lower or "fiesta" in categoria.nombre|lower or "globo" in categoria.nombre|lower or "decoración" in categoria.nombre|lower %}
+                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- ACCESORIOS -->
+                <div class="dropdown">
+                    <span class="category-link has-dropdown">ACCESORIOS</span>
+                    <div class="dropdown-content">
+                        {% for categoria in categorias %}
+                            {% if "accesorio" in categoria.nombre|lower or "llavero" in categoria.nombre|lower or "bolsa" in categoria.nombre|lower or "estuche" in categoria.nombre|lower %}
+                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- NAVIDAD -->
+                <div class="dropdown">
+                    <span class="category-link has-dropdown">NAVIDAD</span>
+                    <div class="dropdown-content">
+                        {% for categoria in categorias %}
+                            {% if "navidad" in categoria.nombre|lower or "navideño" in categoria.nombre|lower or "christmas" in categoria.nombre|lower %}
+                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- ESTAMPADOS -->
+                <div class="dropdown">
+                    <span class="category-link has-dropdown">ESTAMPADOS</span>
+                    <div class="dropdown-content">
+                        {% for categoria in categorias %}
+                            {% if "estampado" in categoria.nombre|lower or "diseño" in categoria.nombre|lower or "print" in categoria.nombre|lower or "personalizado" in categoria.nombre|lower %}
+                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
                 {% block categories %}{% endblock %}
             </div>
         </div>
