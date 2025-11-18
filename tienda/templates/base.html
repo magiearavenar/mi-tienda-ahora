@@ -287,16 +287,16 @@
 
     <footer class="footer mt-5">
         <div class="container py-5">
-            <div class="row">
+            <div class="row align-items-start">
                 {% if sobre_mi %}
-                <div class="col-md-3 mb-4">
+                <div class="col mb-4">
                     <h5>{{ sobre_mi.titulo }}</h5>
-                    <p class="small">{{ sobre_mi.contenido|truncatewords:20 }}</p>
+                    <p class="small">{{ sobre_mi.contenido }}</p>
                 </div>
                 {% endif %}
                 
                 {% if contacto %}
-                <div class="col-md-3 mb-4">
+                <div class="col mb-4">
                     <h5>{{ contacto.titulo }}</h5>
                     {% if contacto.telefono %}<p class="small mb-1"><i class="fas fa-phone me-2"></i>{{ contacto.telefono }}</p>{% endif %}
                     {% if contacto.email %}<p class="small mb-1"><i class="fas fa-envelope me-2"></i>{{ contacto.email }}</p>{% endif %}
@@ -305,8 +305,15 @@
                 </div>
                 {% endif %}
                 
+                <!-- Logo en el centro -->
+                <div class="col mb-4 text-center">
+                    <a href="{% url 'home' %}">
+                        <img src="/static/images/logo.png" alt="Mundo Magie Logo" style="max-width: 250px; height: auto; opacity: 0.8; margin-top: -20px;" onerror="this.style.display='none'">
+                    </a>
+                </div>
+                
                 {% if informacion %}
-                <div class="col-md-3 mb-4">
+                <div class="col mb-4">
                     <h5>Información</h5>
                     {% for info in informacion %}
                     <p class="small mb-1"><a href="#" class="footer-link">{{ info.titulo }}</a></p>
@@ -315,21 +322,20 @@
                 {% endif %}
                 
                 {% if suscripcion %}
-                <div class="col-md-3 mb-4">
+                <div class="col mb-4">
                     <h5>{{ suscripcion.titulo }}</h5>
-                    <p class="small mb-3">{{ suscripcion.descripcion }}</p>
-                    <div class="input-group input-group-sm">
+                    <p class="small mb-2">{{ suscripcion.descripcion|truncatewords:8 }}</p>
+                    <div class="input-group input-group-sm mb-2">
                         <input type="email" class="form-control" placeholder="Tu email">
                         <button class="btn btn-primary" type="button">Suscribir</button>
                     </div>
-                    <div class="mt-3">
-                        <h6>Síguenos</h6>
-                        <a href="https://wa.link/ggf77d" target="_blank" class="me-3 social-link">
+                    <div>
+                        <a href="https://wa.link/ggf77d" target="_blank" class="me-2 social-link">
                             <i class="fab fa-whatsapp"></i>
                         </a>
                         {% if redes_sociales %}
                         {% for red in redes_sociales %}
-                        <a href="{{ red.url }}" target="_blank" class="me-3 social-link">
+                        <a href="{{ red.url }}" target="_blank" class="me-2 social-link">
                             <i class="{{ red.icono }}"></i>
                         </a>
                         {% endfor %}
@@ -341,7 +347,7 @@
             
             <hr style="border-top: 1px solid #dee2e6; border-bottom: none; border-left: none; border-right: none; margin: 2rem 0 1rem 0;">
             
-            <div class="row">
+            <div class="row" style="margin-top: -20px;">
                 <div class="col-12 text-center">
                     <p class="small mb-0">Diseñado por Mundo Magie 2025</p>
                     <p class="small mb-0">Diseño & Desarrollo Web Personalizado ♥</p>

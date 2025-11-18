@@ -184,6 +184,25 @@
 </div>
 {% endfor %}
 
+{% if instagram_config %}
+<div class="instagram-section mb-5">
+    <div class="text-center mb-4">
+        <h4 class="instagram-title">{{ instagram_config.titulo }}</h4>
+        <p class="text-muted">@{{ instagram_config.usuario }}</p>
+    </div>
+    
+    <div class="instagram-grid" id="instagram-posts">
+        <!-- Los posts se cargarán aquí -->
+    </div>
+    
+    <div class="text-center mt-4">
+        <a href="https://instagram.com/{{ instagram_config.usuario }}" target="_blank" class="btn btn-outline-primary">
+            <i class="fab fa-instagram"></i> Seguir en Instagram
+        </a>
+    </div>
+</div>
+{% endif %}
+
 <style>
 .category-section {
     margin-bottom: 3rem;
@@ -454,6 +473,77 @@
         min-width: 180px;
     }
 }
+
+.instagram-section {
+    margin-top: 4rem;
+}
+
+.instagram-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.instagram-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.instagram-post {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.instagram-post:hover {
+    transform: scale(1.05);
+}
+
+.instagram-post img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.instagram-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.instagram-post:hover .instagram-overlay {
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .instagram-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .instagram-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+}
 </style>
 
 <script>
@@ -513,6 +603,62 @@ function updateDots(carouselId) {
     dots.forEach((dot, index) => {
         dot.classList.toggle('active', index === carouselPositions[carouselId]);
     });
+}
+
+// Cargar posts de Instagram
+document.addEventListener('DOMContentLoaded', function() {
+    {% if instagram_config %}
+    loadInstagramPosts('{{ instagram_config.usuario }}', {{ instagram_config.cantidad_posts }});
+    {% endif %}
+});
+
+function loadInstagramPosts(username, count) {
+    const container = document.getElementById('instagram-posts');
+    
+    // Mostrar loading
+    container.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Cargando posts...</div>';
+    
+    // Cargar posts desde la API
+    fetch('/api/instagram-posts/')
+        .then(response => response.json())
+        .then(data => {
+            const posts = data.posts || [];
+            
+            if (posts.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted">No hay posts disponibles</div>';
+                return;
+            }
+            
+            container.innerHTML = posts.map(post => `
+                <div class="instagram-post" onclick="window.open('${post.permalink}', '_blank')" title="${post.caption}">
+                    <img src="${post.image_url}" alt="Instagram post" loading="lazy">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error cargando posts de Instagram:', error);
+            // Fallback a posts placeholder
+            const posts = [];
+            for (let i = 1; i <= count; i++) {
+                posts.push({
+                    id: i,
+                    image_url: `https://picsum.photos/300/300?random=${i}`,
+                    permalink: `https://instagram.com/${username}`
+                });
+            }
+            
+            container.innerHTML = posts.map(post => `
+                <div class="instagram-post" onclick="window.open('${post.permalink}', '_blank')">
+                    <img src="${post.image_url}" alt="Instagram post" loading="lazy">
+                    <div class="instagram-overlay">
+                        <i class="fab fa-instagram"></i>
+                    </div>
+                </div>
+            `).join('');
+        });
 }
 </script>
 {% endblock %}

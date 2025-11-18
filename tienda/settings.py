@@ -210,3 +210,6 @@ MERCADOPAGO_ACCESS_TOKEN = os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')
 MERCADOPAGO_SANDBOX = os.environ.get('MERCADOPAGO_SANDBOX', 'True').lower() == 'true'
 
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
+
+# Instagram API
+INSTAGRAM_ACCESS_TOKEN = os.environ.get('INSTAGRAM_ACCESS_TOKEN', '')

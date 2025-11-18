@@ -291,3 +291,17 @@ class OpcionProducto(models.Model):
         ordering = ['orden']
         verbose_name = "Opción de Producto"
         verbose_name_plural = "Opciones de Producto"
+
+class InstagramConfig(models.Model):
+    usuario = models.CharField(max_length=100, help_text='Usuario de Instagram (sin @)')
+    titulo = models.CharField(max_length=100, default='Síguenos en Instagram')
+    mostrar_en_home = models.BooleanField(default=True)
+    cantidad_posts = models.IntegerField(default=6, help_text='Cantidad de posts a mostrar')
+    activo = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"Instagram: @{self.usuario}"
+    
+    class Meta:
+        verbose_name = "Configuración de Instagram"
+        verbose_name_plural = "Configuración de Instagram"

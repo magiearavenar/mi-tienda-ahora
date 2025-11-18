@@ -1,4 +1,4 @@
-from .models import FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, BannerFidelizacion, ConfiguracionSitio, Categoria
+from .models import FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, BannerFidelizacion, ConfiguracionSitio, Categoria, InstagramConfig
 
 def footer_context(request):
     return {
@@ -10,5 +10,6 @@ def footer_context(request):
         'redes_sociales': RedSocial.objects.filter(activo=True),
         'banners': BannerFidelizacion.objects.filter(activo=True),
         'config': ConfiguracionSitio.objects.filter(activo=True).first(),
-        'categorias': Categoria.objects.all()
+        'categorias': Categoria.objects.all(),
+        'instagram_config': InstagramConfig.objects.filter(activo=True, mostrar_en_home=True).first()
     }

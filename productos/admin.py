@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig
 from .widgets import ColorPickerWidget
 
 @admin.register(Tag)
@@ -220,3 +220,14 @@ class PagoAdmin(admin.ModelAdmin):
     list_filter = ['metodo', 'estado', 'fecha_creacion']
     search_fields = ['pedido__id', 'token_pago', 'id_transaccion']
     readonly_fields = ['fecha_creacion', 'fecha_pago', 'datos_respuesta']
+
+@admin.register(InstagramConfig)
+class InstagramConfigAdmin(admin.ModelAdmin):
+    list_display = ['usuario', 'titulo', 'mostrar_en_home', 'activo']
+    list_editable = ['mostrar_en_home', 'activo']
+    
+    def has_add_permission(self, request):
+        return not InstagramConfig.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        return True

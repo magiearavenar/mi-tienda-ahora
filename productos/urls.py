@@ -1,6 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from . import views
+from .views_instagram import instagram_posts_api
 
 urlpatterns = [
     path('', views.home, name='home'),
@@ -26,4 +27,5 @@ urlpatterns = [
     path('debug/config/', views.debug_config, name='debug_config'),
     path('obtener-imagen/<int:producto_id>/', views.obtener_imagen_producto, name='obtener_imagen_producto'),
     path('calcular-envio/', views.calcular_envio, name='calcular_envio'),
+    path('api/instagram-posts/', instagram_posts_api, name='instagram_posts_api'),
 ]
