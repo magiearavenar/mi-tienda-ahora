@@ -14,8 +14,17 @@ class Tag(models.Model):
         ordering = ['nombre']
 
 class Categoria(models.Model):
+    CATEGORIAS_MADRE = [
+        ('PAPELERIA', 'PAPELERÍA'),
+        ('COTILLON', 'COTILLÓN'),
+        ('ACCESORIOS', 'ACCESORIOS'),
+        ('NAVIDAD', 'NAVIDAD'),
+        ('ESTAMPADOS', 'ESTAMPADOS'),
+    ]
+    
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
+    categoria_madre = models.CharField(max_length=20, choices=CATEGORIAS_MADRE, blank=True, null=True, help_text='Categoría madre a la que pertenece')
     tags = models.ManyToManyField(Tag, blank=True, help_text='Tags asociados a esta categoría')
     visible_navegacion = models.BooleanField(default=True, help_text='¿Mostrar en el menú de navegación?')
     
