@@ -250,11 +250,14 @@
                 <div class="dropdown">
                     <span class="category-link has-dropdown">PAPELERÍA</span>
                     <div class="dropdown-content">
-                        {% for categoria in categorias %}
-                            {% if "planner" in categoria.nombre|lower or "agenda" in categoria.nombre|lower or "organizador" in categoria.nombre|lower or "cuaderno" in categoria.nombre|lower or "libreta" in categoria.nombre|lower %}
-                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
-                            {% endif %}
-                        {% endfor %}
+                        <a href="{% url 'buscar' %}?q=planner">Planner</a>
+                        <a href="{% url 'buscar' %}?q=colorear">Colorear</a>
+                        <a href="{% url 'buscar' %}?q=organizadores">Organizadores</a>
+                        <a href="{% url 'buscar' %}?q=calendario">Calendario</a>
+                        <a href="{% url 'buscar' %}?q=turnario">Turnario</a>
+                        <a href="{% url 'buscar' %}?q=planner+profesiones">Planner Profesiones</a>
+                        <a href="{% url 'buscar' %}?q=agenda+docente">Agenda Docente</a>
+                        <a href="{% url 'buscar' %}?q=agenda+educadora">Agenda Educadora</a>
                     </div>
                 </div>
                 
@@ -264,7 +267,9 @@
                     <div class="dropdown-content">
                         {% for categoria in categorias %}
                             {% if "cotillón" in categoria.nombre|lower or "fiesta" in categoria.nombre|lower or "globo" in categoria.nombre|lower or "decoración" in categoria.nombre|lower %}
-                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower %}
+                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -276,7 +281,9 @@
                     <div class="dropdown-content">
                         {% for categoria in categorias %}
                             {% if "accesorio" in categoria.nombre|lower or "llavero" in categoria.nombre|lower or "bolsa" in categoria.nombre|lower or "estuche" in categoria.nombre|lower %}
-                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower %}
+                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -288,7 +295,9 @@
                     <div class="dropdown-content">
                         {% for categoria in categorias %}
                             {% if "navidad" in categoria.nombre|lower or "navideño" in categoria.nombre|lower or "christmas" in categoria.nombre|lower %}
-                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower %}
+                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -300,7 +309,9 @@
                     <div class="dropdown-content">
                         {% for categoria in categorias %}
                             {% if "estampado" in categoria.nombre|lower or "diseño" in categoria.nombre|lower or "print" in categoria.nombre|lower or "personalizado" in categoria.nombre|lower %}
-                                <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower %}
+                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
                     </div>
