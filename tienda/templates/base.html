@@ -316,6 +316,12 @@
                         {% endfor %}
                     </div>
                 </div>
+                <!-- Mostrar solo categorías que no estén en los dropdowns -->
+                {% for categoria in categorias %}
+                    {% if categoria.nombre != "Colorear" and categoria.nombre != "Navidad" and categoria.nombre != "Papelería" and categoria.nombre != "Docente" and "planner" not in categoria.nombre|lower and "agenda" not in categoria.nombre|lower and "organizador" not in categoria.nombre|lower and "cuaderno" not in categoria.nombre|lower and "libreta" not in categoria.nombre|lower and "cotillón" not in categoria.nombre|lower and "fiesta" not in categoria.nombre|lower and "globo" not in categoria.nombre|lower and "decoración" not in categoria.nombre|lower and "accesorio" not in categoria.nombre|lower and "llavero" not in categoria.nombre|lower and "bolsa" not in categoria.nombre|lower and "estuche" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower and "navideño" not in categoria.nombre|lower and "christmas" not in categoria.nombre|lower and "estampado" not in categoria.nombre|lower and "diseño" not in categoria.nombre|lower and "print" not in categoria.nombre|lower and "personalizado" not in categoria.nombre|lower %}
+                        <a href="{% url 'productos_categoria' categoria.id %}" class="category-link">{{ categoria.nombre }}</a>
+                    {% endif %}
+                {% endfor %}
                 {% block categories %}{% endblock %}
             </div>
         </div>
