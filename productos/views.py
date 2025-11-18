@@ -11,7 +11,7 @@ from django.utils import timezone
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, InstagramConfig
 from .services import FlowService, MercadoPagoService
 
 def home(request):
@@ -20,6 +20,7 @@ def home(request):
     slides = Slide.objects.filter(activo=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
+    instagram_config = InstagramConfig.objects.filter(activo=True, mostrar_en_home=True).first()
     
     # Secciones de categorías
     secciones_categorias = SeccionCategoria.objects.filter(activo=True)[:3]
@@ -41,7 +42,8 @@ def home(request):
         'slides': slides,
         'config': config,
         'banners': banners,
-        'secciones_categorias': secciones_con_productos
+        'secciones_categorias': secciones_con_productos,
+        'instagram_config': instagram_config
     })
 
 def productos_por_categoria(request, categoria_id):
