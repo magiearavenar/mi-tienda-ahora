@@ -15,6 +15,6 @@ COPY . .
 
 RUN python manage.py collectstatic --noinput
 
-EXPOSE 8000
+EXPOSE $PORT
 
-CMD ["sh", "-c", "python manage.py migrate && gunicorn tienda.wsgi:application --bind 0.0.0.0:8000"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn tienda.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
