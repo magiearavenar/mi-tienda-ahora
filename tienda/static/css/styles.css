@@ -60,11 +60,13 @@ div {
     padding: 0.5rem 1rem;
     transition: all 0.2s;
     margin: 0 0.25rem;
+    border-radius: 8px;
 }
 
 .category-link:hover {
     background-color: var(--color-hover);
     color: var(--color-primario);
+    text-decoration: none;
 }
 
 .product-card {

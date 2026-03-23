@@ -142,10 +142,8 @@
             position: absolute;
             background-color: white;
             min-width: 200px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1000;
             border-radius: 8px;
-            border: 1px solid #dee2e6;
             top: 100%;
             left: 0;
         }
@@ -250,14 +248,13 @@
                 <div class="dropdown">
                     <span class="category-link has-dropdown">PAPELERÍA</span>
                     <div class="dropdown-content">
-                        <a href="{% url 'buscar' %}?q=planner">Planner</a>
-                        <a href="{% url 'buscar' %}?q=colorear">Colorear</a>
-                        <a href="{% url 'buscar' %}?q=organizadores">Organizadores</a>
-                        <a href="{% url 'buscar' %}?q=calendario">Calendario</a>
-                        <a href="{% url 'buscar' %}?q=turnario">Turnario</a>
-                        <a href="{% url 'buscar' %}?q=planner+profesiones">Planner Profesiones</a>
-                        <a href="{% url 'buscar' %}?q=agenda+docente">Agenda Docente</a>
-                        <a href="{% url 'buscar' %}?q=agenda+educadora">Agenda Educadora</a>
+                        {% for categoria in categorias %}
+                            {% if "papeleria" in categoria.nombre|lower or "planner" in categoria.nombre|lower or "agenda" in categoria.nombre|lower or "organizador" in categoria.nombre|lower or "calendario" in categoria.nombre|lower or "turnario" in categoria.nombre|lower or "colorear" in categoria.nombre|lower %}
+                                {% if "cotillón" not in categoria.nombre|lower and "fiesta" not in categoria.nombre|lower and "globo" not in categoria.nombre|lower and "decoración" not in categoria.nombre|lower and "accesorio" not in categoria.nombre|lower and "llavero" not in categoria.nombre|lower and "bolsa" not in categoria.nombre|lower and "estuche" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower and "estampado" not in categoria.nombre|lower %}
+                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
                     </div>
                 </div>
                 
@@ -266,7 +263,7 @@
                     <span class="category-link has-dropdown">COTILLÓN</span>
                     <div class="dropdown-content">
                         {% for categoria in categorias %}
-                            {% if "cotillón" in categoria.nombre|lower or "fiesta" in categoria.nombre|lower or "globo" in categoria.nombre|lower or "decoración" in categoria.nombre|lower %}
+                            {% if "cotillon" in categoria.nombre|lower or "fiesta" in categoria.nombre|lower or "globo" in categoria.nombre|lower or "decoracion" in categoria.nombre|lower %}
                                 {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower %}
                                     <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
                                 {% endif %}
@@ -294,7 +291,7 @@
                     <span class="category-link has-dropdown">NAVIDAD</span>
                     <div class="dropdown-content">
                         {% for categoria in categorias %}
-                            {% if "navidad" in categoria.nombre|lower or "navideño" in categoria.nombre|lower or "christmas" in categoria.nombre|lower %}
+                            {% if "navidad" in categoria.nombre|lower or "navideno" in categoria.nombre|lower or "christmas" in categoria.nombre|lower %}
                                 {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower %}
                                     <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
                                 {% endif %}
@@ -316,13 +313,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                <!-- Mostrar solo categorías que no estén en los dropdowns -->
-                {% for categoria in categorias %}
-                    {% if categoria.nombre != "Colorear" and categoria.nombre != "Navidad" and categoria.nombre != "Papelería" and categoria.nombre != "Docente" and "planner" not in categoria.nombre|lower and "agenda" not in categoria.nombre|lower and "organizador" not in categoria.nombre|lower and "cuaderno" not in categoria.nombre|lower and "libreta" not in categoria.nombre|lower and "cotillón" not in categoria.nombre|lower and "fiesta" not in categoria.nombre|lower and "globo" not in categoria.nombre|lower and "decoración" not in categoria.nombre|lower and "accesorio" not in categoria.nombre|lower and "llavero" not in categoria.nombre|lower and "bolsa" not in categoria.nombre|lower and "estuche" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower and "navideño" not in categoria.nombre|lower and "christmas" not in categoria.nombre|lower and "estampado" not in categoria.nombre|lower and "diseño" not in categoria.nombre|lower and "print" not in categoria.nombre|lower and "personalizado" not in categoria.nombre|lower %}
-                        <a href="{% url 'productos_categoria' categoria.id %}" class="category-link">{{ categoria.nombre }}</a>
-                    {% endif %}
-                {% endfor %}
-                {% block categories %}{% endblock %}
+
             </div>
         </div>
     </nav>

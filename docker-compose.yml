@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - media_files:/app/media
+
+volumes:
+  media_files:

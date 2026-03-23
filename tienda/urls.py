@@ -4,6 +4,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
 
+# Configuración del sitio administrativo
+admin.site.site_title = "Mi Tienda Admin"
+admin.site.site_header = "Panel de Administración - Mi Tienda"
+admin.site.index_title = "Bienvenido al Panel de Administración"
+
 def robots_txt(request):
     content = """User-agent: *
 Allow: /

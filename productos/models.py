@@ -49,13 +49,34 @@ class Producto(models.Model):
         return self.nombre
     
     def imagen_principal(self):
+        # Primero buscar en ImagenProducto marcada como principal
         imagen_principal = self.imagenes.filter(es_principal=True).first()
         if imagen_principal:
             return imagen_principal.imagen
+        
+        # Si no hay principal, tomar la primera imagen de ImagenProducto
         primera_imagen = self.imagenes.first()
         if primera_imagen:
             return primera_imagen.imagen
+        
+        # Como último recurso, usar el campo imagen individual
         return self.imagen
+    
+    def todas_las_imagenes(self):
+        """Retorna todas las imágenes del producto para mostrar en el catálogo"""
+        imagenes = []
+        
+        # Agregar todas las imágenes de ImagenProducto
+        for img in self.imagenes.all():
+            imagenes.append(img.imagen)
+        
+        # Si hay imagen individual y no está en ImagenProducto, agregarla
+        if self.imagen:
+            urls_existentes = [img.imagen.url for img in self.imagenes.all() if img.imagen]
+            if self.imagen.url not in urls_existentes:
+                imagenes.append(self.imagen)
+        
+        return imagenes
     
     class Meta:
         ordering = ['-fecha_creacion']

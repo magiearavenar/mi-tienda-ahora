@@ -2,6 +2,8 @@ from django.contrib import admin
 from django import forms
 from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig
 from .widgets import ColorPickerWidget
+from .image_widgets import DragDropImageWidget
+# from .forms import ProductoAdminForm  # Comentado temporalmente
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -21,7 +23,26 @@ class CategoriaAdmin(admin.ModelAdmin):
 class ImagenProductoInline(admin.TabularInline):
     model = ImagenProducto
     extra = 1
-    fields = ['imagen', 'orden', 'es_principal']
+    fields = ['imagen', 'orden', 'es_principal', 'preview']
+    readonly_fields = ['preview']
+    
+    def preview(self, obj):
+        if obj.imagen:
+            return f'<img src="{obj.imagen.url}" style="max-width: 100px; max-height: 100px; border-radius: 4px;">'
+        return "Sin imagen"
+    preview.short_description = "Vista previa"
+    preview.allow_tags = True
+    
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == 'imagen':
+            kwargs['widget'] = DragDropImageWidget
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
+    
+    class Media:
+        css = {
+            'all': ('admin/css/dragdrop-image.css',)
+        }
+        js = ('admin/js/color-picker.js',)
 
 class OpcionProductoInline(admin.TabularInline):
     model = OpcionProducto
@@ -30,6 +51,7 @@ class OpcionProductoInline(admin.TabularInline):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
+    # form = ProductoAdminForm  # Comentado temporalmente
     list_display = ['nombre', 'categoria', 'precio', 'stock', 'permite_personalizacion', 'activo', 'fecha_creacion']
     list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion', 'tags_adicionales']
     search_fields = ['nombre', 'descripcion']
@@ -37,12 +59,20 @@ class ProductoAdmin(admin.ModelAdmin):
     inlines = [ImagenProductoInline, OpcionProductoInline]
     filter_horizontal = ['tags_adicionales']
     
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == 'imagen':
+            kwargs['widget'] = DragDropImageWidget
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
+    
     fieldsets = (
         ('Información Básica', {
             'fields': ('nombre', 'descripcion', 'precio', 'categoria', 'tags_adicionales', 'stock', 'activo')
         }),
         ('Imágenes', {
-            'fields': ('imagen', 'imagen_url')
+            'fields': ('imagen', 'imagen_url'),
+            'description': '''<strong>Imagen Principal:</strong> Sube la imagen principal del producto.<br>
+                             <strong>Imágenes Adicionales:</strong> Usa "Imágenes de Productos" abajo para agregar más imágenes.<br>
+                             <strong>URL Externa:</strong> Enlace a imagen externa (opcional).'''
         }),
         ('Personalización', {
             'fields': ('permite_personalizacion', 'texto_personalizacion', 'placeholder_personalizacion'),
@@ -55,6 +85,11 @@ class SlideAdmin(admin.ModelAdmin):
     list_display = ['titulo', 'orden', 'activo']
     list_editable = ['orden', 'activo']
     ordering = ['orden']
+    
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == 'imagen':
+            kwargs['widget'] = DragDropImageWidget
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
 class ConfiguracionSitioForm(forms.ModelForm):
     class Meta:

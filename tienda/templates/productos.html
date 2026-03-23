@@ -7,6 +7,16 @@
 {% endblock %}
 
 {% block content %}
+{% if tag %}
+<div class="mb-4">
+    <h4>Productos con tag: <span class="badge" style="background-color: {{ tag.color }}; color: white;">{{ tag.nombre }}</span></h4>
+</div>
+{% elif categoria %}
+<div class="mb-4">
+    <h4>{{ categoria.nombre }}</h4>
+</div>
+{% endif %}
+
 <div class="row g-3">
     {% for producto in productos %}
     <div class="col-lg-3 col-md-4 col-sm-6">

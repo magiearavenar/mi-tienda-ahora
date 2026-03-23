@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.utils import timezone
+from django.db import models
 import json
 import requests
 import os
@@ -121,14 +122,23 @@ def buscar(request):
     })
 
 def productos_por_tag(request, tag_nombre):
+    # Decodificar caracteres especiales en la URL
+    import urllib.parse
+    tag_nombre = urllib.parse.unquote(tag_nombre)
+    
     tag = get_object_or_404(Tag, nombre=tag_nombre, activo=True)
+    
+    # Buscar productos que tengan este tag tanto en tags_adicionales como en tags de categoría
     productos = Producto.objects.filter(
-        tags_adicionales=tag,
         activo=True
+    ).filter(
+        models.Q(tags_adicionales=tag) | models.Q(categoria__tags=tag)
     ).distinct()
+    
     categorias = Categoria.objects.filter(visible_navegacion=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
+    
     return render(request, 'productos.html', {
         'productos': productos,
         'tag': tag,
