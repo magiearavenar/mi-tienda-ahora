@@ -12,6 +12,28 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('registro/', views.registro, name='registro'),
     path('perfil/', views.perfil, name='perfil'),
+    path('cambiar-contrasena/', auth_views.PasswordChangeView.as_view(
+        template_name='cambiar_contrasena.html',
+        success_url='/cambiar-contrasena/exito/'
+    ), name='password_change'),
+    path('cambiar-contrasena/exito/', auth_views.PasswordChangeDoneView.as_view(
+        template_name='cambiar_contrasena_exito.html'
+    ), name='password_change_done'),
+    path('recuperar-contrasena/', auth_views.PasswordResetView.as_view(
+        template_name='recuperar_contrasena.html',
+        email_template_name='emails/recuperar_contrasena_email.html',
+        success_url='/recuperar-contrasena/enviado/'
+    ), name='password_reset'),
+    path('recuperar-contrasena/enviado/', auth_views.PasswordResetDoneView.as_view(
+        template_name='recuperar_contrasena_enviado.html'
+    ), name='password_reset_done'),
+    path('recuperar-contrasena/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name='recuperar_contrasena_confirmar.html',
+        success_url='/recuperar-contrasena/completado/'
+    ), name='password_reset_confirm'),
+    path('recuperar-contrasena/completado/', auth_views.PasswordResetCompleteView.as_view(
+        template_name='recuperar_contrasena_completado.html'
+    ), name='password_reset_complete'),
     path('pedido/<int:pedido_id>/', views.detalle_pedido, name='detalle_pedido'),
     path('buscar/', views.buscar, name='buscar'),
     path('tag/<str:tag_nombre>/', views.productos_por_tag, name='productos_tag'),

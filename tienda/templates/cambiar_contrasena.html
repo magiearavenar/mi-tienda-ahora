@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h3 class="card-title text-center mb-4">Cambiar Contraseña</h3>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Contraseña actual</label>
+                        {{ form.old_password }}
+                        {% if form.old_password.errors %}
+                            <div class="text-danger small">{{ form.old_password.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nueva contraseña</label>
+                        {{ form.new_password1 }}
+                        {% if form.new_password1.errors %}
+                            <div class="text-danger small">{{ form.new_password1.errors }}</div>
+                        {% endif %}
+                        <div id="password-strength" class="mt-1"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirmar nueva contraseña</label>
+                        {{ form.new_password2 }}
+                        {% if form.new_password2.errors %}
+                            <div class="text-danger small">{{ form.new_password2.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="alert alert-info small">
+                        <strong>Requisitos:</strong> mínimo 10 caracteres, no puede ser solo números ni una contraseña común.
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Cambiar Contraseña</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const input = document.getElementById('id_new_password1');
+    const bar = document.getElementById('password-strength');
+    if (!input) return;
+    input.addEventListener('input', function () {
+        const val = input.value;
+        let score = 0;
+        if (val.length >= 10) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        const labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
+        const colors = ['', 'danger', 'warning', 'info', 'success'];
+        bar.innerHTML = score > 0
+            ? `<span class="badge bg-${colors[score]}">Contraseña ${labels[score]}</span>`
+            : '';
+    });
+});
+</script>
+{% endblock %}

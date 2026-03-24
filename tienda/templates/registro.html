@@ -25,9 +25,11 @@
                     <div class="mb-3">
                         <label for="{{ form.password1.id_for_label }}" class="form-label">Contraseña</label>
                         <input type="password" name="password1" class="form-control" id="{{ form.password1.id_for_label }}" required>
+                        <div id="password-strength" class="mt-1"></div>
                         {% if form.password1.errors %}
                             <div class="text-danger">{{ form.password1.errors }}</div>
                         {% endif %}
+                        <div class="form-text">Mínimo 10 caracteres. No puede ser solo números ni una contraseña común.</div>
                     </div>
                     <div class="mb-3">
                         <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmar Contraseña</label>
@@ -41,6 +43,27 @@
                         <button type="submit" class="btn btn-primary">Crear Cuenta</button>
                     </div>
                 </form>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const input = document.getElementById('{{ form.password1.id_for_label }}');
+                    const bar = document.getElementById('password-strength');
+                    if (!input) return;
+                    input.addEventListener('input', function () {
+                        const val = input.value;
+                        let score = 0;
+                        if (val.length >= 10) score++;
+                        if (/[A-Z]/.test(val)) score++;
+                        if (/[0-9]/.test(val)) score++;
+                        if (/[^A-Za-z0-9]/.test(val)) score++;
+                        const labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
+                        const colors = ['', 'danger', 'warning', 'info', 'success'];
+                        bar.innerHTML = score > 0
+                            ? `<span class="badge bg-${colors[score]}">Contraseña ${labels[score]}</span>`
+                            : '';
+                    });
+                });
+                </script>
                 
                 <div class="text-center mt-3">
                     <p>¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
