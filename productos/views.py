@@ -151,7 +151,6 @@ def checkout(request):
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     return render(request, 'checkout.html', {'config': config})
 
-@csrf_exempt
 @require_POST
 def procesar_pago(request):
     try:
@@ -304,7 +303,11 @@ def pago_fallido(request):
 def pago_pendiente(request):
     return render(request, 'pago_pendiente.html')
 
+@login_required
 def debug_config(request):
+    if not request.user.is_staff:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden()
     import os
     config = {
         'FLOW_API_KEY': bool(os.environ.get('FLOW_API_KEY', '')),
