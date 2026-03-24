@@ -1,0 +1,332 @@
+/* 🌸 MUNDO MAGIE - TEMA COMPLETO KAWAII ELEGANTE */
+
+/* =========================
+   🎀 VARIABLES DE MARCA
+========================= */
+:root {
+    --magie-pink: #ffc1ea;
+    --magie-pink-soft: #fff0f9;
+    --magie-purple: #d2a8dd;
+    --magie-dark: #a07ab0;
+    --magie-border: #f3d9fa;
+    --magie-text: #555;
+
+    /* Bootstrap 5 overrides */
+    --bs-btn-bg: #ffc1ea;
+    --bs-btn-border-color: #ffc1ea;
+    --bs-btn-hover-bg: #d2a8dd;
+    --bs-btn-hover-border-color: #d2a8dd;
+    --bs-btn-active-bg: #a07ab0;
+    --bs-primary: #ffc1ea;
+    --bs-primary-rgb: 255, 193, 234;
+    --bs-link-color: #a07ab0;
+    --bs-link-hover-color: #ffc1ea;
+    --bs-border-color: #f3d9fa;
+    --bs-body-bg: #ffffff;
+    --bs-body-color: #555;
+}
+
+/* =========================
+   🧼 RESET MODO OSCURO
+========================= */
+body.dark-mode,
+.dark-mode .content-wrapper,
+.dark-mode .main-header,
+.dark-mode .main-sidebar,
+[class*="bg-dark"],
+[class*="navbar-dark"] {
+    background: #ffffff !important;
+    color: var(--magie-text) !important;
+}
+
+/* =========================
+   🌸 FONDO GENERAL
+========================= */
+body, .wrapper, .content-wrapper {
+    background: linear-gradient(180deg, #ffffff, var(--magie-pink-soft)) !important;
+    color: var(--magie-text) !important;
+}
+
+/* =========================
+   🍓 SIDEBAR
+========================= */
+.main-sidebar {
+    background: #ffffff !important;
+    border-right: 1px solid var(--magie-border) !important;
+}
+
+.nav-sidebar .nav-link {
+    color: #888 !important;
+    border-radius: 10px;
+    margin: 4px 8px;
+    transition: all 0.2s ease;
+}
+
+.nav-sidebar .nav-link:hover {
+    background: var(--magie-pink-soft) !important;
+    transform: translateX(4px);
+}
+
+.nav-sidebar .nav-link.active {
+    background: linear-gradient(135deg, var(--magie-pink), var(--magie-purple)) !important;
+    color: #fff !important;
+}
+
+/* =========================
+   🍬 LOGO / BRAND
+========================= */
+/* .brand-link {
+    background: #fff !important;
+    border-bottom: 2px solid var(--magie-pink) !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+}
+
+.brand-image {
+    max-height: 40px !important;
+    width: auto !important;
+    border-radius: 8px !important;
+    background: #fff !important;
+    padding: 3px;
+}
+
+.brand-text {
+    color: var(--magie-dark) !important;
+    font-weight: 700 !important;
+} */
+
+/* =========================
+   🌷 NAVBAR
+========================= */
+.main-header {
+    background: #ffffff !important;
+    border-bottom: 2px solid var(--magie-pink) !important;
+    box-shadow: 0 4px 15px rgba(255, 182, 230, 0.2);
+}
+
+.main-header .nav-link {
+    color: var(--magie-dark) !important;
+}
+
+.navbar input {
+    background: var(--magie-pink-soft) !important;
+    border: 1px solid var(--magie-border) !important;
+    border-radius: 8px;
+}
+
+/* =========================
+   🧁 CARDS
+========================= */
+.card {
+    border-radius: 16px !important;
+    border: 1px solid var(--magie-border) !important;
+    background: #ffffff !important;
+    box-shadow: 0 8px 25px rgba(210, 168, 221, 0.15) !important;
+    transition: all 0.25s ease;
+}
+
+.card:hover {
+    box-shadow: 0 12px 30px rgba(210, 168, 221, 0.25) !important;
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--magie-pink), var(--magie-purple)) !important;
+    color: #fff !important;
+    font-weight: 600;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+.card-header::after {
+    content: " ✨";
+}
+
+/* =========================
+   📋 LISTAS (módulos)
+========================= */
+.card-body,
+.list-group,
+.list-group-item {
+    background: #fff !important;
+    color: var(--magie-text) !important;
+}
+
+.list-group-item {
+    border: none !important;
+    border-bottom: 1px dashed var(--magie-border) !important;
+    padding: 12px 10px;
+    transition: all 0.2s ease;
+}
+
+.list-group-item:hover {
+    background: var(--magie-pink-soft) !important;
+    border-radius: 8px;
+}
+
+/* =========================
+   💖 BOTONES
+========================= */
+.btn-primary {
+    background: linear-gradient(135deg, #ffb6e6, var(--magie-purple)) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(255, 182, 230, 0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    box-shadow: 0 6px 18px rgba(210, 168, 221, 0.5);
+}
+
+.btn-success {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #ffc1ea;
+    --bs-btn-border-color: #ffc1ea;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #d2a8dd;
+    --bs-btn-hover-border-color: #d2a8dd;
+    --bs-btn-focus-shadow-rgb: 255, 193, 234;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #a07ab0;
+    --bs-btn-active-border-color: #a07ab0;
+    --bs-btn-disabled-bg: #ffc1ea;
+    --bs-btn-disabled-border-color: #ffc1ea;
+    background: linear-gradient(135deg, #ffb6e6, var(--magie-purple)) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(255, 182, 230, 0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-info {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: #d2a8dd;
+    --bs-btn-border-color: #d2a8dd;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #a07ab0;
+    --bs-btn-hover-border-color: #a07ab0;
+    --bs-btn-focus-shadow-rgb: 210, 168, 221;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #a07ab0;
+    --bs-btn-active-border-color: #a07ab0;
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: #d2a8dd;
+    --bs-btn-disabled-border-color: #d2a8dd;
+    background: linear-gradient(135deg, #d2a8dd, #a07ab0) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 12px rgba(210, 168, 221, 0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-info:hover {
+    background: linear-gradient(135deg, #a07ab0, #7a5a8a) !important;
+    box-shadow: 0 6px 18px rgba(160, 122, 176, 0.5);
+}
+
+/* =========================
+   🧾 TABLAS
+========================= */
+.table thead th {
+    background: var(--magie-pink-soft) !important;
+    color: var(--magie-dark) !important;
+    border-bottom: 2px solid var(--magie-pink) !important;
+    font-size: 11px;
+}
+
+.table tbody tr {
+    background: #fff !important;
+    transition: all 0.15s ease;
+}
+
+.table tbody tr:hover {
+    background: var(--magie-pink-soft) !important;
+}
+
+/* =========================
+   ✏️ FORMULARIOS
+========================= */
+.form-control {
+    border-radius: 10px !important;
+    border: 1px solid var(--magie-border) !important;
+    padding: 10px !important;
+    background: #fff !important;
+}
+
+.form-control:focus {
+    border-color: var(--magie-pink) !important;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 234, 0.25) !important;
+}
+
+/* =========================
+   🧸 INFO BOXES
+========================= */
+.info-box {
+    border-radius: 12px !important;
+    border: 1px solid var(--magie-border) !important;
+    background: #fff !important;
+}
+
+.info-box-icon {
+    background: linear-gradient(135deg, var(--magie-pink), var(--magie-purple)) !important;
+}
+
+/* =========================
+   🕒 ACCIONES RECIENTES
+========================= */
+.timeline-item,
+.card-outline {
+    border-radius: 12px !important;
+    border: 1px solid var(--magie-border) !important;
+    background: #ffffff !important;
+}
+
+/* =========================
+   🔗 LINKS
+========================= */
+a {
+    color: var(--magie-dark) !important;
+}
+
+a:hover {
+    color: var(--magie-pink) !important;
+}
+
+/* =========================
+   🍰 FOOTER
+========================= */
+.main-footer {
+    background: #fff !important;
+    border-top: 2px solid var(--magie-pink) !important;
+    color: var(--magie-dark) !important;
+}
+
+/* =========================
+   🐰 DETALLES KAWAII
+========================= */
+h1::after {
+    content: " 💖";
+}
+
+/* =========================
+   🧃 SCROLL
+========================= */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--magie-pink-soft);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--magie-pink), var(--magie-dark));
+    border-radius: 10px;
+}

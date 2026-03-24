@@ -8,6 +8,100 @@ import cloudinary.api
 
 load_dotenv()
 
+# Jazzmin Admin Configuration
+JAZZMIN_SETTINGS = {
+    'site_title': 'Mundo Magie',
+    'site_header': 'Mundo Magie',
+    'site_brand': 'Mundo Magie',
+    'site_logo': 'images/logo.png',
+    'site_logo_classes': 'img-fluid',
+    'site_icon': 'images/conf-ico.ico',
+    'welcome_sign': 'Bienvenida al Panel de Administración',
+    'copyright': 'Mundo Magie 2025',
+    'search_model': ['productos.Producto', 'productos.Categoria'],
+    'user_avatar': None,
+
+    # Navbar
+    'topmenu_links': [
+        {'name': 'Ver Tienda', 'url': '/', 'new_window': True, 'icon': 'fas fa-store'},
+        {'model': 'auth.user'},
+    ],
+
+    # Sidebar
+    'show_sidebar': True,
+    'navigation_expanded': True,
+    'hide_apps': [],
+    'hide_models': [],
+
+    'icons': {
+        'auth': 'fas fa-users-cog',
+        'auth.user': 'fas fa-user',
+        'auth.Group': 'fas fa-users',
+        'productos.Producto': 'fas fa-box-open',
+        'productos.Categoria': 'fas fa-tags',
+        'productos.Tag': 'fas fa-tag',
+        'productos.Pedido': 'fas fa-shopping-bag',
+        'productos.Pago': 'fas fa-credit-card',
+        'productos.Slide': 'fas fa-images',
+        'productos.ConfiguracionSitio': 'fas fa-cog',
+        'productos.BannerFidelizacion': 'fas fa-star',
+        'productos.FooterConfig': 'fas fa-shoe-prints',
+        'productos.SobreMi': 'fas fa-heart',
+        'productos.Contacto': 'fas fa-envelope',
+        'productos.Informacion': 'fas fa-info-circle',
+        'productos.RedSocial': 'fas fa-share-alt',
+        'productos.SeccionCategoria': 'fas fa-th-large',
+        'productos.ImagenProducto': 'fas fa-camera',
+        'productos.OpcionProducto': 'fas fa-list',
+        'productos.InstagramConfig': 'fab fa-instagram',
+    },
+
+    'default_icon_parents': 'fas fa-folder',
+    'default_icon_children': 'fas fa-circle',
+
+    'related_modal_active': True,
+    'custom_css': 'admin/css/jazzmin-custom.css',
+    'custom_js': None,
+    'use_google_fonts_cdn': True,
+    'show_ui_builder': False,
+    'changeform_format': 'horizontal_tabs',
+    'changeform_format_overrides': {
+        'auth.user': 'collapsible',
+        'auth.group': 'vertical_tabs',
+    },
+    'language_chooser': False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    'navbar_small_text': False,
+    'footer_small_text': False,
+    'body_small_text': False,
+    'brand_small_text': False,
+    'brand_colour': False,
+    'accent': 'accent-pink',
+    'navbar': 'navbar-white navbar-light',
+    'no_navbar_border': True,
+    'navbar_fixed': True,
+    'layout_boxed': False,
+    'footer_fixed': False,
+    'sidebar_fixed': True,
+    'sidebar': 'sidebar-light-pink',
+    'sidebar_nav_small_text': False,
+    'sidebar_disable_expand': False,
+    'sidebar_nav_child_indent': True,
+    'sidebar_nav_compact_style': False,
+    'sidebar_nav_legacy_style': False,
+    'sidebar_nav_flat_style': False,
+    'button_classes': {
+        'primary': 'btn-primary',
+        'secondary': 'btn-secondary',
+        'info': 'btn-info',
+        'warning': 'btn-warning',
+        'danger': 'btn-danger',
+        'success': 'btn-success',
+    },
+}
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-this-in-production')
@@ -52,6 +146,7 @@ CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -170,7 +265,7 @@ else:
 
 # Servir archivos estáticos con WhiteNoise en producción
 if not DEBUG:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = True
 
