@@ -53,4 +53,5 @@ urlpatterns = [
     path('portafolio/', views.portafolio, name='portafolio'),
     path('configurador/', views.configurador, name='configurador'),
     path('configurador/guardar/', views.configurador_guardar, name='configurador_guardar'),
+    path('configurador/preview/', views.preview_home, name='configurador_preview'),
 ]

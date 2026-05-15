@@ -333,6 +333,16 @@ def configurador(request):
 
 
 @login_required
+def preview_home(request):
+    """Vista del home sin X-Frame-Options para el iframe del configurador."""
+    if not request.user.is_staff:
+        return redirect('home')
+    response = home(request)
+    response['X-Frame-Options'] = 'SAMEORIGIN'
+    return response
+
+
+@login_required
 @require_POST
 def configurador_guardar(request):
     if not request.user.is_staff:
