@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portafolio Web — Mundo Magie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            margin: 0;
+        }
+
+        /* NAV */
+        .port-nav {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1e1e1e;
+        }
+        .port-nav .brand {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+        .port-nav .back-link {
+            font-size: 0.85rem;
+            color: #888;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .port-nav .back-link:hover { color: #fff; }
+
+        /* HERO */
+        .hero {
+            text-align: center;
+            padding: 80px 20px 50px;
+        }
+        .hero .badge-tag {
+            display: inline-block;
+            background: #1e1e1e;
+            border: 1px solid #333;
+            color: #aaa;
+            font-size: 0.75rem;
+            padding: 4px 14px;
+            border-radius: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+        .hero p {
+            font-size: 1rem;
+            color: #888;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* FILTROS */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 30px 20px;
+        }
+        .filter-btn {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            color: #888;
+            padding: 7px 18px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        /* GRID */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 24px;
+            padding: 10px 40px 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* CARD */
+        .project-card {
+            background: #141414;
+            border: 1px solid #1e1e1e;
+            border-radius: 16px;
+            overflow: hidden;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+        }
+        .project-card:hover {
+            transform: translateY(-6px);
+            border-color: #333;
+        }
+        .card-image {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            display: block;
+            background: #1a1a1a;
+        }
+        .card-image-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #1a1a1a, #222);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-size: 2rem;
+        }
+        .card-body {
+            padding: 20px;
+        }
+        .card-category {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .card-desc {
+            font-size: 0.85rem;
+            color: #777;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .card-footer-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .tech-tag {
+            background: #1e1e1e;
+            border: 1px solid #2a2a2a;
+            color: #888;
+            font-size: 0.7rem;
+            padding: 3px 10px;
+            border-radius: 10px;
+        }
+        .visit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #fff;
+            color: #000;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 7px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .visit-btn:hover { background: #ddd; color: #000; }
+
+        /* EMPTY */
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #444;
+        }
+        .empty-state i { font-size: 3rem; margin-bottom: 16px; display: block; }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid #1e1e1e;
+        }
+        .cta-section h3 { color: #fff; font-weight: 600; margin-bottom: 10px; }
+        .cta-section p { color: #666; font-size: 0.9rem; margin-bottom: 24px; }
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #25d366;
+            color: #fff;
+            padding: 12px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+        .cta-btn:hover { background: #1ebe5d; color: #fff; }
+
+        @media (max-width: 768px) {
+            .port-nav { padding: 16px 20px; }
+            .portfolio-grid { padding: 10px 16px 60px; grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="port-nav">
+        <a href="{% url 'home' %}" class="brand">MUNDO MAGIE</a>
+        <a href="{% url 'home' %}" class="back-link"><i class="fas fa-arrow-left me-1"></i> Volver a la tienda</a>
+    </nav>
+
+    <section class="hero">
+        <div class="badge-tag">Portafolio</div>
+        <h1>Diseño & Desarrollo Web</h1>
+        <p>Proyectos creados con atención al detalle, funcionalidad y estética. Cada sitio es único.</p>
+    </section>
+
+    {% if proyectos %}
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">Todos</button>
+        {% for cat_key, cat_label in categorias_disponibles %}
+        <button class="filter-btn" data-filter="{{ cat_key }}">{{ cat_label }}</button>
+        {% endfor %}
+    </div>
+
+    <div class="portfolio-grid">
+        {% for proyecto in proyectos %}
+        <div class="project-card" data-category="{{ proyecto.categoria }}">
+            {% if proyecto.imagen %}
+                <img src="{{ proyecto.imagen.url }}" alt="{{ proyecto.titulo }}" class="card-image">
+            {% else %}
+                <div class="card-image-placeholder">
+                    <i class="fas fa-globe"></i>
+                </div>
+            {% endif %}
+            <div class="card-body">
+                <div class="card-category">{{ proyecto.get_categoria_display }}</div>
+                <div class="card-title">{{ proyecto.titulo }}</div>
+                {% if proyecto.descripcion %}
+                <div class="card-desc">{{ proyecto.descripcion }}</div>
+                {% endif %}
+                <div class="card-footer-row">
+                    <div class="tech-tags">
+                        {% if proyecto.tecnologias %}
+                            {% for tech in proyecto.tecnologias.split %}
+                            <span class="tech-tag">{{ tech|cut:"," }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                    {% if proyecto.url_proyecto %}
+                    <a href="{{ proyecto.url_proyecto }}" target="_blank" class="visit-btn">
+                        Ver proyecto <i class="fas fa-arrow-up-right-from-square" style="font-size:0.7rem;"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-layer-group"></i>
+        <p>Proyectos próximamente...</p>
+    </div>
+    {% endif %}
+
+    <div class="cta-section">
+        <h3>¿Quieres un sitio web?</h3>
+        <p>Cuéntame tu idea y lo hacemos realidad.</p>
+        <a href="https://wa.link/ggf77d" target="_blank" class="cta-btn">
+            <i class="fab fa-whatsapp"></i> Escribir por WhatsApp
+        </a>
+    </div>
+
+    <script>
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const filter = this.dataset.filter;
+                document.querySelectorAll('.project-card').forEach(card => {
+                    card.style.display = (filter === 'all' || card.dataset.category === filter) ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

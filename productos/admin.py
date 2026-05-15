@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
 # from .forms import ProductoAdminForm  # Comentado temporalmente
@@ -255,6 +255,26 @@ class PagoAdmin(admin.ModelAdmin):
     list_filter = ['metodo', 'estado', 'fecha_creacion']
     search_fields = ['pedido__id', 'token_pago', 'id_transaccion']
     readonly_fields = ['fecha_creacion', 'fecha_pago', 'datos_respuesta']
+
+@admin.register(ProyectoPortafolio)
+class ProyectoPortafolioAdmin(admin.ModelAdmin):
+    list_display = ['titulo', 'categoria', 'tecnologias', 'orden', 'activo']
+    list_editable = ['orden', 'activo']
+    list_filter = ['categoria', 'activo']
+    search_fields = ['titulo', 'descripcion']
+    ordering = ['orden']
+    fieldsets = (
+        ('Información del Proyecto', {
+            'fields': ('titulo', 'descripcion', 'categoria', 'tecnologias')
+        }),
+        ('Imagen y Link', {
+            'fields': ('imagen', 'url_proyecto'),
+        }),
+        ('Configuración', {
+            'fields': ('orden', 'activo'),
+        }),
+    )
+
 
 @admin.register(InstagramConfig)
 class InstagramConfigAdmin(admin.ModelAdmin):

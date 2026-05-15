@@ -50,4 +50,5 @@ urlpatterns = [
     path('obtener-imagen/<int:producto_id>/', views.obtener_imagen_producto, name='obtener_imagen_producto'),
     path('calcular-envio/', views.calcular_envio, name='calcular_envio'),
     path('api/instagram-posts/', instagram_posts_api, name='instagram_posts_api'),
+    path('portafolio/', views.portafolio, name='portafolio'),
 ]

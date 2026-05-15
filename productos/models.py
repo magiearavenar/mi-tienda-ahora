@@ -313,6 +313,35 @@ class OpcionProducto(models.Model):
         verbose_name = "Opción de Producto"
         verbose_name_plural = "Opciones de Producto"
 
+class ProyectoPortafolio(models.Model):
+    CATEGORIAS = [
+        ('landing', 'Landing Page'),
+        ('ecommerce', 'Tienda Online'),
+        ('dashboard', 'Dashboard'),
+        ('linktree', 'Linktree / Bio Link'),
+        ('corporativo', 'Sitio Corporativo'),
+        ('otro', 'Otro'),
+    ]
+
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField(blank=True)
+    categoria = models.CharField(max_length=20, choices=CATEGORIAS, default='otro')
+    imagen = models.ImageField(upload_to='portafolio/', blank=True, null=True)
+    url_proyecto = models.URLField(blank=True, help_text='Link para ver el proyecto en vivo')
+    tecnologias = models.CharField(max_length=200, blank=True, help_text='Ej: Django, Bootstrap, PostgreSQL')
+    orden = models.IntegerField(default=0)
+    activo = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo
+
+    class Meta:
+        ordering = ['orden', '-fecha_creacion']
+        verbose_name = 'Proyecto'
+        verbose_name_plural = 'Portafolio Web'
+
+
 class InstagramConfig(models.Model):
     usuario = models.CharField(max_length=100, help_text='Usuario de Instagram (sin @)')
     titulo = models.CharField(max_length=100, default='Síguenos en Instagram')

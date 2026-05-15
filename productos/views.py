@@ -12,7 +12,7 @@ from django.db import models
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio
 from .services import FlowService, MercadoPagoService
 
 def home(request):
@@ -302,6 +302,18 @@ def pago_fallido(request):
 
 def pago_pendiente(request):
     return render(request, 'pago_pendiente.html')
+
+
+def portafolio(request):
+    proyectos = ProyectoPortafolio.objects.filter(activo=True)
+    categorias_usadas = proyectos.values_list('categoria', flat=True).distinct()
+    categorias_disponibles = [
+        (k, v) for k, v in ProyectoPortafolio.CATEGORIAS if k in categorias_usadas
+    ]
+    return render(request, 'portafolio.html', {
+        'proyectos': proyectos,
+        'categorias_disponibles': categorias_disponibles,
+    })
 
 @login_required
 def debug_config(request):

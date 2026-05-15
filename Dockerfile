@@ -2,7 +2,6 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-# Dependencias del sistema para Pillow y psycopg2
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
@@ -15,6 +14,6 @@ COPY . .
 
 RUN python manage.py collectstatic --noinput
 
-EXPOSE $PORT
+EXPOSE 8000
 
-CMD ["sh", "-c", "python manage.py migrate && gunicorn tienda.wsgi:application --bind 0.0.0.0:${PORT:-8000}"]
+CMD ["sh", "-c", "python manage.py migrate && gunicorn tienda.wsgi:application --bind 0.0.0.0:8000"]
