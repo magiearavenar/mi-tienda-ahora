@@ -24,6 +24,7 @@ JAZZMIN_SETTINGS = {
     # Navbar
     'topmenu_links': [
         {'name': 'Ver Tienda', 'url': '/', 'new_window': True, 'icon': 'fas fa-store'},
+        {'name': 'Configurador', 'url': '/configurador/', 'new_window': False, 'icon': 'fas fa-sliders'},
         {'model': 'auth.user'},
     ],
 

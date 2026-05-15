@@ -51,4 +51,6 @@ urlpatterns = [
     path('calcular-envio/', views.calcular_envio, name='calcular_envio'),
     path('api/instagram-posts/', instagram_posts_api, name='instagram_posts_api'),
     path('portafolio/', views.portafolio, name='portafolio'),
+    path('configurador/', views.configurador, name='configurador'),
+    path('configurador/guardar/', views.configurador_guardar, name='configurador_guardar'),
 ]

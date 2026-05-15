@@ -315,6 +315,65 @@ def portafolio(request):
         'categorias_disponibles': categorias_disponibles,
     })
 
+
+@login_required
+def configurador(request):
+    if not request.user.is_staff:
+        return redirect('home')
+    config = ConfiguracionSitio.objects.filter(activo=True).first()
+    footer = FooterConfig.objects.filter(activo=True).first()
+    sobre_mi = SobreMi.objects.filter(activo=True).first()
+    contacto = Contacto.objects.filter(activo=True).first()
+    return render(request, 'configurador.html', {
+        'config': config,
+        'footer': footer,
+        'sobre_mi': sobre_mi,
+        'contacto': contacto,
+    })
+
+
+@login_required
+@require_POST
+def configurador_guardar(request):
+    if not request.user.is_staff:
+        return JsonResponse({'ok': False}, status=403)
+    try:
+        data = json.loads(request.body)
+        seccion = data.get('seccion')
+
+        if seccion == 'colores':
+            config, _ = ConfiguracionSitio.objects.get_or_create(activo=True)
+            for campo in ['color_primario', 'color_secundario', 'color_fondo', 'color_banner', 'color_cards', 'color_hover']:
+                if campo in data:
+                    setattr(config, campo, data[campo])
+            if 'mensaje_envio' in data:
+                config.mensaje_envio = data['mensaje_envio']
+            config.save()
+
+        elif seccion == 'footer':
+            footer, _ = FooterConfig.objects.get_or_create(activo=True)
+            for campo in ['color_fondo', 'color_texto', 'color_enlaces', 'color_hover', 'color_redes']:
+                if campo in data:
+                    setattr(footer, campo, data[campo])
+            footer.save()
+
+        elif seccion == 'sobre_mi':
+            obj, _ = SobreMi.objects.get_or_create(activo=True)
+            if 'titulo' in data: obj.titulo = data['titulo']
+            if 'contenido' in data: obj.contenido = data['contenido']
+            obj.save()
+
+        elif seccion == 'contacto':
+            obj, _ = Contacto.objects.get_or_create(activo=True)
+            for campo in ['titulo', 'telefono', 'email', 'direccion', 'horarios']:
+                if campo in data:
+                    setattr(obj, campo, data[campo])
+            obj.save()
+
+        return JsonResponse({'ok': True})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)
+
 @login_required
 def debug_config(request):
     if not request.user.is_staff:

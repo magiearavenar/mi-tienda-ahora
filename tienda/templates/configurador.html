@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurador — Mundo Magie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; height: 100vh; overflow: hidden; }
+
+        /* TOPBAR */
+        .topbar {
+            height: 52px;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+        }
+        .topbar .brand { color: #fff; font-weight: 600; font-size: 0.9rem; letter-spacing: 1px; }
+        .topbar-actions { display: flex; gap: 10px; align-items: center; }
+        .btn-save {
+            background: #ffc1ea;
+            color: #333;
+            border: none;
+            padding: 7px 20px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-save:hover { background: #d2a8dd; color: #fff; }
+        .btn-admin {
+            background: transparent;
+            color: #aaa;
+            border: 1px solid #333;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-admin:hover { color: #fff; border-color: #666; }
+        .save-status {
+            font-size: 0.75rem;
+            color: #888;
+            transition: color 0.3s;
+        }
+        .save-status.saved { color: #4caf50; }
+        .save-status.saving { color: #ffc107; }
+
+        /* LAYOUT */
+        .layout {
+            display: flex;
+            height: calc(100vh - 52px);
+            margin-top: 52px;
+        }
+
+        /* PANEL */
+        .panel {
+            width: 300px;
+            min-width: 300px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* TABS */
+        .panel-tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+        .panel-tab {
+            flex: 1;
+            padding: 12px 6px;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #999;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .panel-tab.active { color: #333; border-bottom-color: #ffc1ea; }
+        .panel-tab i { display: block; font-size: 1rem; margin-bottom: 3px; }
+
+        /* SECCIONES */
+        .panel-section { display: none; padding: 16px; }
+        .panel-section.active { display: block; }
+
+        .field-group { margin-bottom: 18px; }
+        .field-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 6px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .field-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+        .field-input:focus { border-color: #ffc1ea; }
+        textarea.field-input { resize: vertical; min-height: 80px; }
+
+        /* COLOR PICKER */
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .color-preview {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .color-preview input[type="color"] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 200%;
+            height: 200%;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+        }
+        .color-info { flex: 1; }
+        .color-name { font-size: 0.75rem; font-weight: 600; color: #444; }
+        .color-hex { font-size: 0.7rem; color: #999; font-family: monospace; }
+
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #bbb;
+            margin: 16px 0 10px;
+        }
+        .section-title:first-child { margin-top: 0; }
+
+        /* PREVIEW */
+        .preview {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #e8e8e8;
+        }
+        .preview-toolbar {
+            background: #2a2a2a;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .preview-dots { display: flex; gap: 6px; }
+        .preview-dots span {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #555;
+        }
+        .preview-url {
+            flex: 1;
+            background: #1a1a1a;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            color: #888;
+            font-family: monospace;
+        }
+        .preview-refresh {
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 4px;
+            transition: color 0.2s;
+        }
+        .preview-refresh:hover { color: #fff; }
+        .preview iframe {
+            flex: 1;
+            border: none;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <span class="brand">✦ CONFIGURADOR</span>
+    <div class="topbar-actions">
+        <span class="save-status" id="saveStatus">Sin cambios</span>
+        <a href="/admin/" class="btn-admin"><i class="fas fa-th-large me-1"></i>Admin</a>
+        <button class="btn-save" id="btnGuardar" onclick="guardarActual()">
+            <i class="fas fa-save me-1"></i> Guardar
+        </button>
+    </div>
+</div>
+
+<div class="layout">
+
+    <!-- PANEL IZQUIERDO -->
+    <div class="panel">
+        <div class="panel-tabs">
+            <div class="panel-tab active" onclick="switchTab('colores', this)">
+                <i class="fas fa-palette"></i>Colores
+            </div>
+            <div class="panel-tab" onclick="switchTab('footer', this)">
+                <i class="fas fa-shoe-prints"></i>Footer
+            </div>
+            <div class="panel-tab" onclick="switchTab('sobre_mi', this)">
+                <i class="fas fa-heart"></i>Sobre mí
+            </div>
+            <div class="panel-tab" onclick="switchTab('contacto', this)">
+                <i class="fas fa-envelope"></i>Contacto
+            </div>
+        </div>
+
+        <!-- COLORES -->
+        <div class="panel-section active" id="tab-colores">
+            <div class="field-group">
+                <span class="field-label">Mensaje de envío</span>
+                <input type="text" class="field-input" id="mensaje_envio"
+                    value="{{ config.mensaje_envio|default:'Envíos a domicilio en 3 días hábiles' }}"
+                    oninput="previewChange()">
+            </div>
+
+            <div class="section-title">Colores del sitio</div>
+
+            {% with colores=config %}
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ config.color_primario|default:'#ffc1ea' }}">
+                    <input type="color" id="color_primario" value="{{ config.color_primario|default:'#ffc1ea' }}" oninput="updateColor(this, 'color_primario')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Color primario</div>
+                    <div class="color-hex" id="hex_color_primario">{{ config.color_primario|default:'#ffc1ea' }}</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ config.color_secundario|default:'#d2a8dd' }}" id="prev_color_secundario">
+                    <input type="color" id="color_secundario" value="{{ config.color_secundario|default:'#d2a8dd' }}" oninput="updateColor(this, 'color_secundario')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Color secundario</div>
+                    <div class="color-hex" id="hex_color_secundario">{{ config.color_secundario|default:'#d2a8dd' }}</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ config.color_fondo|default:'#ffffff' }}" id="prev_color_fondo">
+                    <input type="color" id="color_fondo" value="{{ config.color_fondo|default:'#ffffff' }}" oninput="updateColor(this, 'color_fondo')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Fondo del sitio</div>
+                    <div class="color-hex" id="hex_color_fondo">{{ config.color_fondo|default:'#ffffff' }}</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ config.color_banner|default:'#95d4e8' }}" id="prev_color_banner">
+                    <input type="color" id="color_banner" value="{{ config.color_banner|default:'#95d4e8' }}" oninput="updateColor(this, 'color_banner')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Banner de envío</div>
+                    <div class="color-hex" id="hex_color_banner">{{ config.color_banner|default:'#95d4e8' }}</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ config.color_hover|default:'#f4d875' }}" id="prev_color_hover">
+                    <input type="color" id="color_hover" value="{{ config.color_hover|default:'#f4d875' }}" oninput="updateColor(this, 'color_hover')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Hover navegación</div>
+                    <div class="color-hex" id="hex_color_hover">{{ config.color_hover|default:'#f4d875' }}</div>
+                </div>
+            </div>
+            {% endwith %}
+        </div>
+
+        <!-- FOOTER -->
+        <div class="panel-section" id="tab-footer">
+            <div class="section-title">Colores del footer</div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ footer.color_fondo|default:'#f8f4ff' }}">
+                    <input type="color" id="footer_color_fondo" value="{{ footer.color_fondo|default:'#f8f4ff' }}" oninput="updateColor(this, 'footer_color_fondo')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Fondo</div>
+                    <div class="color-hex" id="hex_footer_color_fondo">{{ footer.color_fondo|default:'#f8f4ff' }}</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ footer.color_texto|default:'#4a4a4a' }}">
+                    <input type="color" id="footer_color_texto" value="{{ footer.color_texto|default:'#4a4a4a' }}" oninput="updateColor(this, 'footer_color_texto')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Texto</div>
+                    <div class="color-hex" id="hex_footer_color_texto">{{ footer.color_texto|default:'#4a4a4a' }}</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ footer.color_enlaces|default:'#d7b9ff' }}">
+                    <input type="color" id="footer_color_enlaces" value="{{ footer.color_enlaces|default:'#d7b9ff' }}" oninput="updateColor(this, 'footer_color_enlaces')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Enlaces</div>
+                    <div class="color-hex" id="hex_footer_color_enlaces">{{ footer.color_enlaces|default:'#d7b9ff' }}</div>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ footer.color_redes|default:'#ffc1e3' }}">
+                    <input type="color" id="footer_color_redes" value="{{ footer.color_redes|default:'#ffc1e3' }}" oninput="updateColor(this, 'footer_color_redes')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Redes sociales</div>
+                    <div class="color-hex" id="hex_footer_color_redes">{{ footer.color_redes|default:'#ffc1e3' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SOBRE MÍ -->
+        <div class="panel-section" id="tab-sobre_mi">
+            <div class="field-group">
+                <span class="field-label">Título</span>
+                <input type="text" class="field-input" id="sobre_titulo"
+                    value="{{ sobre_mi.titulo|default:'Sobre Mí' }}" oninput="previewChange()">
+            </div>
+            <div class="field-group">
+                <span class="field-label">Contenido</span>
+                <textarea class="field-input" id="sobre_contenido" oninput="previewChange()">{{ sobre_mi.contenido|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <!-- CONTACTO -->
+        <div class="panel-section" id="tab-contacto">
+            <div class="field-group">
+                <span class="field-label">Teléfono</span>
+                <input type="text" class="field-input" id="contacto_telefono"
+                    value="{{ contacto.telefono|default:'' }}" oninput="previewChange()">
+            </div>
+            <div class="field-group">
+                <span class="field-label">Email</span>
+                <input type="text" class="field-input" id="contacto_email"
+                    value="{{ contacto.email|default:'' }}" oninput="previewChange()">
+            </div>
+            <div class="field-group">
+                <span class="field-label">Dirección</span>
+                <input type="text" class="field-input" id="contacto_direccion"
+                    value="{{ contacto.direccion|default:'' }}" oninput="previewChange()">
+            </div>
+            <div class="field-group">
+                <span class="field-label">Horarios</span>
+                <textarea class="field-input" id="contacto_horarios" oninput="previewChange()">{{ contacto.horarios|default:'' }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW IFRAME -->
+    <div class="preview">
+        <div class="preview-toolbar">
+            <div class="preview-dots">
+                <span style="background:#e74c3c"></span>
+                <span style="background:#f39c12"></span>
+                <span style="background:#2ecc71"></span>
+            </div>
+            <div class="preview-url">mundomagie.cl</div>
+            <button class="preview-refresh" onclick="recargarPreview()" title="Recargar">
+                <i class="fas fa-rotate-right"></i>
+            </button>
+        </div>
+        <iframe id="previewFrame" src="/"></iframe>
+    </div>
+</div>
+
+<script>
+    const csrfToken = '{{ csrf_token }}';
+    let tabActual = 'colores';
+    let previewTimer = null;
+
+    function switchTab(tab, el) {
+        document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel-section').forEach(s => s.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+        tabActual = tab;
+    }
+
+    function updateColor(input, campo) {
+        const color = input.value;
+        // Actualizar preview del cuadro
+        input.parentElement.style.background = color;
+        // Actualizar hex label
+        const hexEl = document.getElementById('hex_' + campo);
+        if (hexEl) hexEl.textContent = color;
+        previewChange();
+    }
+
+    function previewChange() {
+        setStatus('saving', 'Cambios sin guardar...');
+    }
+
+    function setStatus(type, msg) {
+        const el = document.getElementById('saveStatus');
+        el.className = 'save-status ' + type;
+        el.textContent = msg;
+    }
+
+    function recargarPreview() {
+        document.getElementById('previewFrame').src = '/';
+    }
+
+    function getDatos() {
+        if (tabActual === 'colores') {
+            return {
+                seccion: 'colores',
+                mensaje_envio: document.getElementById('mensaje_envio').value,
+                color_primario: document.getElementById('color_primario').value,
+                color_secundario: document.getElementById('color_secundario').value,
+                color_fondo: document.getElementById('color_fondo').value,
+                color_banner: document.getElementById('color_banner').value,
+                color_hover: document.getElementById('color_hover').value,
+            };
+        } else if (tabActual === 'footer') {
+            return {
+                seccion: 'footer',
+                color_fondo: document.getElementById('footer_color_fondo').value,
+                color_texto: document.getElementById('footer_color_texto').value,
+                color_enlaces: document.getElementById('footer_color_enlaces').value,
+                color_redes: document.getElementById('footer_color_redes').value,
+            };
+        } else if (tabActual === 'sobre_mi') {
+            return {
+                seccion: 'sobre_mi',
+                titulo: document.getElementById('sobre_titulo').value,
+                contenido: document.getElementById('sobre_contenido').value,
+            };
+        } else if (tabActual === 'contacto') {
+            return {
+                seccion: 'contacto',
+                telefono: document.getElementById('contacto_telefono').value,
+                email: document.getElementById('contacto_email').value,
+                direccion: document.getElementById('contacto_direccion').value,
+                horarios: document.getElementById('contacto_horarios').value,
+            };
+        }
+    }
+
+    async function guardarActual() {
+        setStatus('saving', 'Guardando...');
+        try {
+            const res = await fetch('/configurador/guardar/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify(getDatos()),
+            });
+            const data = await res.json();
+            if (data.ok) {
+                setStatus('saved', '✓ Guardado');
+                setTimeout(() => recargarPreview(), 300);
+            } else {
+                setStatus('', 'Error al guardar');
+            }
+        } catch (e) {
+            setStatus('', 'Error de conexión');
+        }
+    }
+</script>
+</body>
+</html>
