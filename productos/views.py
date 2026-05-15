@@ -12,8 +12,9 @@ from django.db import models
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig
 from .services import FlowService, MercadoPagoService
+from .instagram_service import InstagramService
 
 def home(request):
     productos = Producto.objects.filter(activo=True).order_by('-fecha_creacion')[:8]
@@ -21,28 +22,28 @@ def home(request):
     slides = Slide.objects.filter(activo=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
-    
-    # Secciones de categorías
+
+    # Instagram
+    instagram_config = InstagramConfig.objects.filter(activo=True, mostrar_en_home=True).first()
+    instagram_posts = []
+    if instagram_config:
+        instagram_posts = InstagramService().get_user_media(instagram_config.cantidad_posts)
+
     secciones_categorias = SeccionCategoria.objects.filter(activo=True)[:3]
     secciones_con_productos = []
-    
     for seccion in secciones_categorias:
-        productos_seccion = Producto.objects.filter(
-            categoria=seccion.categoria, 
-            activo=True
-        )[:12]  # 12 productos (6x2 filas)
-        secciones_con_productos.append({
-            'seccion': seccion,
-            'productos': productos_seccion
-        })
-    
+        productos_seccion = Producto.objects.filter(categoria=seccion.categoria, activo=True)[:12]
+        secciones_con_productos.append({'seccion': seccion, 'productos': productos_seccion})
+
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
         'slides': slides,
         'config': config,
         'banners': banners,
-        'secciones_categorias': secciones_con_productos
+        'secciones_categorias': secciones_con_productos,
+        'instagram_posts': instagram_posts,
+        'instagram_config': instagram_config,
     })
 
 def productos_por_categoria(request, categoria_id):
