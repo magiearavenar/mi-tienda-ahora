@@ -34,7 +34,7 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
     tags_adicionales = models.ManyToManyField(Tag, blank=True, help_text='Tags adicionales para este producto')
-    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True, max_length=500)
     imagen_url = models.URLField(blank=True, null=True, help_text='URL externa de la imagen')
     stock = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
@@ -142,7 +142,7 @@ class Pago(models.Model):
 
 class Slide(models.Model):
     titulo = models.CharField(max_length=200, blank=True)
-    imagen = models.ImageField(upload_to='slides/')
+    imagen = models.ImageField(upload_to='slides/', max_length=500)
     orden = models.IntegerField(default=0)
     activo = models.BooleanField(default=True)
     
@@ -287,7 +287,7 @@ class RedSocial(models.Model):
 
 class ImagenProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes')
-    imagen = models.ImageField(upload_to='productos/')
+    imagen = models.ImageField(upload_to='productos/', max_length=500)
     orden = models.IntegerField(default=0)
     es_principal = models.BooleanField(default=False)
     
