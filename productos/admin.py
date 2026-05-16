@@ -62,14 +62,6 @@ class ImagenProductoInline(admin.TabularInline):
         return ''
     preview.short_description = 'Vista previa'
 
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        if db_field.name == 'imagen':
-            # Ocultar el nombre del archivo y el link "modificar"
-            field = super().formfield_for_dbfield(db_field, request, **kwargs)
-            field.widget.template_name = 'admin/widgets/clearable_file_input_simple.html'
-            return field
-        return super().formfield_for_dbfield(db_field, request, **kwargs)
-
     class Media:
         css = {'all': ('admin/css/dragdrop-image.css', 'admin/css/inline-images.css')}
         js = ('admin/js/sortable-images.js',)

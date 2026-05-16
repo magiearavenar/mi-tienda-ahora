@@ -2,7 +2,9 @@
 #imagenproducto_set-group .clearable-file-input a,
 #imagenproducto_set-group p.file-upload,
 #imagenproducto_set-group .file-upload,
-#imagenproducto_set-group span.clearable-file-input {
+#imagenproducto_set-group span.clearable-file-input,
+#imagenproducto_set-group .field-imagen a,
+#imagenproducto_set-group .field-imagen p {
     display: none !important;
 }
 
