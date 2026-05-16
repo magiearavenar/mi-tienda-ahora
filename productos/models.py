@@ -304,6 +304,42 @@ class ImagenProducto(models.Model):
         verbose_name = "Imagen de Producto"
         verbose_name_plural = "Imágenes de Productos"
 
+class VarianteAtributo(models.Model):
+    """Ej: Talla, Color, Tamaño"""
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE, related_name='atributos')
+    nombre = models.CharField(max_length=100, help_text='Ej: Talla, Color, Material')
+    orden = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.producto.nombre} — {self.nombre}'
+
+    class Meta:
+        ordering = ['orden']
+        verbose_name = 'Atributo de variante'
+        verbose_name_plural = 'Atributos de variantes'
+
+
+class VarianteValor(models.Model):
+    """Ej: S, M, L / Rojo, Azul"""
+    atributo = models.ForeignKey(VarianteAtributo, on_delete=models.CASCADE, related_name='valores')
+    valor = models.CharField(max_length=100, help_text='Ej: S, Rojo, 200 hojas')
+    precio_extra = models.DecimalField(
+        max_digits=10, decimal_places=2, default=0,
+        help_text='Precio adicional sobre el precio base (puede ser 0 o negativo)'
+    )
+    stock = models.IntegerField(default=0)
+    activo = models.BooleanField(default=True)
+    orden = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.atributo.nombre}: {self.valor}'
+
+    class Meta:
+        ordering = ['orden']
+        verbose_name = 'Valor de variante'
+        verbose_name_plural = 'Valores de variantes'
+
+
 class OpcionProducto(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='opciones')
     nombre = models.CharField(max_length=200, help_text='Ej: 200 hojas')

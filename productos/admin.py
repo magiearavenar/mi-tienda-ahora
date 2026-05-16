@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.html import format_html
 from PIL import Image
 import io
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
 
@@ -67,6 +67,29 @@ class ImagenProductoInline(admin.TabularInline):
         js = ('admin/js/sortable-images.js',)
 
 
+class VarianteValorInline(admin.TabularInline):
+    model = VarianteValor
+    extra = 1
+    fields = ['valor', 'precio_extra', 'stock', 'activo', 'orden']
+
+
+@admin.register(VarianteAtributo)
+class VarianteAtributoAdmin(admin.ModelAdmin):
+    list_display = ['producto', 'nombre', 'orden']
+    list_filter = ['producto']
+    search_fields = ['nombre', 'producto__nombre']
+    inlines = [VarianteValorInline]
+
+
+class VarianteAtributoInline(admin.StackedInline):
+    model = VarianteAtributo
+    extra = 0
+    show_change_link = True
+    fields = ['nombre', 'orden']
+    verbose_name = 'Variante (ej: Talla, Color)'
+    verbose_name_plural = 'Variantes del producto'
+
+
 class OpcionProductoInline(admin.TabularInline):
     model = OpcionProducto
     extra = 1
@@ -78,7 +101,7 @@ class ProductoAdmin(admin.ModelAdmin):
     list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion', 'tags_adicionales']
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
-    inlines = [ImagenProductoInline, OpcionProductoInline]
+    inlines = [ImagenProductoInline, VarianteAtributoInline, OpcionProductoInline]
     filter_horizontal = ['tags_adicionales', 'categoria']
     actions = ['asignar_etiquetas', 'asignar_categoria']
 

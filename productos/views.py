@@ -63,7 +63,26 @@ def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id, activo=True)
     categorias = Categoria.objects.filter(visible_navegacion=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
-    return render(request, 'detalle_producto.html', {'producto': producto, 'categorias': categorias, 'config': config})
+    atributos = producto.atributos.prefetch_related('valores').all()
+    # Serializar variantes para JS
+    variantes_json = []
+    for atributo in atributos:
+        valores = []
+        for v in atributo.valores.filter(activo=True):
+            valores.append({
+                'id': v.id,
+                'valor': v.valor,
+                'precio_extra': float(v.precio_extra),
+                'stock': v.stock,
+            })
+        variantes_json.append({'nombre': atributo.nombre, 'valores': valores})
+    return render(request, 'detalle_producto.html', {
+        'producto': producto,
+        'categorias': categorias,
+        'config': config,
+        'atributos': atributos,
+        'variantes_json': variantes_json,
+    })
 
 def carrito(request):
     return render(request, 'carrito.html')
@@ -404,13 +423,10 @@ def debug_config(request):
 def obtener_imagen_producto(request, producto_id):
     try:
         producto = Producto.objects.get(id=producto_id)
-        imagen_principal = producto.imagen_principal()
-        
-        if not imagen_principal:
+        img = producto.imagen_principal
+        if not img:
             return JsonResponse({'imagen': None})
-        
-        return JsonResponse({'imagen': imagen_principal.url})
-            
+        return JsonResponse({'imagen': img.url})
     except Producto.DoesNotExist:
         return JsonResponse({'imagen': None})
     except Exception as e:

@@ -70,6 +70,34 @@
             <div class="mb-4">
                 <h3 class="text-primary" id="precio-actual">${{ producto.precio|floatformat:0 }}</h3>
             </div>
+
+            {% if atributos %}
+            <div class="mb-4" id="variantes-container">
+                {% for atributo in atributos %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ atributo.nombre }}</label>
+                    <select class="form-select variante-select" data-atributo="{{ atributo.nombre }}"
+                            onchange="actualizarVariante()">
+                        <option value="" data-precio-extra="0" data-stock="-1">Selecciona {{ atributo.nombre }}</option>
+                        {% for valor in atributo.valores.all %}
+                        {% if valor.activo %}
+                        <option value="{{ valor.id }}"
+                                data-precio-extra="{{ valor.precio_extra }}"
+                                data-stock="{{ valor.stock }}"
+                                {% if valor.stock == 0 %}disabled{% endif %}>
+                            {{ valor.valor }}
+                            {% if valor.precio_extra > 0 %}(+${{ valor.precio_extra|floatformat:0 }}){% endif %}
+                            {% if valor.precio_extra < 0 %}(-${{ valor.precio_extra|floatformat:0 }}){% endif %}
+                            {% if valor.stock == 0 %} — Sin stock{% endif %}
+                        </option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endfor %}
+                <small id="stock-variante" class="text-muted"></small>
+            </div>
+            {% endif %}
             
             <div class="row mb-4">
                 {% if producto.opciones.all %}
@@ -149,31 +177,69 @@
 </div>
 
 <script>
+const precioBase = {{ producto.precio }};
+
+function actualizarVariante() {
+    let precioExtra = 0;
+    let stockMinimo = null;
+    let seleccionCompleta = true;
+
+    document.querySelectorAll('.variante-select').forEach(select => {
+        const opt = select.options[select.selectedIndex];
+        if (!opt || !opt.value) {
+            seleccionCompleta = false;
+            return;
+        }
+        precioExtra += parseFloat(opt.dataset.precioExtra || 0);
+        const stock = parseInt(opt.dataset.stock);
+        if (stockMinimo === null || stock < stockMinimo) stockMinimo = stock;
+    });
+
+    const precioFinal = precioBase + precioExtra;
+    document.getElementById('precio-actual').textContent = `$${Math.round(precioFinal).toLocaleString('es-CL')}`;
+
+    const stockEl = document.getElementById('stock-variante');
+    if (seleccionCompleta && stockMinimo !== null) {
+        stockEl.textContent = stockMinimo > 0 ? `Stock disponible: ${stockMinimo}` : 'Sin stock para esta combinación';
+        stockEl.style.color = stockMinimo > 0 ? '#28a745' : '#dc3545';
+        const input = document.getElementById('cantidad');
+        if (input) input.max = stockMinimo;
+    } else {
+        stockEl.textContent = '';
+    }
+}
+
 function actualizarPrecioOpcion() {
     const select = document.getElementById('opcion');
     const precio = parseFloat(select.value);
-    document.getElementById('precio-actual').textContent = `$${Math.round(precio)}`;
+    document.getElementById('precio-actual').textContent = `$${Math.round(precio).toLocaleString('es-CL')}`;
 }
 
 function agregarAlCarritoConOpcion() {
     const cantidad = parseInt(document.getElementById('cantidad').value);
-    const precioActual = document.getElementById('precio-actual').textContent.replace('$', '').replace(',', '');
-    const select = document.getElementById('opcion');
+    const precioTexto = document.getElementById('precio-actual').textContent.replace('$', '').replace(/\./g, '').replace(',', '.');
+    const precioFinal = parseFloat(precioTexto);
     let nombreProducto = '{{ producto.nombre }}';
-    
+
+    // Agregar variantes seleccionadas al nombre
+    const variantes = [];
+    document.querySelectorAll('.variante-select').forEach(select => {
+        const opt = select.options[select.selectedIndex];
+        if (opt && opt.value) variantes.push(`${select.dataset.atributo}: ${opt.text.split('(')[0].trim()}`);
+    });
+    if (variantes.length) nombreProducto += ` (${variantes.join(', ')})`;
+
+    const select = document.getElementById('opcion');
     if (select && select.selectedIndex > 0) {
-        const opcionNombre = select.options[select.selectedIndex].dataset.nombre;
-        nombreProducto += ` - ${opcionNombre}`;
+        nombreProducto += ` - ${select.options[select.selectedIndex].dataset.nombre}`;
     }
-    
-    // Obtener personalización si existe
+
     const personalizacionField = document.getElementById('personalizacion');
     const personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
-    
-    agregarAlCarrito({{ producto.id }}, nombreProducto, parseFloat(precioActual), cantidad, personalizacion);
+
+    agregarAlCarrito({{ producto.id }}, nombreProducto, precioFinal, cantidad, personalizacion);
 }
 
-// Función para ir a un slide específico
 function goToSlide(slideIndex) {
     const carousel = document.querySelector('#productCarousel');
     if (carousel) {
@@ -182,20 +248,9 @@ function goToSlide(slideIndex) {
     }
 }
 
-// Actualizar precio al cargar la página si hay una opción seleccionada
 document.addEventListener('DOMContentLoaded', function() {
-    const select = document.getElementById('opcion');
-    if (select && select.selectedIndex > 0) {
-        actualizarPrecioOpcion();
-    }
-    
-    // Inicializar carousel si existe
     const carousel = document.querySelector('#productCarousel');
-    if (carousel) {
-        new bootstrap.Carousel(carousel, {
-            interval: false // Desactivar auto-play
-        });
-    }
+    if (carousel) new bootstrap.Carousel(carousel, { interval: false });
 });
 </script>
 {% endblock %}
