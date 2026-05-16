@@ -1,5 +1,26 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+    // Ocultar "Actualmente" y "Modificar" del widget de imagen
+    function limpiarWidgetImagen() {
+        document.querySelectorAll('#imagenproducto_set-group td.field-imagen').forEach(td => {
+            // Ocultar todo excepto el input file
+            td.childNodes.forEach(node => {
+                if (node.nodeType === 1 && node.tagName !== 'INPUT') {
+                    node.style.display = 'none';
+                }
+                if (node.nodeType === 3) { // texto plano
+                    node.textContent = '';
+                }
+            });
+            // Ocultar p, a, span dentro del td
+            td.querySelectorAll('p, a, span, br').forEach(el => {
+                if (el.tagName !== 'INPUT') el.style.display = 'none';
+            });
+        });
+    }
+
+    limpiarWidgetImagen();
+
     // Cargar SortableJS y SweetAlert2
     loadScript('https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js', function () {
         initSortable();
@@ -38,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         new MutationObserver(() => {
             addDeleteButtons(tbody);
             styleRows(tbody);
+            limpiarWidgetImagen();
         }).observe(tbody, { childList: true });
     }
 

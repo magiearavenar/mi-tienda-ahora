@@ -4,7 +4,15 @@
 #imagenproducto_set-group .file-upload,
 #imagenproducto_set-group span.clearable-file-input,
 #imagenproducto_set-group .field-imagen a,
-#imagenproducto_set-group .field-imagen p {
+#imagenproducto_set-group .field-imagen p,
+#imagenproducto_set-group td.field-imagen a,
+#imagenproducto_set-group td.field-imagen p,
+#imagenproducto_set-group td.field-imagen span,
+#imagenproducto_set-group .clearablefileinput ~ a,
+#imagenproducto_set-group .clearablefileinput ~ p,
+#imagenproducto_set-group input[name$="-imagen"] ~ a,
+#imagenproducto_set-group input[name$="-imagen"] ~ p,
+#imagenproducto_set-group input[name$="-imagen"] ~ span {
     display: none !important;
 }
 
