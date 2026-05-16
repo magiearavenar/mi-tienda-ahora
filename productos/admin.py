@@ -75,19 +75,25 @@ class VarianteValorInline(admin.TabularInline):
 
 @admin.register(VarianteAtributo)
 class VarianteAtributoAdmin(admin.ModelAdmin):
-    list_display = ['producto', 'nombre', 'orden']
+    list_display = ['producto', 'nombre', 'valores_texto', 'orden']
     list_filter = ['producto']
     search_fields = ['nombre', 'producto__nombre']
     inlines = [VarianteValorInline]
+    fields = ['producto', 'nombre', 'valores_texto', 'orden']
+    help_texts = {
+        'valores_texto': 'Escribe los valores separados por coma. Ej: S, M, L, XL'
+    }
 
 
-class VarianteAtributoInline(admin.StackedInline):
+class VarianteAtributoInline(admin.TabularInline):
     model = VarianteAtributo
-    extra = 0
-    show_change_link = True
-    fields = ['nombre', 'orden']
-    verbose_name = 'Variante (ej: Talla, Color)'
-    verbose_name_plural = 'Variantes del producto'
+    extra = 1
+    fields = ['nombre', 'valores_texto', 'orden']
+    verbose_name = 'Variante'
+    verbose_name_plural = 'Variantes (ej: Talla: S, M, L)'
+
+    class Media:
+        css = {'all': ('admin/css/variantes.css',)}
 
 
 class OpcionProductoInline(admin.TabularInline):

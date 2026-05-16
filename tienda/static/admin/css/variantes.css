@@ -1,0 +1,20 @@
+/* Inline de variantes */
+#atributos-group .field-valores_texto input {
+    width: 100%;
+    min-width: 280px;
+}
+
+#atributos-group .field-valores_texto input::placeholder {
+    color: #bbb;
+    font-style: italic;
+}
+
+#atributos-group th {
+    font-size: 0.8rem;
+}
+
+/* Hint debajo del campo */
+#atributos-group .field-valores_texto p.help {
+    color: #a07ab0;
+    font-size: 0.75rem;
+}

@@ -308,15 +308,34 @@ class VarianteAtributo(models.Model):
     """Ej: Talla, Color, Tamaño"""
     producto = models.ForeignKey('Producto', on_delete=models.CASCADE, related_name='atributos')
     nombre = models.CharField(max_length=100, help_text='Ej: Talla, Color, Material')
+    valores_texto = models.CharField(
+        max_length=500, blank=True,
+        help_text='Escribe los valores separados por coma. Ej: S, M, L, XL'
+    )
     orden = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.producto.nombre} — {self.nombre}'
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Sincronizar valores_texto con VarianteValor
+        if self.valores_texto:
+            valores_actuales = [v.strip() for v in self.valores_texto.split(',') if v.strip()]
+            # Eliminar los que ya no están
+            self.valores.exclude(valor__in=valores_actuales).delete()
+            # Crear los nuevos
+            existentes = set(self.valores.values_list('valor', flat=True))
+            for i, val in enumerate(valores_actuales):
+                if val not in existentes:
+                    VarianteValor.objects.create(
+                        atributo=self, valor=val, orden=i
+                    )
+
     class Meta:
         ordering = ['orden']
-        verbose_name = 'Atributo de variante'
-        verbose_name_plural = 'Atributos de variantes'
+        verbose_name = 'Variante'
+        verbose_name_plural = 'Variantes del producto'
 
 
 class VarianteValor(models.Model):
