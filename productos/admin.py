@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from django.db import models
 from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
@@ -25,24 +26,27 @@ class ImagenProductoInline(admin.TabularInline):
     extra = 1
     fields = ['imagen', 'orden', 'es_principal', 'preview']
     readonly_fields = ['preview']
-    
+
     def preview(self, obj):
         if obj.imagen:
             return f'<img src="{obj.imagen.url}" style="max-width: 100px; max-height: 100px; border-radius: 4px;">'
         return "Sin imagen"
     preview.short_description = "Vista previa"
     preview.allow_tags = True
-    
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        if db_field.name == 'imagen':
-            kwargs['widget'] = DragDropImageWidget
-        return super().formfield_for_dbfield(db_field, request, **kwargs)
-    
+
     class Media:
-        css = {
-            'all': ('admin/css/dragdrop-image.css',)
-        }
+        css = {'all': ('admin/css/dragdrop-image.css',)}
         js = ('admin/js/color-picker.js',)
+
+
+class SubirVariasImagenesForm(forms.Form):
+    """Formulario para subir múltiples imágenes de una vez."""
+    imagenes = forms.FileField(
+        widget=forms.ClearableFileInput(attrs={'multiple': True}),
+        label='Subir varias imágenes a la vez',
+        required=False,
+        help_text='Selecciona varias imágenes con Ctrl+clic o Cmd+clic'
+    )
 
 class OpcionProductoInline(admin.TabularInline):
     model = OpcionProducto
@@ -51,34 +55,48 @@ class OpcionProductoInline(admin.TabularInline):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    # form = ProductoAdminForm  # Comentado temporalmente
     list_display = ['nombre', 'categoria', 'precio', 'stock', 'permite_personalizacion', 'activo', 'fecha_creacion']
     list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion', 'tags_adicionales']
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
     inlines = [ImagenProductoInline, OpcionProductoInline]
     filter_horizontal = ['tags_adicionales']
-    
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        if db_field.name == 'imagen':
-            kwargs['widget'] = DragDropImageWidget
-        return super().formfield_for_dbfield(db_field, request, **kwargs)
-    
+
     fieldsets = (
         ('Información Básica', {
             'fields': ('nombre', 'descripcion', 'precio', 'categoria', 'tags_adicionales', 'stock', 'activo')
         }),
         ('Imágenes', {
             'fields': ('imagen', 'imagen_url'),
-            'description': '''<strong>Imagen Principal:</strong> Sube la imagen principal del producto.<br>
-                             <strong>Imágenes Adicionales:</strong> Usa "Imágenes de Productos" abajo para agregar más imágenes.<br>
-                             <strong>URL Externa:</strong> Enlace a imagen externa (opcional).'''
         }),
         ('Personalización', {
             'fields': ('permite_personalizacion', 'texto_personalizacion', 'placeholder_personalizacion'),
-            'description': 'Configura si este producto permite personalización y qué texto mostrar al cliente.'
         }),
     )
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        return form
+
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['bulk_form'] = SubirVariasImagenesForm()
+        return super().changeform_view(request, object_id, form_url, extra_context)
+
+    def save_model(self, request, obj, form, change):
+        super().save_model(request, obj, form, change)
+        # Procesar imágenes múltiples
+        imagenes = request.FILES.getlist('imagenes_bulk')
+        ultimo_orden = obj.imagenes.aggregate(
+            max_orden=models.Max('orden')
+        )['max_orden'] or 0
+        for i, imagen in enumerate(imagenes):
+            ImagenProducto.objects.create(
+                producto=obj,
+                imagen=imagen,
+                orden=ultimo_orden + i + 1,
+                es_principal=(i == 0 and not obj.imagenes.exists())
+            )
 
 @admin.register(Slide)
 class SlideAdmin(admin.ModelAdmin):

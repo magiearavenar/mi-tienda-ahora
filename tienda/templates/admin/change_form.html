@@ -12,10 +12,38 @@
         padding: 0 !important;
         margin-right: 10px !important;
     }
-    
     input[type="color"]:hover {
         border-color: #007cba !important;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
     }
+    .bulk-upload-box {
+        background: #f8f9fa;
+        border: 2px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 16px 0;
+    }
+    .bulk-upload-box h4 {
+        font-size: 0.95rem;
+        margin-bottom: 8px;
+        color: #495057;
+    }
+    .bulk-upload-box small {
+        color: #6c757d;
+        display: block;
+        margin-top: 6px;
+    }
 </style>
+{% endblock %}
+
+{% block after_related_objects %}
+{{ block.super }}
+{% if bulk_form and opts.model_name == 'producto' %}
+<div class="bulk-upload-box">
+    <h4>📦 Subir varias imágenes a la vez</h4>
+    <input type="file" name="imagenes_bulk" multiple accept="image/*"
+           style="display:block; margin-top:8px;">
+    <small>Selecciona varias imágenes con Ctrl+clic (Windows) o Cmd+clic (Mac). Se agregarán automáticamente al guardar.</small>
+</div>
+{% endif %}
 {% endblock %}
