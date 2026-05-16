@@ -32,6 +32,16 @@
             {% endfor %}
         </div>
 
+        <p style="font-weight:600; margin-bottom:8px;">Modo:</p>
+        <div style="display:flex; gap:16px; margin-bottom:20px;">
+            <label style="cursor:pointer;">
+                <input type="radio" name="modo" value="agregar" checked> Agregar a las existentes
+            </label>
+            <label style="cursor:pointer;">
+                <input type="radio" name="modo" value="reemplazar"> Reemplazar todas
+            </label>
+        </div>
+
         <div style="display:flex; gap:10px;">
             <input type="submit" value="✓ Aplicar categoría" class="button default"
                    style="background:#ffc1ea; border:none; color:#333; padding:10px 24px; border-radius:8px; cursor:pointer; font-weight:600;">

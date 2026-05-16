@@ -59,7 +59,6 @@ def productos_por_categoria(request, categoria_id):
         'config': config,
         'banners': banners
     })
-
 def detalle_producto(request, producto_id):
     producto = get_object_or_404(Producto, id=producto_id, activo=True)
     categorias = Categoria.objects.filter(visible_navegacion=True)

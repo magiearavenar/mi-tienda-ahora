@@ -79,7 +79,7 @@ class ProductoAdmin(admin.ModelAdmin):
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
     inlines = [ImagenProductoInline, OpcionProductoInline]
-    filter_horizontal = ['tags_adicionales']
+    filter_horizontal = ['tags_adicionales', 'categoria']
     actions = ['asignar_etiquetas', 'asignar_categoria']
 
     fieldsets = (
@@ -92,14 +92,14 @@ class ProductoAdmin(admin.ModelAdmin):
     )
 
     def mostrar_categoria(self, obj):
-        if obj.categoria:
-            return format_html(
-                '<span title="{}" style="background:#e8f4fd;color:#1a6fa8;padding:3px 10px;border-radius:12px;font-size:0.8rem;">{}</span>',
-                obj.categoria.descripcion or obj.categoria.nombre,
-                obj.categoria.nombre
-            )
-        return '-'
-    mostrar_categoria.short_description = 'Categoría'
+        cats = obj.categoria.all()
+        if not cats:
+            return '-'
+        html = ''
+        for cat in cats:
+            html += f'<span title="{cat.descripcion or cat.nombre}" style="background:#e8f4fd;color:#1a6fa8;padding:2px 8px;border-radius:10px;font-size:0.75rem;margin-right:3px;display:inline-block;">{cat.nombre}</span>'
+        return format_html(html)
+    mostrar_categoria.short_description = 'Categorías'
     mostrar_categoria.allow_tags = True
 
     def mostrar_tags(self, obj):
@@ -156,9 +156,14 @@ class ProductoAdmin(admin.ModelAdmin):
     def asignar_categoria(self, request, queryset):
         if 'aplicar' in request.POST:
             cat_id = request.POST.get('categoria_seleccionada')
+            modo = request.POST.get('modo', 'agregar')
             if cat_id:
                 categoria = Categoria.objects.get(id=cat_id)
-                queryset.update(categoria=categoria)
+                for producto in queryset:
+                    if modo == 'reemplazar':
+                        producto.categoria.set([categoria])
+                    else:
+                        producto.categoria.add(categoria)
                 self.message_user(request, f'Categoría asignada a {queryset.count()} producto(s).')
             return
         return render(request, 'admin/asignar_categoria.html', {

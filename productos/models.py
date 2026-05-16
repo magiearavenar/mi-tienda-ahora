@@ -40,7 +40,7 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True)
+    categoria = models.ManyToManyField(Categoria, blank=True, verbose_name='Categorías')
     tags_adicionales = models.ManyToManyField(Tag, blank=True, help_text='Tags adicionales para este producto')
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True, max_length=500)
     imagen_url = models.URLField(blank=True, null=True, help_text='URL externa de la imagen')
@@ -57,18 +57,15 @@ class Producto(models.Model):
         return self.nombre
     
     def imagen_principal(self):
-        # Primero buscar en ImagenProducto marcada como principal
-        imagen_principal = self.imagenes.filter(es_principal=True).first()
-        if imagen_principal:
-            return imagen_principal.imagen
-        
-        # Si no hay principal, tomar la primera imagen de ImagenProducto
-        primera_imagen = self.imagenes.first()
-        if primera_imagen:
-            return primera_imagen.imagen
-        
-        # Como último recurso, usar el campo imagen individual
-        return self.imagen
+        img = self.imagenes.filter(es_principal=True).first()
+        if not img:
+            img = self.imagenes.first()
+        if img and img.imagen:
+            return img.imagen
+        if self.imagen:
+            return self.imagen
+        return None
+    imagen_principal = property(imagen_principal)
     
     def todas_las_imagenes(self):
         """Retorna todas las imágenes del producto para mostrar en el catálogo"""
