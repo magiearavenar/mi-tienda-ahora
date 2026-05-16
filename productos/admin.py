@@ -165,19 +165,12 @@ class ProductoAdmin(admin.ModelAdmin):
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)
-        # Procesar stock y precio extra de variantes
         import json as _json
         for key, value in request.POST.items():
             if 'valores_extra' in key and value:
                 try:
-                    # Extraer el prefijo del formset (ej: atributos-0)
                     prefix = key.replace('-valores_extra', '')
-                    nombre_key = f'{prefix}-valores_texto'
-                    nombre = request.POST.get(nombre_key, '')
-                    if not nombre:
-                        continue
                     extras = _json.loads(value)
-                    # Buscar el atributo recien guardado
                     atributo = form.instance.atributos.filter(
                         nombre=request.POST.get(f'{prefix}-nombre', '')
                     ).first()
@@ -189,6 +182,32 @@ class ProductoAdmin(admin.ModelAdmin):
                             valor_obj.stock = int(datos.get('stock', 0))
                             valor_obj.precio_extra = float(datos.get('precio_extra', 0))
                             valor_obj.save()
+                except Exception:
+                    continue
+
+        # Procesar imágenes de variantes
+        for key, file in request.FILES.items():
+            if key.startswith('variante_imagen__'):
+                try:
+                    # formato: variante_imagen__atributos-0__Rojo
+                    parts = key.split('__')
+                    if len(parts) < 3:
+                        continue
+                    prefix = parts[1]  # ej: atributos-0
+                    val_nombre = '__'.join(parts[2:])  # por si el valor tiene __
+                    atributo = form.instance.atributos.filter(
+                        nombre=request.POST.get(f'{prefix}-nombre', '')
+                    ).first()
+                    if not atributo:
+                        continue
+                    valor_obj = atributo.valores.filter(valor=val_nombre).first()
+                    if valor_obj:
+                        try:
+                            imagen_comprimida = comprimir_imagen(file)
+                        except Exception:
+                            imagen_comprimida = file
+                        valor_obj.imagen = imagen_comprimida
+                        valor_obj.save()
                 except Exception:
                     continue
 

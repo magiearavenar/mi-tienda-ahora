@@ -347,6 +347,7 @@ class VarianteValor(models.Model):
         help_text='Precio adicional sobre el precio base (puede ser 0 o negativo)'
     )
     stock = models.IntegerField(default=0)
+    imagen = models.ImageField(upload_to='variantes/', blank=True, null=True, max_length=500)
     activo = models.BooleanField(default=True)
     orden = models.IntegerField(default=0)
 
