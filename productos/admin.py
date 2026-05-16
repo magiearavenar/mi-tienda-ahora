@@ -150,6 +150,16 @@ class ProductoAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         imagenes = request.FILES.getlist('imagenes_bulk')
+        if not imagenes:
+            return
+        # Leer orden personalizado si existe
+        orden_str = request.POST.get('imagenes_bulk_orden', '')
+        if orden_str:
+            try:
+                indices = [int(x) for x in orden_str.split(',')]
+                imagenes = [imagenes[i] for i in indices if i < len(imagenes)]
+            except Exception:
+                pass
         ultimo_orden = obj.imagenes.aggregate(max_orden=models.Max('orden'))['max_orden'] or 0
         for i, imagen in enumerate(imagenes):
             try:

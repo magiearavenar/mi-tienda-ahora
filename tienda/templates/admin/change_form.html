@@ -74,20 +74,38 @@ document.addEventListener('DOMContentLoaded', function () {
     window.previewBulkImages = function(input) {
         const grid = document.getElementById('bulk-preview-grid');
         grid.innerHTML = '';
+        if (grid._sortable) { grid._sortable.destroy(); grid._sortable = null; }
+
         Array.from(input.files).forEach((file, i) => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const wrap = document.createElement('div');
+                wrap.dataset.fileIndex = i;
                 wrap.style.cssText = 'position:relative;width:90px;height:90px;border-radius:8px;overflow:hidden;border:2px solid #ffc1ea;';
+
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+                img.style.cssText = 'width:100%;height:100%;object-fit:cover;pointer-events:none;';
+
                 const badge = document.createElement('span');
-                badge.textContent = i + 1;
-                badge.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(255,193,234,0.9);color:#333;font-size:0.7rem;font-weight:700;padding:1px 6px;border-radius:8px;';
+                badge.className = 'bulk-orden-badge';
+                badge.textContent = `#${i + 1}`;
+
                 wrap.appendChild(img);
                 wrap.appendChild(badge);
                 grid.appendChild(wrap);
+
+                // Mostrar hint de arrastre solo la primera vez
+                if (i === 0) {
+                    let hint = document.getElementById('bulk-drag-hint');
+                    if (!hint) {
+                        hint = document.createElement('small');
+                        hint.id = 'bulk-drag-hint';
+                        hint.className = 'bulk-drag-hint';
+                        hint.textContent = '✦ Arrastra las imágenes para cambiar el orden del slide';
+                        grid.parentNode.insertBefore(hint, grid.nextSibling);
+                    }
+                }
             };
             reader.readAsDataURL(file);
         });

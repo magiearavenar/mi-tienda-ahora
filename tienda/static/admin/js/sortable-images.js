@@ -61,6 +61,76 @@ document.addEventListener('DOMContentLoaded', function () {
             styleRows(tbody);
             limpiarWidgetImagen();
         }).observe(tbody, { childList: true });
+
+        // Sortable para el grid de preview de bulk upload
+        initBulkPreviewSortable();
+    }
+
+    function initBulkPreviewSortable() {
+        const grid = document.getElementById('bulk-preview-grid');
+        if (!grid) return;
+
+        // Observar cuando se agregan items al grid
+        new MutationObserver(() => {
+            if (grid.children.length > 0 && !grid._sortable) {
+                grid._sortable = Sortable.create(grid, {
+                    animation: 200,
+                    ghostClass: 'bulk-ghost',
+                    onEnd: actualizarOrdenBulk
+                });
+                // Agregar estilos de drag
+                if (!document.getElementById('bulk-sortable-style')) {
+                    const s = document.createElement('style');
+                    s.id = 'bulk-sortable-style';
+                    s.textContent = `
+                        .bulk-ghost { opacity: 0.4; }
+                        #bulk-preview-grid > div { cursor: grab; transition: transform 0.15s; }
+                        #bulk-preview-grid > div:active { cursor: grabbing; transform: scale(1.05); }
+                        .bulk-orden-badge {
+                            position: absolute; bottom: 4px; right: 4px;
+                            background: rgba(160,122,176,0.9); color: #fff;
+                            font-size: 0.65rem; font-weight: 700;
+                            padding: 1px 5px; border-radius: 6px;
+                        }
+                        .bulk-drag-hint {
+                            font-size: 0.75rem; color: #a07ab0;
+                            margin-top: 6px; display: block;
+                        }
+                    `;
+                    document.head.appendChild(s);
+                }
+            }
+            actualizarOrdenBulk();
+        }).observe(grid, { childList: true });
+    }
+
+    function actualizarOrdenBulk() {
+        const grid = document.getElementById('bulk-preview-grid');
+        if (!grid) return;
+        const items = Array.from(grid.children);
+
+        // Actualizar badges de orden
+        items.forEach((item, i) => {
+            let badge = item.querySelector('.bulk-orden-badge');
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'bulk-orden-badge';
+                item.appendChild(badge);
+            }
+            badge.textContent = `#${i + 1}`;
+        });
+
+        // Guardar orden en campo oculto para que el servidor lo use
+        let hidden = document.getElementById('bulk-orden-hidden');
+        if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.id = 'bulk-orden-hidden';
+            hidden.name = 'imagenes_bulk_orden';
+            grid.parentNode.appendChild(hidden);
+        }
+        // Guardar los índices originales en el orden actual
+        hidden.value = items.map(item => item.dataset.fileIndex || '0').join(',');
     }
 
     function styleRows(tbody) {
