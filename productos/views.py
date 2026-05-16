@@ -12,7 +12,7 @@ from django.db import models
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento
 from .services import FlowService, MercadoPagoService
 from .instagram_service import InstagramService
 
@@ -321,6 +321,28 @@ def pago_fallido(request):
 
 def pago_pendiente(request):
     return render(request, 'pago_pendiente.html')
+
+
+def validar_cupon(request):
+    codigo = request.GET.get('codigo', '').strip().upper()
+    producto_id = request.GET.get('producto_id')
+    if not codigo:
+        return JsonResponse({'ok': False, 'error': 'Ingresa un código'})
+    try:
+        descuento = Descuento.objects.get(codigo__iexact=codigo)
+        if not descuento.es_valido():
+            return JsonResponse({'ok': False, 'error': 'Cupón no válido o expirado'})
+        return JsonResponse({
+            'ok': True,
+            'tipo': descuento.tipo,
+            'valor': float(descuento.valor),
+            'aplica_a': descuento.aplica_a,
+            'nombre': descuento.nombre,
+            'productos_ids': list(descuento.productos.values_list('id', flat=True)),
+            'categorias_ids': list(descuento.categorias.values_list('id', flat=True)),
+        })
+    except Descuento.DoesNotExist:
+        return JsonResponse({'ok': False, 'error': 'Cupón no encontrado'})
 
 
 def portafolio(request):

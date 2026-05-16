@@ -55,6 +55,7 @@ JAZZMIN_SETTINGS = {
         'productos.ImagenProducto': 'fas fa-camera',
         'productos.OpcionProducto': 'fas fa-list',
         'productos.InstagramConfig': 'fab fa-instagram',
+        'productos.Descuento': 'fas fa-tag',
     },
 
     'default_icon_parents': 'fas fa-folder',

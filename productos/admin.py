@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.html import format_html
 from PIL import Image
 import io
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
 
@@ -444,6 +444,28 @@ class ProyectoPortafolioAdmin(admin.ModelAdmin):
             'fields': ('orden', 'activo'),
         }),
     )
+
+
+@admin.register(Descuento)
+class DescuentoAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'codigo', 'tipo', 'valor', 'aplica_a', 'activo', 'usos_actuales', 'fecha_fin']
+    list_editable = ['activo']
+    list_filter = ['tipo', 'aplica_a', 'activo']
+    search_fields = ['nombre', 'codigo']
+    filter_horizontal = ['productos', 'categorias']
+    fieldsets = (
+        ('Información del descuento', {
+            'fields': ('nombre', 'codigo', 'tipo', 'valor', 'activo')
+        }),
+        ('¿A quién aplica?', {
+            'fields': ('aplica_a', 'productos', 'categorias'),
+            'description': 'Si aplica a “todos”, deja productos y categorías vacíos.'
+        }),
+        ('Vigencia y límites', {
+            'fields': ('fecha_inicio', 'fecha_fin', 'usos_maximos', 'usos_actuales'),
+        }),
+    )
+    readonly_fields = ['usos_actuales']
 
 
 @admin.register(InstagramConfig)

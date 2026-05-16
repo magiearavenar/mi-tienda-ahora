@@ -374,6 +374,62 @@ class OpcionProducto(models.Model):
         verbose_name = "Opción de Producto"
         verbose_name_plural = "Opciones de Producto"
 
+class Descuento(models.Model):
+    TIPO_CHOICES = [
+        ('porcentaje', 'Porcentaje (%)'),
+        ('monto', 'Monto fijo ($)'),
+    ]
+    APLICA_CHOICES = [
+        ('producto', 'Producto específico'),
+        ('categoria', 'Categoría'),
+        ('todos', 'Todos los productos'),
+    ]
+
+    nombre = models.CharField(max_length=100, help_text='Nombre interno del descuento')
+    codigo = models.CharField(max_length=50, unique=True, blank=True, null=True,
+                              help_text='Cupón de descuento (opcional). Si no hay código, se aplica automáticamente.')
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, default='porcentaje')
+    valor = models.DecimalField(max_digits=10, decimal_places=2,
+                                help_text='Ej: 10 para 10% o 1000 para $1000')
+    aplica_a = models.CharField(max_length=20, choices=APLICA_CHOICES, default='todos')
+    productos = models.ManyToManyField('Producto', blank=True,
+                                       help_text='Productos con descuento (si aplica a producto específico)')
+    categorias = models.ManyToManyField('Categoria', blank=True,
+                                        help_text='Categorías con descuento')
+    activo = models.BooleanField(default=True)
+    fecha_inicio = models.DateField(null=True, blank=True)
+    fecha_fin = models.DateField(null=True, blank=True)
+    usos_maximos = models.IntegerField(null=True, blank=True,
+                                       help_text='Máximo de usos. Vacío = ilimitado')
+    usos_actuales = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.nombre} ({self.valor}{"%" if self.tipo == "porcentaje" else "$"})'
+
+    def es_valido(self):
+        from django.utils import timezone
+        hoy = timezone.now().date()
+        if not self.activo:
+            return False
+        if self.fecha_inicio and hoy < self.fecha_inicio:
+            return False
+        if self.fecha_fin and hoy > self.fecha_fin:
+            return False
+        if self.usos_maximos and self.usos_actuales >= self.usos_maximos:
+            return False
+        return True
+
+    def calcular_descuento(self, precio):
+        if self.tipo == 'porcentaje':
+            return round(float(precio) * float(self.valor) / 100, 2)
+        return min(float(self.valor), float(precio))
+
+    class Meta:
+        verbose_name = 'Descuento'
+        verbose_name_plural = 'Descuentos'
+        ordering = ['-activo', 'nombre']
+
+
 class ProyectoPortafolio(models.Model):
     CATEGORIAS = [
         ('landing', 'Landing Page'),

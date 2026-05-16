@@ -199,10 +199,10 @@
                         <span>Envío:</span>
                         <span id="costo-envio">$0</span>
                     </div>
-                    <div class="summary-row">
-                        <span>Descuento:</span>
-                        <span id="descuento">$0</span>
-                    </div>
+    <div class="summary-row" id="descuento-row" style="display:none;">
+        <span id="descuento-label">Descuento:</span>
+        <span id="descuento" style="color:#28a745;">-$0</span>
+    </div>
                     <div class="summary-row total-row">
                         <span>Total:</span>
                         <span id="total">$0</span>
@@ -499,8 +499,20 @@ function mostrarResumenPedido() {
 }
 
 function aplicarDescuento() {
-    // Implementar lógica de descuento
-    alert('Función de descuento por implementar');
+    const codigo = document.getElementById('codigoDescuento').value.trim();
+    if (!codigo) return;
+
+    fetch(`/validar-cupon/?codigo=${encodeURIComponent(codigo)}`)
+        .then(r => r.json())
+        .then(data => {
+            if (!data.ok) {
+                alert(data.error);
+                return;
+            }
+            window._cuponActivo = data;
+            actualizarTotal();
+            document.getElementById('descuento-label').textContent = `Cupón: ${data.nombre}`;
+        });
 }
 
 function procesarPedido() {
@@ -644,32 +656,53 @@ function actualizarTotal() {
     const totalElement = document.getElementById('total');
     const costoEnvioElement = document.getElementById('costo-envio');
     const envioRow = document.getElementById('envio-row');
-    
+
     let subtotal = carrito.reduce((total, item) => total + (item.precio * item.cantidad), 0);
     let costoEnvio = 0;
-    
+    let montoDescuento = 0;
+
+    // Calcular descuento por cupón
+    const cupon = window._cuponActivo;
+    if (cupon) {
+        if (cupon.aplica_a === 'todos') {
+            montoDescuento = cupon.tipo === 'porcentaje'
+                ? subtotal * cupon.valor / 100
+                : Math.min(cupon.valor, subtotal);
+        } else if (cupon.aplica_a === 'producto') {
+            carrito.forEach(item => {
+                if (cupon.productos_ids.includes(item.id)) {
+                    const base = item.precio * item.cantidad;
+                    montoDescuento += cupon.tipo === 'porcentaje'
+                        ? base * cupon.valor / 100
+                        : Math.min(cupon.valor, base);
+                }
+            });
+        }
+        document.getElementById('descuento').textContent = `-$${Math.round(montoDescuento).toLocaleString()}`;
+        document.getElementById('descuento-row').style.display = 'flex';
+    } else {
+        document.getElementById('descuento-row').style.display = 'none';
+    }
+
     const tipoEnvioSeleccionado = document.querySelector('input[name="tipoEnvio"]:checked')?.value;
     if (tipoEnvioSeleccionado === 'starken') {
         const precioTexto = document.getElementById('precio-starken').textContent;
-        if (precioTexto.includes('$')) {
-            costoEnvio = parseInt(precioTexto.replace(/[^0-9]/g, ''));
-        }
+        if (precioTexto.includes('$')) costoEnvio = parseInt(precioTexto.replace(/[^0-9]/g, ''));
     } else if (tipoEnvioSeleccionado === 'bluexpress') {
         const precioTexto = document.getElementById('precio-bluexpress').textContent;
-        if (precioTexto.includes('$')) {
-            costoEnvio = parseInt(precioTexto.replace(/[^0-9]/g, ''));
-        }
+        if (precioTexto.includes('$')) costoEnvio = parseInt(precioTexto.replace(/[^0-9]/g, ''));
     }
-    
-    // Mostrar/ocultar fila de envío
+
     if (costoEnvio > 0) {
         costoEnvioElement.textContent = `$${costoEnvio.toLocaleString()}`;
         envioRow.style.display = 'flex';
     } else {
         envioRow.style.display = 'none';
     }
-    
-    totalElement.textContent = `$${(subtotal + costoEnvio).toLocaleString()}`;
+
+    const total = Math.max(0, subtotal - montoDescuento + costoEnvio);
+    subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
+    totalElement.textContent = `$${Math.round(total).toLocaleString()}`;
 }
 
 function getCookie(name) {

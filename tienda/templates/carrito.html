@@ -310,7 +310,13 @@ function procederPago() {
         alert('Agrega productos antes de proceder');
         return;
     }
-    
+    {% if not user.is_authenticated %}
+    // Redirigir al login si no está autenticado
+    if (confirm('Debes iniciar sesión para continuar con tu compra. ¿Ir al login?')) {
+        window.location.href = '/login/?next=/checkout/';
+    }
+    return;
+    {% endif %}
     window.location.href = '/checkout/';
 }
 

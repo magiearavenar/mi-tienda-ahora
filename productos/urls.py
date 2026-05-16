@@ -46,6 +46,7 @@ urlpatterns = [
     path('pago/exitoso/', views.pago_exitoso, name='pago_exitoso'),
     path('pago/fallido/', views.pago_fallido, name='pago_fallido'),
     path('pago/pendiente/', views.pago_pendiente, name='pago_pendiente'),
+    path('validar-cupon/', views.validar_cupon, name='validar_cupon'),
     path('debug/config/', views.debug_config, name='debug_config'),
     path('obtener-imagen/<int:producto_id>/', views.obtener_imagen_producto, name='obtener_imagen_producto'),
     path('calcular-envio/', views.calcular_envio, name='calcular_envio'),
