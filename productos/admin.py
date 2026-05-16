@@ -3,6 +3,7 @@ from django import forms
 from django.db import models
 from django.core.files.base import ContentFile
 from django.shortcuts import render
+from django.utils.html import format_html
 from PIL import Image
 import io
 from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio
@@ -70,13 +71,13 @@ class OpcionProductoInline(admin.TabularInline):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'categoria', 'precio', 'stock', 'permite_personalizacion', 'activo', 'fecha_creacion']
+    list_display = ['nombre', 'mostrar_categoria', 'mostrar_tags', 'precio', 'stock', 'activo', 'fecha_creacion']
     list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion', 'tags_adicionales']
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
     inlines = [ImagenProductoInline, OpcionProductoInline]
     filter_horizontal = ['tags_adicionales']
-    actions = ['asignar_etiquetas']
+    actions = ['asignar_etiquetas', 'asignar_categoria']
 
     fieldsets = (
         ('Información Básica', {
@@ -90,9 +91,27 @@ class ProductoAdmin(admin.ModelAdmin):
         }),
     )
 
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        return form
+    def mostrar_categoria(self, obj):
+        if obj.categoria:
+            return format_html(
+                '<span title="{}" style="background:#e8f4fd;color:#1a6fa8;padding:3px 10px;border-radius:12px;font-size:0.8rem;">{}</span>',
+                obj.categoria.descripcion or obj.categoria.nombre,
+                obj.categoria.nombre
+            )
+        return '-'
+    mostrar_categoria.short_description = 'Categoría'
+    mostrar_categoria.allow_tags = True
+
+    def mostrar_tags(self, obj):
+        tags = obj.tags_adicionales.filter(activo=True)
+        if not tags:
+            return '-'
+        html = ''
+        for tag in tags:
+            html += f'<span title="Tag: {tag.nombre}" style="background:{tag.color};color:#fff;padding:2px 8px;border-radius:10px;font-size:0.75rem;margin-right:3px;display:inline-block;">{tag.nombre}</span>'
+        return format_html(html)
+    mostrar_tags.short_description = 'Etiquetas'
+    mostrar_tags.allow_tags = True
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -102,9 +121,7 @@ class ProductoAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         imagenes = request.FILES.getlist('imagenes_bulk')
-        ultimo_orden = obj.imagenes.aggregate(
-            max_orden=models.Max('orden')
-        )['max_orden'] or 0
+        ultimo_orden = obj.imagenes.aggregate(max_orden=models.Max('orden'))['max_orden'] or 0
         for i, imagen in enumerate(imagenes):
             try:
                 imagen_comprimida = comprimir_imagen(imagen)
@@ -129,18 +146,27 @@ class ProductoAdmin(admin.ModelAdmin):
                     producto.tags_adicionales.add(*tags)
             self.message_user(request, f'Etiquetas asignadas a {queryset.count()} producto(s).')
             return
+        return render(request, 'admin/asignar_etiquetas.html', {
+            'productos': queryset,
+            'tags': Tag.objects.filter(activo=True),
+            'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+        })
+    asignar_etiquetas.short_description = '🏷️ Asignar etiquetas'
 
-        todos_los_tags = Tag.objects.filter(activo=True)
-        return render(
-            request,
-            'admin/asignar_etiquetas.html',
-            {
-                'productos': queryset,
-                'tags': todos_los_tags,
-                'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
-            }
-        )
-    asignar_etiquetas.short_description = '🏷️ Asignar etiquetas a productos seleccionados'
+    def asignar_categoria(self, request, queryset):
+        if 'aplicar' in request.POST:
+            cat_id = request.POST.get('categoria_seleccionada')
+            if cat_id:
+                categoria = Categoria.objects.get(id=cat_id)
+                queryset.update(categoria=categoria)
+                self.message_user(request, f'Categoría asignada a {queryset.count()} producto(s).')
+            return
+        return render(request, 'admin/asignar_categoria.html', {
+            'productos': queryset,
+            'categorias': Categoria.objects.all(),
+            'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+        })
+    asignar_categoria.short_description = '📂 Asignar categoría'
 
 @admin.register(Slide)
 class SlideAdmin(admin.ModelAdmin):
