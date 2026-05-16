@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h2>🏷️ Asignar etiquetas</h2>
+<p>Productos seleccionados: <strong>{{ productos.count }}</strong></p>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="asignar_etiquetas">
+    <input type="hidden" name="aplicar" value="1">
+
+    {% for producto in productos %}
+        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ producto.pk }}">
+    {% endfor %}
+
+    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:20px; margin:20px 0; max-width:600px;">
+
+        <p style="font-weight:600; margin-bottom:12px;">Selecciona las etiquetas:</p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
+            {% for tag in tags %}
+            <label style="display:flex; align-items:center; gap:6px; background:#f8f9fa; border:1px solid #dee2e6; border-radius:20px; padding:6px 14px; cursor:pointer;">
+                <input type="checkbox" name="tags_seleccionados" value="{{ tag.id }}">
+                <span style="width:10px; height:10px; border-radius:50%; background:{{ tag.color }}; display:inline-block;"></span>
+                {{ tag.nombre }}
+            </label>
+            {% empty %}
+            <p class="text-muted">No hay etiquetas creadas. <a href="{% url 'admin:productos_tag_add' %}">Crear etiqueta</a></p>
+            {% endfor %}
+        </div>
+
+        <p style="font-weight:600; margin-bottom:8px;">Modo:</p>
+        <div style="display:flex; gap:16px; margin-bottom:20px;">
+            <label style="cursor:pointer;">
+                <input type="radio" name="modo" value="agregar" checked> Agregar a las existentes
+            </label>
+            <label style="cursor:pointer;">
+                <input type="radio" name="modo" value="reemplazar"> Reemplazar todas
+            </label>
+        </div>
+
+        <div style="display:flex; gap:10px;">
+            <input type="submit" value="✓ Aplicar etiquetas" class="button default"
+                   style="background:#ffc1ea; border:none; color:#333; padding:10px 24px; border-radius:8px; cursor:pointer; font-weight:600;">
+            <a href="{% url 'admin:productos_producto_changelist' %}"
+               style="padding:10px 20px; border-radius:8px; border:1px solid #ddd; text-decoration:none; color:#555;">
+                Cancelar
+            </a>
+        </div>
+    </div>
+
+    <div style="max-width:600px;">
+        <p style="font-size:0.85rem; color:#888; margin-bottom:6px;">Productos que se modificarán:</p>
+        <ul style="font-size:0.85rem; color:#555; padding-left:20px;">
+            {% for producto in productos %}
+            <li>{{ producto.nombre }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</form>
+{% endblock %}

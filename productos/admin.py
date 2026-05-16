@@ -2,6 +2,7 @@ from django.contrib import admin
 from django import forms
 from django.db import models
 from django.core.files.base import ContentFile
+from django.shortcuts import render
 from PIL import Image
 import io
 from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio
@@ -75,6 +76,7 @@ class ProductoAdmin(admin.ModelAdmin):
     list_editable = ['precio', 'stock', 'activo']
     inlines = [ImagenProductoInline, OpcionProductoInline]
     filter_horizontal = ['tags_adicionales']
+    actions = ['asignar_etiquetas']
 
     fieldsets = (
         ('Información Básica', {
@@ -114,6 +116,31 @@ class ProductoAdmin(admin.ModelAdmin):
                 orden=ultimo_orden + i + 1,
                 es_principal=(i == 0 and not obj.imagenes.filter(es_principal=True).exists())
             )
+
+    def asignar_etiquetas(self, request, queryset):
+        if 'aplicar' in request.POST:
+            tag_ids = request.POST.getlist('tags_seleccionados')
+            modo = request.POST.get('modo', 'agregar')
+            tags = Tag.objects.filter(id__in=tag_ids)
+            for producto in queryset:
+                if modo == 'reemplazar':
+                    producto.tags_adicionales.set(tags)
+                else:
+                    producto.tags_adicionales.add(*tags)
+            self.message_user(request, f'Etiquetas asignadas a {queryset.count()} producto(s).')
+            return
+
+        todos_los_tags = Tag.objects.filter(activo=True)
+        return render(
+            request,
+            'admin/asignar_etiquetas.html',
+            {
+                'productos': queryset,
+                'tags': todos_los_tags,
+                'action_checkbox_name': admin.helpers.ACTION_CHECKBOX_NAME,
+            }
+        )
+    asignar_etiquetas.short_description = '🏷️ Asignar etiquetas a productos seleccionados'
 
 @admin.register(Slide)
 class SlideAdmin(admin.ModelAdmin):
