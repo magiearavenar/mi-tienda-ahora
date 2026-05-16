@@ -339,15 +339,15 @@ class VarianteAtributo(models.Model):
 
 
 class VarianteValor(models.Model):
-    """Ej: S, M, L / Rojo, Azul"""
     atributo = models.ForeignKey(VarianteAtributo, on_delete=models.CASCADE, related_name='valores')
-    valor = models.CharField(max_length=100, help_text='Ej: S, Rojo, 200 hojas')
-    precio_extra = models.DecimalField(
-        max_digits=10, decimal_places=2, default=0,
-        help_text='Precio adicional sobre el precio base (puede ser 0 o negativo)'
-    )
+    valor = models.CharField(max_length=100)
+    precio_extra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     stock = models.IntegerField(default=0)
-    imagen = models.ImageField(upload_to='variantes/', blank=True, null=True, max_length=500)
+    imagen_producto = models.ForeignKey(
+        'ImagenProducto', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='variantes',
+        help_text='Imagen del producto que se muestra al elegir esta variante'
+    )
     activo = models.BooleanField(default=True)
     orden = models.IntegerField(default=0)
 

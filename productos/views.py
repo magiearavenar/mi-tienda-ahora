@@ -456,6 +456,23 @@ def obtener_imagen_producto(request, producto_id):
         logging.error(f'Error obteniendo imagen: {str(e)}')
         return JsonResponse({'imagen': None})
 
+
+def obtener_imagenes_producto(request, producto_id):
+    try:
+        producto = Producto.objects.get(id=producto_id)
+        imagenes = []
+        for img in producto.imagenes.all():
+            if img.imagen:
+                imagenes.append({
+                    'id': img.id,
+                    'url': img.imagen.url,
+                    'orden': img.orden,
+                    'es_principal': img.es_principal,
+                })
+        return JsonResponse({'imagenes': imagenes})
+    except Producto.DoesNotExist:
+        return JsonResponse({'imagenes': []})
+
 @csrf_exempt
 @require_POST
 def calcular_envio(request):

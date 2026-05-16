@@ -4,67 +4,47 @@
 {{ block.super }}
 <style>
     input[type="color"] {
-        width: 80px !important;
-        height: 50px !important;
-        border: 2px solid #ddd !important;
-        border-radius: 8px !important;
-        cursor: pointer !important;
-        padding: 0 !important;
-        margin-right: 10px !important;
+        width: 80px !important; height: 50px !important;
+        border: 2px solid #ddd !important; border-radius: 8px !important;
+        cursor: pointer !important; padding: 0 !important; margin-right: 10px !important;
     }
-    input[type="color"]:hover {
-        border-color: #007cba !important;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
-    }
+    input[type="color"]:hover { border-color: #007cba !important; box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important; }
+
     .bulk-upload-box {
-        background: #f8f9fa;
-        border: 2px dashed #dee2e6;
-        border-radius: 8px;
-        padding: 16px 20px;
-        margin: 16px 0;
+        background: #f8f9fa; border: 2px dashed #dee2e6;
+        border-radius: 8px; padding: 16px 20px; margin: 16px 0;
     }
     .bulk-upload-box h4 { font-size: 0.95rem; margin-bottom: 8px; color: #495057; }
     .bulk-upload-box small { color: #6c757d; display: block; margin-top: 6px; }
 
-    /* Tabla de valores de variante */
-    .variante-valores-tabla {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 8px;
-        font-size: 0.85rem;
-    }
+    .variante-valores-tabla { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 0.85rem; }
     .variante-valores-tabla th {
-        background: #fff0f9;
-        color: #a07ab0;
-        padding: 6px 10px;
-        text-align: left;
-        font-weight: 600;
-        border-bottom: 2px solid #ffc1ea;
+        background: #fff0f9; color: #a07ab0; padding: 6px 10px;
+        text-align: left; font-weight: 600; border-bottom: 2px solid #ffc1ea;
     }
-    .variante-valores-tabla td {
-        padding: 5px 8px;
-        border-bottom: 1px solid #f3d9fa;
+    .variante-valores-tabla td { padding: 5px 8px; border-bottom: 1px solid #f3d9fa; vertical-align: middle; }
+    .variante-valores-tabla input[type="number"] {
+        width: 80px; padding: 4px 6px; border: 1px solid #ddd;
+        border-radius: 6px; font-size: 0.82rem;
     }
-    .variante-valores-tabla input {
-        width: 80px;
-        padding: 4px 6px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 0.82rem;
-    }
-    .variante-valores-tabla input:focus {
-        border-color: #ffc1ea;
-        outline: none;
-    }
+    .variante-valores-tabla input[type="number"]:focus { border-color: #ffc1ea; outline: none; }
     .variante-tabla-wrap {
-        background: #fff;
-        border: 1px solid #f3d9fa;
-        border-radius: 8px;
-        padding: 10px 14px;
-        margin-top: 6px;
-        display: none;
+        background: #fff; border: 1px solid #f3d9fa;
+        border-radius: 8px; padding: 10px 14px; margin-top: 6px; display: none;
     }
     .variante-tabla-wrap.visible { display: block; }
+
+    .img-select-wrap { display: flex; align-items: center; gap: 8px; }
+    .img-select-preview {
+        width: 48px; height: 48px; border-radius: 6px;
+        border: 2px solid #f3d9fa; overflow: hidden; flex-shrink: 0;
+        background: #fff0f9; display: flex; align-items: center; justify-content: center;
+    }
+    .img-select-preview img { width: 100%; height: 100%; object-fit: cover; }
+    .img-select-dropdown {
+        font-size: 0.78rem; border: 1px solid #ddd; border-radius: 6px;
+        padding: 4px 6px; max-width: 150px;
+    }
 </style>
 {% endblock %}
 
@@ -73,8 +53,9 @@
 {% if show_bulk_upload and opts.model_name == 'producto' %}
 <div class="bulk-upload-box">
     <h4>📦 Subir varias imágenes a la vez</h4>
-    <input type="file" name="imagenes_bulk" multiple accept="image/*"
-           style="display:block; margin-top:8px;">
+    <input type="file" id="imagenes_bulk_input" name="imagenes_bulk" multiple accept="image/*"
+           style="display:block; margin-top:8px;" onchange="previewBulkImages(this)">
+    <div id="bulk-preview-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;"></div>
     <small>Selecciona varias imágenes con Ctrl+clic (Windows) o Cmd+clic (Mac). Se agregarán automáticamente al guardar.</small>
 </div>
 {% endif %}
@@ -88,46 +69,99 @@
 {{ block.super }}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Observar cuando se agregan filas de variantes
+
+    // ── PREVIEW BULK ──────────────────────────────────────────
+    window.previewBulkImages = function(input) {
+        const grid = document.getElementById('bulk-preview-grid');
+        grid.innerHTML = '';
+        Array.from(input.files).forEach((file, i) => {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const wrap = document.createElement('div');
+                wrap.style.cssText = 'position:relative;width:90px;height:90px;border-radius:8px;overflow:hidden;border:2px solid #ffc1ea;';
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+                const badge = document.createElement('span');
+                badge.textContent = i + 1;
+                badge.style.cssText = 'position:absolute;top:4px;left:4px;background:rgba(255,193,234,0.9);color:#333;font-size:0.7rem;font-weight:700;padding:1px 6px;border-radius:8px;';
+                wrap.appendChild(img);
+                wrap.appendChild(badge);
+                grid.appendChild(wrap);
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+
+    // ── VARIANTES ─────────────────────────────────────────────
+    // Obtener ID del producto desde la URL
+    function getProductoId() {
+        const match = window.location.pathname.match(/\/producto\/(\d+)\//);
+        return match ? match[1] : null;
+    }
+
+    // Cargar imágenes del producto una sola vez
+    let imagenesProducto = [];
+    const productoId = getProductoId();
+    if (productoId) {
+        fetch(`/obtener-imagenes/${productoId}/`)
+            .then(r => r.json())
+            .then(data => {
+                imagenesProducto = data.imagenes || [];
+                // Re-renderizar tablas que ya estén visibles
+                document.querySelectorAll('.variante-tabla-wrap.visible').forEach(wrap => {
+                    const inputValores = wrap.previousElementSibling;
+                    if (inputValores) poblarSelects(wrap, imagenesProducto);
+                });
+            })
+            .catch(() => {});
+    }
+
+    function poblarSelects(wrap, imagenes) {
+        wrap.querySelectorAll('.img-select-dropdown').forEach(select => {
+            const valorActual = select.value;
+            select.innerHTML = '<option value="">Sin imagen</option>';
+            imagenes.forEach(img => {
+                const opt = document.createElement('option');
+                opt.value = img.id;
+                opt.textContent = `Imagen ${img.orden}${img.es_principal ? ' ★' : ''}`;
+                opt.dataset.url = img.url;
+                select.appendChild(opt);
+            });
+            if (valorActual) select.value = valorActual;
+        });
+    }
+
     function initVarianteRow(row) {
         const inputValores = row.querySelector('input[name$="-valores_texto"]');
         if (!inputValores || inputValores.dataset.varianteInit) return;
         inputValores.dataset.varianteInit = '1';
         inputValores.placeholder = 'Ej: S, M, L, XL';
 
-        // Crear contenedor de tabla
         const wrap = document.createElement('div');
         wrap.className = 'variante-tabla-wrap';
         inputValores.parentNode.appendChild(wrap);
 
         function renderTabla() {
-            const texto = inputValores.value.trim();
-            const valores = texto ? texto.split(',').map(v => v.trim()).filter(Boolean) : [];
+            const valores = inputValores.value.trim()
+                ? inputValores.value.split(',').map(v => v.trim()).filter(Boolean)
+                : [];
             wrap.innerHTML = '';
             if (!valores.length) { wrap.classList.remove('visible'); return; }
             wrap.classList.add('visible');
 
             const tabla = document.createElement('table');
             tabla.className = 'variante-valores-tabla';
-            tabla.innerHTML = `
-                <thead>
-                    <tr>
-                        <th>Valor</th>
-                        <th>Stock</th>
-                        <th>Precio extra ($)</th>
-                        <th>Imagen</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>`;
+            tabla.innerHTML = `<thead><tr>
+                <th>Valor</th><th>Stock</th><th>Precio extra ($)</th><th>Imagen del producto</th>
+            </tr></thead><tbody></tbody>`;
 
             const tbody = tabla.querySelector('tbody');
-
-            // Recuperar valores guardados previamente
             const guardados = JSON.parse(inputValores.dataset.guardados || '{}');
 
             valores.forEach(val => {
                 const g = guardados[val] || {};
-                const inputId = `img-prev-${Math.random().toString(36).slice(2)}`;
+                const previewId = `prev-${Math.random().toString(36).slice(2)}`;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td><strong>${val}</strong></td>
@@ -138,25 +172,59 @@ document.addEventListener('DOMContentLoaded', function () {
                                data-val="${val}" data-tipo="precio_extra"
                                onchange="guardarVarianteExtra(this)"></td>
                     <td>
-                        <label style="cursor:pointer;display:flex;align-items:center;gap:8px;">
-                            <div id="${inputId}-preview" style="width:48px;height:48px;border-radius:6px;border:2px dashed #ffc1ea;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#fff0f9;flex-shrink:0;">
-                                ${g.imagen_preview ? `<img src="${g.imagen_preview}" style="width:100%;height:100%;object-fit:cover;">` : '<span style="font-size:1.2rem;">📷</span>'}
+                        <div class="img-select-wrap">
+                            <div class="img-select-preview" id="${previewId}">
+                                ${g.imagen_url
+                                    ? `<img src="${g.imagen_url}">`
+                                    : '<span style="font-size:1.1rem;">🖼️</span>'}
                             </div>
-                            <input type="file" accept="image/*" data-val="${val}" data-preview="${inputId}-preview"
-                                   style="display:none;" onchange="previewVarianteImagen(this)">
-                            <span style="font-size:0.75rem;color:#a07ab0;">Subir imagen</span>
-                        </label>
+                            <select class="img-select-dropdown"
+                                    data-val="${val}" data-preview="${previewId}"
+                                    onchange="seleccionarImagenVariante(this)">
+                                <option value="">Sin imagen</option>
+                            </select>
+                        </div>
                     </td>`;
                 tbody.appendChild(tr);
             });
 
             wrap.appendChild(tabla);
+
+            // Poblar selects con imágenes ya cargadas
+            if (imagenesProducto.length) poblarSelects(wrap, imagenesProducto);
+
+            // Restaurar selección guardada
+            wrap.querySelectorAll('.img-select-dropdown').forEach(sel => {
+                const g2 = guardados[sel.dataset.val] || {};
+                if (g2.imagen_id) sel.value = g2.imagen_id;
+            });
         }
 
         inputValores.addEventListener('input', renderTabla);
-        // Render inicial si ya tiene valor
         if (inputValores.value) renderTabla();
     }
+
+    window.seleccionarImagenVariante = function(select) {
+        const opt = select.options[select.selectedIndex];
+        const previewEl = document.getElementById(select.dataset.preview);
+        if (opt && opt.dataset.url) {
+            previewEl.innerHTML = `<img src="${opt.dataset.url}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+            previewEl.innerHTML = '<span style="font-size:1.1rem;">🖼️</span>';
+        }
+        // Guardar en dataset
+        const row = select.closest('tr.form-row, tr.dynamic-atributos');
+        if (!row) return;
+        const inputValores = row.querySelector('input[name$="-valores_texto"]');
+        if (!inputValores) return;
+        const guardados = JSON.parse(inputValores.dataset.guardados || '{}');
+        const val = select.dataset.val;
+        if (!guardados[val]) guardados[val] = {};
+        guardados[val].imagen_id = select.value;
+        guardados[val].imagen_url = opt ? opt.dataset.url : '';
+        inputValores.dataset.guardados = JSON.stringify(guardados);
+        sincronizarHidden(inputValores, guardados);
+    };
 
     window.guardarVarianteExtra = function(input) {
         const row = input.closest('tr.form-row, tr.dynamic-atributos');
@@ -168,54 +236,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!guardados[val]) guardados[val] = {};
         guardados[val][input.dataset.tipo] = input.value;
         inputValores.dataset.guardados = JSON.stringify(guardados);
+        sincronizarHidden(inputValores, guardados);
+    };
 
-        // Guardar en campo oculto para enviar al servidor
-        let hiddenName = inputValores.name.replace('valores_texto', 'valores_extra');
-        let hidden = row.querySelector(`input[name="${hiddenName}"]`);
+    function sincronizarHidden(inputValores, guardados) {
+        const hiddenName = inputValores.name.replace('valores_texto', 'valores_extra');
+        let hidden = inputValores.closest('tr').querySelector(`input[name="${hiddenName}"]`);
         if (!hidden) {
             hidden = document.createElement('input');
             hidden.type = 'hidden';
             hidden.name = hiddenName;
-            row.appendChild(hidden);
+            inputValores.closest('tr').appendChild(hidden);
         }
         hidden.value = JSON.stringify(guardados);
-    };
+    }
 
-    window.previewVarianteImagen = function(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const previewEl = document.getElementById(input.dataset.preview);
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            previewEl.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`;
-            // Guardar referencia en dataset para persistir entre re-renders
-            const row = input.closest('tr.form-row, tr.dynamic-atributos');
-            if (!row) return;
-            const inputValores = row.querySelector('input[name$="-valores_texto"]');
-            if (!inputValores) return;
-            const guardados = JSON.parse(inputValores.dataset.guardados || '{}');
-            const val = input.dataset.val;
-            if (!guardados[val]) guardados[val] = {};
-            guardados[val].imagen_preview = e.target.result;
-            inputValores.dataset.guardados = JSON.stringify(guardados);
-        };
-        reader.readAsDataURL(file);
-
-        // Crear input hidden con nombre para enviar el archivo
-        const row = input.closest('tr.form-row, tr.dynamic-atributos');
-        if (!row) return;
-        const inputValores = row.querySelector('input[name$="-valores_texto"]');
-        if (!inputValores) return;
-        const prefix = inputValores.name.replace('-valores_texto', '');
-        const val = input.dataset.val;
-        // Renombrar el input file para que Django lo reciba
-        input.name = `variante_imagen__${prefix}__${val}`;
-    };
-
-    // Inicializar filas existentes
     document.querySelectorAll('#atributos-group tr.form-row, #atributos-group tr.dynamic-atributos').forEach(initVarianteRow);
 
-    // Observar nuevas filas
     const tbody = document.querySelector('#atributos-group tbody');
     if (tbody) {
         new MutationObserver(() => {

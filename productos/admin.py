@@ -181,33 +181,15 @@ class ProductoAdmin(admin.ModelAdmin):
                         if valor_obj:
                             valor_obj.stock = int(datos.get('stock', 0))
                             valor_obj.precio_extra = float(datos.get('precio_extra', 0))
+                            imagen_id = datos.get('imagen_id')
+                            if imagen_id:
+                                try:
+                                    valor_obj.imagen_producto_id = int(imagen_id)
+                                except (ValueError, TypeError):
+                                    pass
+                            else:
+                                valor_obj.imagen_producto = None
                             valor_obj.save()
-                except Exception:
-                    continue
-
-        # Procesar imágenes de variantes
-        for key, file in request.FILES.items():
-            if key.startswith('variante_imagen__'):
-                try:
-                    # formato: variante_imagen__atributos-0__Rojo
-                    parts = key.split('__')
-                    if len(parts) < 3:
-                        continue
-                    prefix = parts[1]  # ej: atributos-0
-                    val_nombre = '__'.join(parts[2:])  # por si el valor tiene __
-                    atributo = form.instance.atributos.filter(
-                        nombre=request.POST.get(f'{prefix}-nombre', '')
-                    ).first()
-                    if not atributo:
-                        continue
-                    valor_obj = atributo.valores.filter(valor=val_nombre).first()
-                    if valor_obj:
-                        try:
-                            imagen_comprimida = comprimir_imagen(file)
-                        except Exception:
-                            imagen_comprimida = file
-                        valor_obj.imagen = imagen_comprimida
-                        valor_obj.save()
                 except Exception:
                     continue
 

@@ -84,7 +84,7 @@
                         <option value="{{ valor.id }}"
                                 data-precio-extra="{{ valor.precio_extra }}"
                                 data-stock="{{ valor.stock }}"
-                                {% if valor.imagen %}data-imagen="{{ valor.imagen.url }}"{% endif %}
+                                {% if valor.imagen_producto %}data-imagen="{{ valor.imagen_producto.imagen.url }}"{% endif %}
                                 {% if valor.stock == 0 %}disabled{% endif %}>
                             {{ valor.valor }}
                             {% if valor.precio_extra > 0 %}(+${{ valor.precio_extra|floatformat:0 }}){% endif %}
@@ -211,8 +211,20 @@ function actualizarVariante() {
 
     // Cambiar imagen principal si la variante tiene imagen
     if (imagenVariante) {
-        const mainImg = document.querySelector('#productCarousel .carousel-item.active img, .product-image img');
-        if (mainImg) mainImg.src = imagenVariante;
+        // Buscar el slide que tenga esa imagen y saltar a él
+        const items = document.querySelectorAll('#productCarousel .carousel-item');
+        let slideIndex = -1;
+        items.forEach((item, i) => {
+            const img = item.querySelector('img');
+            if (img && img.src === imagenVariante) slideIndex = i;
+        });
+        if (slideIndex >= 0) {
+            goToSlide(slideIndex);
+        } else {
+            // Si no está en el carousel, cambiar la imagen activa
+            const activeImg = document.querySelector('#productCarousel .carousel-item.active img');
+            if (activeImg) activeImg.src = imagenVariante;
+        }
     }
 }
 
