@@ -1,0 +1,64 @@
+/* Ocultar nombre de archivo actual y link "modificar" en el inline */
+#imagenproducto_set-group .clearable-file-input a,
+#imagenproducto_set-group p.file-upload,
+#imagenproducto_set-group .file-upload,
+#imagenproducto_set-group span.clearable-file-input {
+    display: none !important;
+}
+
+/* Botón eliminar — ocultar el checkbox nativo, reemplazar con botón rojo */
+#imagenproducto_set-group .delete {
+    display: none !important;
+}
+
+/* Estilo general del inline */
+#imagenproducto_set-group table {
+    border-collapse: separate;
+    border-spacing: 0 6px;
+}
+
+#imagenproducto_set-group tbody tr {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* Botón eliminar personalizado */
+.btn-eliminar-imagen {
+    background: #fff0f5;
+    border: 1px solid #ffc1ea;
+    color: #c0392b;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.btn-eliminar-imagen:hover {
+    background: #ffc1ea;
+    color: #fff;
+    border-color: #ffc1ea;
+}
+
+/* SweetAlert2 personalizado Mundo Magie */
+.swal-popup-magie {
+    border-radius: 16px !important;
+    font-family: 'Montserrat', sans-serif !important;
+}
+.swal-confirm-magie {
+    background: linear-gradient(135deg, #ffb6e6, #d2a8dd) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+}
+.swal-cancel-magie {
+    background: #f0f0f0 !important;
+    color: #555 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    padding: 10px 24px !important;
+}
