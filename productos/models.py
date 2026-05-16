@@ -16,17 +16,25 @@ class Tag(models.Model):
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField(blank=True)
-    tags = models.ManyToManyField(Tag, blank=True, help_text='Tags asociados a esta categoría')
+    categoria_madre = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='subcategorias',
+        help_text='Si esta es una subcategoría, selecciona la categoría principal'
+    )
+    tags = models.ManyToManyField(Tag, blank=True)
     visible_navegacion = models.BooleanField(default=True, help_text='¿Mostrar en el menú de navegación?')
-    
+
     def __str__(self):
+        if self.categoria_madre:
+            return f'{self.categoria_madre.nombre} → {self.nombre}'
         return self.nombre
-    
+
     def get_tags_display(self):
         return ' > '.join([tag.nombre for tag in self.tags.filter(activo=True)])
-    
+
     class Meta:
-        verbose_name_plural = "Categorías"
+        verbose_name_plural = 'Categorías'
+        ordering = ['nombre']
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=200)

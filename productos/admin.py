@@ -40,10 +40,10 @@ class TagAdmin(admin.ModelAdmin):
 
 @admin.register(Categoria)
 class CategoriaAdmin(admin.ModelAdmin):
-    list_display = ['nombre', 'descripcion', 'visible_navegacion']
+    list_display = ['nombre', 'categoria_madre', 'visible_navegacion']
     list_editable = ['visible_navegacion']
+    list_filter = ['visible_navegacion', 'categoria_madre']
     search_fields = ['nombre']
-    list_filter = ['visible_navegacion']
     filter_horizontal = ['tags']
 
 class ImagenProductoInline(admin.TabularInline):

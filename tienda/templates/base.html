@@ -244,77 +244,25 @@
             <div class="d-flex flex-wrap justify-content-center">
                 <a href="{% url 'home' %}" class="category-link">INICIO</a>
                 <a href="{% url 'portafolio' %}" class="category-link">PORTAFOLIO WEB</a>
-                
-                <!-- PAPELERÍA -->
-                <div class="dropdown">
-                    <span class="category-link has-dropdown">PAPELERÍA</span>
-                    <div class="dropdown-content">
-                        {% for categoria in categorias %}
-                            {% if "papeleria" in categoria.nombre|lower or "planner" in categoria.nombre|lower or "agenda" in categoria.nombre|lower or "organizador" in categoria.nombre|lower or "calendario" in categoria.nombre|lower or "turnario" in categoria.nombre|lower or "colorear" in categoria.nombre|lower %}
-                                {% if "cotillón" not in categoria.nombre|lower and "fiesta" not in categoria.nombre|lower and "globo" not in categoria.nombre|lower and "decoración" not in categoria.nombre|lower and "accesorio" not in categoria.nombre|lower and "llavero" not in categoria.nombre|lower and "bolsa" not in categoria.nombre|lower and "estuche" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower and "estampado" not in categoria.nombre|lower %}
-                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                
-                <!-- COTILLÓN -->
-                <div class="dropdown">
-                    <span class="category-link has-dropdown">COTILLÓN</span>
-                    <div class="dropdown-content">
-                        {% for categoria in categorias %}
-                            {% if "cotillon" in categoria.nombre|lower or "fiesta" in categoria.nombre|lower or "globo" in categoria.nombre|lower or "decoracion" in categoria.nombre|lower %}
-                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower %}
-                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                
-                <!-- ACCESORIOS -->
-                <div class="dropdown">
-                    <span class="category-link has-dropdown">ACCESORIOS</span>
-                    <div class="dropdown-content">
-                        {% for categoria in categorias %}
-                            {% if "accesorio" in categoria.nombre|lower or "llavero" in categoria.nombre|lower or "bolsa" in categoria.nombre|lower or "estuche" in categoria.nombre|lower %}
-                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower %}
-                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                
-                <!-- NAVIDAD -->
-                <div class="dropdown">
-                    <span class="category-link has-dropdown">NAVIDAD</span>
-                    <div class="dropdown-content">
-                        {% for categoria in categorias %}
-                            {% if "navidad" in categoria.nombre|lower or "navideno" in categoria.nombre|lower or "christmas" in categoria.nombre|lower %}
-                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower %}
-                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
-                
-                <!-- ESTAMPADOS -->
-                <div class="dropdown">
-                    <span class="category-link has-dropdown">ESTAMPADOS</span>
-                    <div class="dropdown-content">
-                        {% for categoria in categorias %}
-                            {% if "estampado" in categoria.nombre|lower or "diseño" in categoria.nombre|lower or "print" in categoria.nombre|lower or "personalizado" in categoria.nombre|lower %}
-                                {% if "papeleria" not in categoria.nombre|lower and "docente" not in categoria.nombre|lower and "colorear" not in categoria.nombre|lower and "navidad" not in categoria.nombre|lower %}
-                                    <a href="{% url 'productos_categoria' categoria.id %}">{{ categoria.nombre }}</a>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                </div>
 
+                {% for cat in categorias_madre %}
+                {% with subs=cat.subcategorias.all %}
+                {% if subs %}
+                <div class="dropdown">
+                    <a href="{% url 'productos_categoria' cat.id %}" class="category-link has-dropdown">{{ cat.nombre|upper }}</a>
+                    <div class="dropdown-content">
+                        {% for sub in subs %}
+                        {% if sub.visible_navegacion %}
+                        <a href="{% url 'productos_categoria' sub.id %}">{{ sub.nombre }}</a>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'productos_categoria' cat.id %}" class="category-link">{{ cat.nombre|upper }}</a>
+                {% endif %}
+                {% endwith %}
+                {% endfor %}
             </div>
         </div>
     </nav>
