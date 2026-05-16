@@ -1,64 +1,151 @@
 {% extends "admin/base_site.html" %}
 
 {% block content %}
-<h2>📂 Asignar categoría</h2>
+<h2>📂 Asignar categorías</h2>
 <p>Productos seleccionados: <strong>{{ productos.count }}</strong></p>
 
-<form method="post">
-    {% csrf_token %}
-    <input type="hidden" name="action" value="asignar_categoria">
-    <input type="hidden" name="aplicar" value="1">
+<div style="display:flex; gap:24px; max-width:900px; align-items:flex-start;">
 
-    {% for producto in productos %}
-        <input type="hidden" name="{{ action_checkbox_name }}" value="{{ producto.pk }}">
-    {% endfor %}
+    <!-- FORMULARIO PRINCIPAL -->
+    <form method="post" id="form-asignar" style="flex:1;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="asignar_categoria">
+        <input type="hidden" name="aplicar" value="1">
+        {% for producto in productos %}
+            <input type="hidden" name="{{ action_checkbox_name }}" value="{{ producto.pk }}">
+        {% endfor %}
 
-    <div style="background:#fff; border:1px solid #e0e0e0; border-radius:10px; padding:20px; margin:20px 0; max-width:600px;">
+        <div style="background:#fff; border:1px solid #e0e0e0; border-radius:12px; padding:20px; margin-bottom:16px;">
+            <p style="font-weight:600; margin-bottom:12px;">Selecciona una o varias categorías:</p>
 
-        <p style="font-weight:600; margin-bottom:12px;">Selecciona la categoría:</p>
+            <div id="lista-categorias" style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px; max-height:320px; overflow-y:auto;">
+                {% for cat in categorias %}
+                <label class="cat-label" style="display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid #dee2e6; border-radius:8px; cursor:pointer; transition:all 0.15s; user-select:none;">
+                    <input type="checkbox" name="categoria_seleccionada" value="{{ cat.id }}"
+                           style="width:16px;height:16px;accent-color:#ffc1ea;">
+                    <span style="font-weight:500;">{{ cat.nombre }}</span>
+                    {% if cat.categoria_madre %}
+                    <span style="color:#bbb; font-size:0.75rem;">↳ {{ cat.categoria_madre.nombre }}</span>
+                    {% endif %}
+                    {% if cat.descripcion %}
+                    <span style="color:#aaa; font-size:0.78rem; margin-left:auto;">{{ cat.descripcion }}</span>
+                    {% endif %}
+                </label>
+                {% empty %}
+                <p style="color:#999;">No hay categorías. Crea una abajo 👇</p>
+                {% endfor %}
+            </div>
 
-        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:20px;">
-            {% for cat in categorias %}
-            <label style="display:flex; align-items:center; gap:10px; padding:10px 14px; border:1px solid #dee2e6; border-radius:8px; cursor:pointer; transition:background 0.2s;"
-                   onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='#fff'">
-                <input type="radio" name="categoria_seleccionada" value="{{ cat.id }}" required>
-                <span style="font-weight:500;">{{ cat.nombre }}</span>
-                {% if cat.descripcion %}
-                <span style="color:#999; font-size:0.8rem;">— {{ cat.descripcion }}</span>
+            <p style="font-weight:600; margin-bottom:8px;">Modo:</p>
+            <div style="display:flex; gap:16px; margin-bottom:20px;">
+                <label style="cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    <input type="radio" name="modo" value="agregar" checked
+                           style="accent-color:#ffc1ea;"> Agregar a las existentes
+                </label>
+                <label style="cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    <input type="radio" name="modo" value="reemplazar"
+                           style="accent-color:#ffc1ea;"> Reemplazar todas
+                </label>
+            </div>
+
+            <div style="display:flex; gap:10px;">
+                <input type="submit" value="✓ Aplicar categorías"
+                       style="background:linear-gradient(135deg,#ffb6e6,#d2a8dd); border:none; color:#fff; padding:10px 24px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.9rem;">
+                <a href="{% url 'admin:productos_producto_changelist' %}"
+                   style="padding:10px 20px; border-radius:8px; border:1px solid #ddd; text-decoration:none; color:#555; font-size:0.9rem;">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+
+        <!-- Productos afectados -->
+        <details style="font-size:0.82rem; color:#888;">
+            <summary style="cursor:pointer; margin-bottom:6px;">Ver productos que se modificarán ({{ productos.count }})</summary>
+            <ul style="padding-left:20px; color:#666;">
+                {% for producto in productos %}
+                <li>{{ producto.nombre }}
+                    {% with cats=producto.categoria.all %}
+                    {% if cats %}<span style="color:#bbb;"> — {{ cats|join:", " }}</span>{% endif %}
+                    {% endwith %}
+                </li>
+                {% endfor %}
+            </ul>
+        </details>
+    </form>
+
+    <!-- CREAR CATEGORÍA RÁPIDA -->
+    <div style="width:260px; background:#fff; border:1px solid #e0e0e0; border-radius:12px; padding:20px; position:sticky; top:20px;">
+        <p style="font-weight:600; margin-bottom:12px;">➕ Crear categoría nueva</p>
+        <div id="msg-nueva" style="display:none; margin-bottom:10px;"></div>
+
+        <div style="margin-bottom:10px;">
+            <label style="font-size:0.78rem; font-weight:600; color:#555; display:block; margin-bottom:4px;">Nombre *</label>
+            <input type="text" id="nueva-nombre" placeholder="Ej: Papelería"
+                   style="width:100%; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem; outline:none;">
+        </div>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:0.78rem; font-weight:600; color:#555; display:block; margin-bottom:4px;">Categoría madre (opcional)</label>
+            <select id="nueva-madre" style="width:100%; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem;">
+                <option value="">— Ninguna —</option>
+                {% for cat in categorias %}
+                {% if not cat.categoria_madre %}
+                <option value="{{ cat.id }}">{{ cat.nombre }}</option>
                 {% endif %}
-            </label>
-            {% empty %}
-            <p class="text-muted">No hay categorías creadas. <a href="{% url 'admin:productos_categoria_add' %}">Crear categoría</a></p>
-            {% endfor %}
+                {% endfor %}
+            </select>
         </div>
-
-        <p style="font-weight:600; margin-bottom:8px;">Modo:</p>
-        <div style="display:flex; gap:16px; margin-bottom:20px;">
-            <label style="cursor:pointer;">
-                <input type="radio" name="modo" value="agregar" checked> Agregar a las existentes
-            </label>
-            <label style="cursor:pointer;">
-                <input type="radio" name="modo" value="reemplazar"> Reemplazar todas
-            </label>
+        <div style="margin-bottom:14px;">
+            <label style="font-size:0.78rem; font-weight:600; color:#555; display:block; margin-bottom:4px;">Descripción</label>
+            <input type="text" id="nueva-descripcion" placeholder="Opcional"
+                   style="width:100%; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font-size:0.85rem; outline:none;">
         </div>
-
-        <div style="display:flex; gap:10px;">
-            <input type="submit" value="✓ Aplicar categoría" class="button default"
-                   style="background:#ffc1ea; border:none; color:#333; padding:10px 24px; border-radius:8px; cursor:pointer; font-weight:600;">
-            <a href="{% url 'admin:productos_producto_changelist' %}"
-               style="padding:10px 20px; border-radius:8px; border:1px solid #ddd; text-decoration:none; color:#555;">
-                Cancelar
-            </a>
-        </div>
+        <button type="button" onclick="crearCategoria()"
+                style="width:100%; background:linear-gradient(135deg,#ffb6e6,#d2a8dd); border:none; color:#fff; padding:9px; border-radius:8px; cursor:pointer; font-weight:600; font-size:0.85rem;">
+            Crear y agregar a la lista
+        </button>
     </div>
+</div>
 
-    <div style="max-width:600px;">
-        <p style="font-size:0.85rem; color:#888; margin-bottom:6px;">Productos que se modificarán:</p>
-        <ul style="font-size:0.85rem; color:#555; padding-left:20px;">
-            {% for producto in productos %}
-            <li>{{ producto.nombre }} {% if producto.categoria %}<span style="color:#999;">(actualmente: {{ producto.categoria }})</span>{% endif %}</li>
-            {% endfor %}
-        </ul>
-    </div>
-</form>
+<style>
+.cat-label:hover { background: #fff0f9 !important; border-color: #ffc1ea !important; }
+.cat-label:has(input:checked) { background: #fff0f9; border-color: #ffc1ea; }
+</style>
+
+<script>
+const csrfToken = '{{ csrf_token }}';
+
+async function crearCategoria() {
+    const nombre = document.getElementById('nueva-nombre').value.trim();
+    const madre = document.getElementById('nueva-madre').value;
+    const descripcion = document.getElementById('nueva-descripcion').value.trim();
+    const msg = document.getElementById('msg-nueva');
+
+    if (!nombre) {
+        msg.style.display = 'block';
+        msg.innerHTML = '<span style="color:#e74c3c;font-size:0.82rem;">El nombre es obligatorio.</span>';
+        return;
+    }
+
+    const res = await fetch('{% url "admin:productos_categoria_add" %}', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrfToken, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            nombre, descripcion,
+            categoria_madre: madre,
+            visible_navegacion: 'on',
+            _save: '1'
+        })
+    });
+
+    // Si redirige, la categoría fue creada — recargar la página para mostrarla
+    if (res.redirected || res.ok) {
+        msg.style.display = 'block';
+        msg.innerHTML = '<span style="color:#27ae60;font-size:0.82rem;">✓ Categoría creada. Recargando...</span>';
+        setTimeout(() => location.reload(), 800);
+    } else {
+        msg.style.display = 'block';
+        msg.innerHTML = '<span style="color:#e74c3c;font-size:0.82rem;">Error al crear. Intenta de nuevo.</span>';
+    }
+}
+</script>
 {% endblock %}

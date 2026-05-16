@@ -59,7 +59,7 @@
             <h1 class="h2 mb-3">{{ producto.nombre }}</h1>
             
             <div class="mb-3">
-                <span class="badge bg-secondary">{{ producto.categoria.nombre }}</span>
+                <span class="badge bg-secondary">{% for cat in producto.categoria.all %}{{ cat.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</span>
                 {% if producto.stock > 0 %}
                     <span class="badge bg-success ms-2">En Stock ({{ producto.stock }})</span>
                 {% else %}
@@ -133,7 +133,7 @@
                 </tr>
                 <tr>
                     <td><strong>Categoría</strong></td>
-                    <td>{{ producto.categoria.nombre }}</td>
+                    <td>{% for cat in producto.categoria.all %}{{ cat.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td>
                 </tr>
                 <tr>
                     <td><strong>Precio</strong></td>
