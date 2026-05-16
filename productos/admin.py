@@ -1,10 +1,33 @@
 from django.contrib import admin
 from django import forms
 from django.db import models
+from django.core.files.base import ContentFile
+from PIL import Image
+import io
 from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
-# from .forms import ProductoAdminForm  # Comentado temporalmente
+
+
+def comprimir_imagen(imagen, max_kb=4000, max_px=1920):
+    """Comprime una imagen a menos de max_kb KB y max_px px de ancho."""
+    img = Image.open(imagen)
+    if img.mode in ('RGBA', 'P'):
+        img = img.convert('RGB')
+    # Redimensionar si es muy grande
+    if img.width > max_px or img.height > max_px:
+        img.thumbnail((max_px, max_px), Image.LANCZOS)
+    # Comprimir hasta que quepa
+    quality = 85
+    while quality >= 40:
+        buffer = io.BytesIO()
+        img.save(buffer, format='JPEG', quality=quality, optimize=True)
+        if buffer.tell() <= max_kb * 1024:
+            break
+        quality -= 10
+    buffer.seek(0)
+    nombre = imagen.name.rsplit('.', 1)[0] + '.jpg'
+    return ContentFile(buffer.read(), name=nombre)
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
@@ -76,17 +99,20 @@ class ProductoAdmin(admin.ModelAdmin):
 
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
-        # Procesar imágenes múltiples
         imagenes = request.FILES.getlist('imagenes_bulk')
         ultimo_orden = obj.imagenes.aggregate(
             max_orden=models.Max('orden')
         )['max_orden'] or 0
         for i, imagen in enumerate(imagenes):
+            try:
+                imagen_comprimida = comprimir_imagen(imagen)
+            except Exception:
+                imagen_comprimida = imagen
             ImagenProducto.objects.create(
                 producto=obj,
-                imagen=imagen,
+                imagen=imagen_comprimida,
                 orden=ultimo_orden + i + 1,
-                es_principal=(i == 0 and not obj.imagenes.exists())
+                es_principal=(i == 0 and not obj.imagenes.filter(es_principal=True).exists())
             )
 
 @admin.register(Slide)
