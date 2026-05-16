@@ -40,9 +40,8 @@ class ImagenProductoInline(admin.TabularInline):
 
 
 class SubirVariasImagenesForm(forms.Form):
-    """Formulario para subir múltiples imágenes de una vez."""
     imagenes = forms.FileField(
-        widget=forms.ClearableFileInput(attrs={'multiple': True}),
+        widget=forms.FileInput(attrs={'multiple': True}),
         label='Subir varias imágenes a la vez',
         required=False,
         help_text='Selecciona varias imágenes con Ctrl+clic o Cmd+clic'
