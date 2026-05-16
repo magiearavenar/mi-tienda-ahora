@@ -39,14 +39,6 @@ class ImagenProductoInline(admin.TabularInline):
         js = ('admin/js/color-picker.js',)
 
 
-class SubirVariasImagenesForm(forms.Form):
-    imagenes = forms.FileField(
-        widget=forms.FileInput(attrs={'multiple': True}),
-        label='Subir varias imágenes a la vez',
-        required=False,
-        help_text='Selecciona varias imágenes con Ctrl+clic o Cmd+clic'
-    )
-
 class OpcionProductoInline(admin.TabularInline):
     model = OpcionProducto
     extra = 1
@@ -79,7 +71,7 @@ class ProductoAdmin(admin.ModelAdmin):
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         extra_context = extra_context or {}
-        extra_context['bulk_form'] = SubirVariasImagenesForm()
+        extra_context['show_bulk_upload'] = True
         return super().changeform_view(request, object_id, form_url, extra_context)
 
     def save_model(self, request, obj, form, change):

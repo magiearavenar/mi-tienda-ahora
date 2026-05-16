@@ -38,7 +38,7 @@
 
 {% block after_related_objects %}
 {{ block.super }}
-{% if bulk_form and opts.model_name == 'producto' %}
+{% if show_bulk_upload and opts.model_name == 'producto' %}
 <div class="bulk-upload-box">
     <h4>📦 Subir varias imágenes a la vez</h4>
     <input type="file" name="imagenes_bulk" multiple accept="image/*"
