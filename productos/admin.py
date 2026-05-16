@@ -48,20 +48,23 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 class ImagenProductoInline(admin.TabularInline):
     model = ImagenProducto
-    extra = 1
-    fields = ['imagen', 'orden', 'es_principal', 'preview']
+    extra = 0
+    fields = ['orden', 'imagen', 'es_principal', 'preview']
     readonly_fields = ['preview']
+    ordering = ['orden']
 
     def preview(self, obj):
         if obj.imagen:
-            return f'<img src="{obj.imagen.url}" style="max-width: 100px; max-height: 100px; border-radius: 4px;">'
-        return "Sin imagen"
-    preview.short_description = "Vista previa"
-    preview.allow_tags = True
+            return format_html(
+                '<img src="{}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #ddd;">',
+                obj.imagen.url
+            )
+        return ''
+    preview.short_description = 'Vista previa'
 
     class Media:
         css = {'all': ('admin/css/dragdrop-image.css',)}
-        js = ('admin/js/color-picker.js',)
+        js = ('admin/js/sortable-images.js',)
 
 
 class OpcionProductoInline(admin.TabularInline):
@@ -82,9 +85,6 @@ class ProductoAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Información Básica', {
             'fields': ('nombre', 'descripcion', 'precio', 'categoria', 'tags_adicionales', 'stock', 'activo')
-        }),
-        ('Imágenes', {
-            'fields': ('imagen', 'imagen_url'),
         }),
         ('Personalización', {
             'fields': ('permite_personalizacion', 'texto_personalizacion', 'placeholder_personalizacion'),
