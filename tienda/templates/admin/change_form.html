@@ -23,16 +23,48 @@
         padding: 16px 20px;
         margin: 16px 0;
     }
-    .bulk-upload-box h4 {
-        font-size: 0.95rem;
-        margin-bottom: 8px;
-        color: #495057;
+    .bulk-upload-box h4 { font-size: 0.95rem; margin-bottom: 8px; color: #495057; }
+    .bulk-upload-box small { color: #6c757d; display: block; margin-top: 6px; }
+
+    /* Tabla de valores de variante */
+    .variante-valores-tabla {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 8px;
+        font-size: 0.85rem;
     }
-    .bulk-upload-box small {
-        color: #6c757d;
-        display: block;
+    .variante-valores-tabla th {
+        background: #fff0f9;
+        color: #a07ab0;
+        padding: 6px 10px;
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 2px solid #ffc1ea;
+    }
+    .variante-valores-tabla td {
+        padding: 5px 8px;
+        border-bottom: 1px solid #f3d9fa;
+    }
+    .variante-valores-tabla input {
+        width: 80px;
+        padding: 4px 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.82rem;
+    }
+    .variante-valores-tabla input:focus {
+        border-color: #ffc1ea;
+        outline: none;
+    }
+    .variante-tabla-wrap {
+        background: #fff;
+        border: 1px solid #f3d9fa;
+        border-radius: 8px;
+        padding: 10px 14px;
         margin-top: 6px;
+        display: none;
     }
+    .variante-tabla-wrap.visible { display: block; }
 </style>
 {% endblock %}
 
@@ -46,4 +78,107 @@
     <small>Selecciona varias imágenes con Ctrl+clic (Windows) o Cmd+clic (Mac). Se agregarán automáticamente al guardar.</small>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block inline_admin_formset %}
+{{ block.super }}
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Observar cuando se agregan filas de variantes
+    function initVarianteRow(row) {
+        const inputValores = row.querySelector('input[name$="-valores_texto"]');
+        if (!inputValores || inputValores.dataset.varianteInit) return;
+        inputValores.dataset.varianteInit = '1';
+        inputValores.placeholder = 'Ej: S, M, L, XL';
+
+        // Crear contenedor de tabla
+        const wrap = document.createElement('div');
+        wrap.className = 'variante-tabla-wrap';
+        inputValores.parentNode.appendChild(wrap);
+
+        function renderTabla() {
+            const texto = inputValores.value.trim();
+            const valores = texto ? texto.split(',').map(v => v.trim()).filter(Boolean) : [];
+            wrap.innerHTML = '';
+            if (!valores.length) { wrap.classList.remove('visible'); return; }
+            wrap.classList.add('visible');
+
+            const tabla = document.createElement('table');
+            tabla.className = 'variante-valores-tabla';
+            tabla.innerHTML = `
+                <thead>
+                    <tr>
+                        <th>Valor</th>
+                        <th>Stock</th>
+                        <th>Precio extra ($)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>`;
+
+            const tbody = tabla.querySelector('tbody');
+
+            // Recuperar valores guardados previamente
+            const guardados = JSON.parse(inputValores.dataset.guardados || '{}');
+
+            valores.forEach(val => {
+                const g = guardados[val] || {};
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${val}</strong></td>
+                    <td><input type="number" min="0" value="${g.stock ?? 0}"
+                               data-val="${val}" data-tipo="stock"
+                               onchange="guardarVarianteExtra(this)"></td>
+                    <td><input type="number" min="0" value="${g.precio_extra ?? 0}"
+                               data-val="${val}" data-tipo="precio_extra"
+                               onchange="guardarVarianteExtra(this)"></td>`;
+                tbody.appendChild(tr);
+            });
+
+            wrap.appendChild(tabla);
+        }
+
+        inputValores.addEventListener('input', renderTabla);
+        // Render inicial si ya tiene valor
+        if (inputValores.value) renderTabla();
+    }
+
+    window.guardarVarianteExtra = function(input) {
+        const row = input.closest('tr.form-row, tr.dynamic-atributos');
+        if (!row) return;
+        const inputValores = row.querySelector('input[name$="-valores_texto"]');
+        if (!inputValores) return;
+        const guardados = JSON.parse(inputValores.dataset.guardados || '{}');
+        const val = input.dataset.val;
+        if (!guardados[val]) guardados[val] = {};
+        guardados[val][input.dataset.tipo] = input.value;
+        inputValores.dataset.guardados = JSON.stringify(guardados);
+
+        // Guardar en campo oculto para enviar al servidor
+        let hiddenName = inputValores.name.replace('valores_texto', 'valores_extra');
+        let hidden = row.querySelector(`input[name="${hiddenName}"]`);
+        if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden';
+            hidden.name = hiddenName;
+            row.appendChild(hidden);
+        }
+        hidden.value = JSON.stringify(guardados);
+    };
+
+    // Inicializar filas existentes
+    document.querySelectorAll('#atributos-group tr.form-row, #atributos-group tr.dynamic-atributos').forEach(initVarianteRow);
+
+    // Observar nuevas filas
+    const tbody = document.querySelector('#atributos-group tbody');
+    if (tbody) {
+        new MutationObserver(() => {
+            tbody.querySelectorAll('tr.form-row, tr.dynamic-atributos').forEach(initVarianteRow);
+        }).observe(tbody, { childList: true });
+    }
+});
+</script>
 {% endblock %}

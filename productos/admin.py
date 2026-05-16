@@ -163,6 +163,35 @@ class ProductoAdmin(admin.ModelAdmin):
                 es_principal=(i == 0 and not obj.imagenes.filter(es_principal=True).exists())
             )
 
+    def save_related(self, request, form, formsets, change):
+        super().save_related(request, form, formsets, change)
+        # Procesar stock y precio extra de variantes
+        import json as _json
+        for key, value in request.POST.items():
+            if 'valores_extra' in key and value:
+                try:
+                    # Extraer el prefijo del formset (ej: atributos-0)
+                    prefix = key.replace('-valores_extra', '')
+                    nombre_key = f'{prefix}-valores_texto'
+                    nombre = request.POST.get(nombre_key, '')
+                    if not nombre:
+                        continue
+                    extras = _json.loads(value)
+                    # Buscar el atributo recien guardado
+                    atributo = form.instance.atributos.filter(
+                        nombre=request.POST.get(f'{prefix}-nombre', '')
+                    ).first()
+                    if not atributo:
+                        continue
+                    for val_nombre, datos in extras.items():
+                        valor_obj = atributo.valores.filter(valor=val_nombre).first()
+                        if valor_obj:
+                            valor_obj.stock = int(datos.get('stock', 0))
+                            valor_obj.precio_extra = float(datos.get('precio_extra', 0))
+                            valor_obj.save()
+                except Exception:
+                    continue
+
     def asignar_etiquetas(self, request, queryset):
         if 'aplicar' in request.POST:
             tag_ids = request.POST.getlist('tags_seleccionados')
