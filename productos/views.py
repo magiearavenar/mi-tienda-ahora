@@ -198,7 +198,7 @@ def procesar_pago(request):
             estado='pendiente'
         )
         
-        # Crear detalles del pedido
+        # Crear detalles del pedido y descontar stock
         for item in carrito:
             try:
                 producto = Producto.objects.get(id=item['id'])
@@ -209,6 +209,18 @@ def procesar_pago(request):
                     precio=float(item['precio']),
                     personalizacion=item.get('personalizacion', '')
                 )
+                # Descontar stock general
+                producto.stock = max(0, producto.stock - int(item['cantidad']))
+                producto.save(update_fields=['stock'])
+                # Descontar stock de variante si el nombre incluye variante
+                nombre = item.get('personalizacion', '') or item.get('nombre', '')
+                from .models import VarianteValor
+                for valor in VarianteValor.objects.filter(
+                    atributo__producto=producto, activo=True
+                ):
+                    if valor.valor in item.get('nombre', ''):
+                        valor.stock = max(0, valor.stock - int(item['cantidad']))
+                        valor.save(update_fields=['stock'])
             except Producto.DoesNotExist:
                 return JsonResponse({'error': f'Producto {item["id"]} no encontrado'}, status=400)
         
@@ -472,6 +484,30 @@ def obtener_imagenes_producto(request, producto_id):
         return JsonResponse({'imagenes': imagenes})
     except Producto.DoesNotExist:
         return JsonResponse({'imagenes': []})
+
+
+@login_required
+def variantes_datos(request, producto_id):
+    """Retorna datos de variantes guardados para poblar la tabla en el admin."""
+    if not request.user.is_staff:
+        return JsonResponse({}, status=403)
+    from .models import VarianteAtributo
+    try:
+        producto = Producto.objects.get(id=producto_id)
+        data = {}
+        for atributo in producto.atributos.prefetch_related('valores__imagen_producto').all():
+            valores_data = {}
+            for v in atributo.valores.all():
+                valores_data[v.valor] = {
+                    'stock': v.stock,
+                    'precio_extra': float(v.precio_extra),
+                    'imagen_id': v.imagen_producto_id or '',
+                    'imagen_url': v.imagen_producto.imagen.url if v.imagen_producto and v.imagen_producto.imagen else '',
+                }
+            data[atributo.nombre] = valores_data
+        return JsonResponse(data)
+    except Producto.DoesNotExist:
+        return JsonResponse({})
 
 @csrf_exempt
 @require_POST

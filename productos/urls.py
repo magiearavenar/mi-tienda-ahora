@@ -50,6 +50,7 @@ urlpatterns = [
     path('debug/config/', views.debug_config, name='debug_config'),
     path('obtener-imagen/<int:producto_id>/', views.obtener_imagen_producto, name='obtener_imagen_producto'),
     path('obtener-imagenes/<int:producto_id>/', views.obtener_imagenes_producto, name='obtener_imagenes_producto'),
+    path('variantes-datos/<int:producto_id>/', views.variantes_datos, name='variantes_datos'),
     path('calcular-envio/', views.calcular_envio, name='calcular_envio'),
     path('api/instagram-posts/', instagram_posts_api, name='instagram_posts_api'),
     path('portafolio/', views.portafolio, name='portafolio'),

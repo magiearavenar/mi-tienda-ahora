@@ -41,10 +41,19 @@
         background: #fff0f9; display: flex; align-items: center; justify-content: center;
     }
     .img-select-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .img-select-dropdown {
-        font-size: 0.78rem; border: 1px solid #ddd; border-radius: 6px;
-        padding: 4px 6px; max-width: 150px;
+    .img-select-dropdown { font-size: 0.78rem; border: 1px solid #ddd; border-radius: 6px; padding: 4px 6px; max-width: 150px; }
+
+    /* Bulk preview drag */
+    #bulk-preview-grid > div { cursor: grab !important; user-select: none; }
+    #bulk-preview-grid > div:active { cursor: grabbing !important; }
+    .bulk-ghost { opacity: 0.4 !important; border: 2px dashed #a07ab0 !important; }
+    .bulk-orden-badge {
+        position: absolute; bottom: 4px; right: 4px;
+        background: rgba(160,122,176,0.9); color: #fff;
+        font-size: 0.65rem; font-weight: 700; padding: 1px 5px; border-radius: 6px;
+        pointer-events: none;
     }
+    .bulk-drag-hint { font-size: 0.75rem; color: #a07ab0; margin-top: 8px; display: block; }
 </style>
 {% endblock %}
 
@@ -55,8 +64,8 @@
     <h4>📦 Subir varias imágenes a la vez</h4>
     <input type="file" id="imagenes_bulk_input" name="imagenes_bulk" multiple accept="image/*"
            style="display:block; margin-top:8px;" onchange="previewBulkImages(this)">
-    <div id="bulk-preview-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;"></div>
-    <small>Selecciona varias imágenes con Ctrl+clic (Windows) o Cmd+clic (Mac). Se agregarán automáticamente al guardar.</small>
+    <div id="bulk-preview-grid" style="display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;min-height:10px;"></div>
+    <small id="bulk-hint-text">Selecciona varias imágenes con Ctrl+clic (Windows) o Cmd+clic (Mac).</small>
 </div>
 {% endif %}
 {% endblock %}
@@ -74,65 +83,114 @@ document.addEventListener('DOMContentLoaded', function () {
     window.previewBulkImages = function(input) {
         const grid = document.getElementById('bulk-preview-grid');
         grid.innerHTML = '';
-        if (grid._sortable) { grid._sortable.destroy(); grid._sortable = null; }
 
-        Array.from(input.files).forEach((file, i) => {
+        // Destruir sortable anterior si existe
+        if (grid._si) { try { grid._si.destroy(); } catch(e){} grid._si = null; }
+
+        const files = Array.from(input.files);
+        if (!files.length) return;
+
+        let loaded = 0;
+        files.forEach((file, i) => {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const wrap = document.createElement('div');
-                wrap.dataset.fileIndex = i;
-                wrap.style.cssText = 'position:relative;width:90px;height:90px;border-radius:8px;overflow:hidden;border:2px solid #ffc1ea;';
+                wrap.dataset.fileIndex = String(i);
+                wrap.style.cssText = 'position:relative;width:90px;height:90px;border-radius:8px;overflow:hidden;border:2px solid #ffc1ea;flex-shrink:0;';
 
                 const img = document.createElement('img');
                 img.src = e.target.result;
-                img.style.cssText = 'width:100%;height:100%;object-fit:cover;pointer-events:none;';
+                img.style.cssText = 'width:100%;height:100%;object-fit:cover;pointer-events:none;display:block;';
+                wrap.appendChild(img);
 
                 const badge = document.createElement('span');
                 badge.className = 'bulk-orden-badge';
-                badge.textContent = `#${i + 1}`;
-
-                wrap.appendChild(img);
+                badge.textContent = '#' + (i + 1);
                 wrap.appendChild(badge);
-                grid.appendChild(wrap);
 
-                // Mostrar hint de arrastre solo la primera vez
-                if (i === 0) {
-                    let hint = document.getElementById('bulk-drag-hint');
-                    if (!hint) {
-                        hint = document.createElement('small');
-                        hint.id = 'bulk-drag-hint';
-                        hint.className = 'bulk-drag-hint';
-                        hint.textContent = '✦ Arrastra las imágenes para cambiar el orden del slide';
-                        grid.parentNode.insertBefore(hint, grid.nextSibling);
+                grid.appendChild(wrap);
+                loaded++;
+
+                if (loaded === files.length) {
+                    // Actualizar hint
+                    const hint = document.getElementById('bulk-hint-text');
+                    if (hint) hint.textContent = '✦ Arrastra las imágenes para cambiar el orden del slide antes de guardar.';
+
+                    // Iniciar sortable cuando Sortable esté disponible
+                    function tryInit() {
+                        if (window.Sortable) {
+                            grid._si = Sortable.create(grid, {
+                                animation: 200,
+                                ghostClass: 'bulk-ghost',
+                                onEnd: actualizarBadges
+                            });
+                            actualizarBadges();
+                        } else {
+                            setTimeout(tryInit, 100);
+                        }
                     }
+                    tryInit();
                 }
             };
             reader.readAsDataURL(file);
         });
     };
 
-    // ── VARIANTES ─────────────────────────────────────────────
-    // Obtener ID del producto desde la URL
-    function getProductoId() {
-        const match = window.location.pathname.match(/\/producto\/(\d+)\//);
-        return match ? match[1] : null;
+    function actualizarBadges() {
+        const grid = document.getElementById('bulk-preview-grid');
+        if (!grid) return;
+        const items = Array.from(grid.children);
+        items.forEach((item, i) => {
+            const badge = item.querySelector('.bulk-orden-badge');
+            if (badge) badge.textContent = '#' + (i + 1);
+        });
+        // Guardar orden
+        let hidden = document.getElementById('bulk-orden-hidden');
+        if (!hidden) {
+            hidden = document.createElement('input');
+            hidden.type = 'hidden'; hidden.id = 'bulk-orden-hidden';
+            hidden.name = 'imagenes_bulk_orden';
+            grid.parentNode.appendChild(hidden);
+        }
+        hidden.value = items.map(item => item.dataset.fileIndex || '0').join(',');
     }
 
-    // Cargar imágenes del producto una sola vez
+    // ── VARIANTES ─────────────────────────────────────────────
+    function getProductoId() {
+        const m = window.location.pathname.match(/\/producto\/(\d+)\//);
+        return m ? m[1] : null;
+    }
+
     let imagenesProducto = [];
     const productoId = getProductoId();
+
     if (productoId) {
-        fetch(`/obtener-imagenes/${productoId}/`)
+        // Cargar imágenes existentes
+        fetch('/obtener-imagenes/' + productoId + '/')
             .then(r => r.json())
             .then(data => {
                 imagenesProducto = data.imagenes || [];
-                // Re-renderizar tablas que ya estén visibles
                 document.querySelectorAll('.variante-tabla-wrap.visible').forEach(wrap => {
-                    const inputValores = wrap.previousElementSibling;
-                    if (inputValores) poblarSelects(wrap, imagenesProducto);
+                    poblarSelects(wrap, imagenesProducto);
                 });
-            })
-            .catch(() => {});
+            }).catch(() => {});
+
+        // Cargar datos guardados de variantes desde la BD
+        fetch('/variantes-datos/' + productoId + '/')
+            .then(r => r.json())
+            .then(data => {
+                // data = { 'NombreAtributo': { 'valor': { stock, precio_extra, imagen_id, imagen_url } } }
+                document.querySelectorAll('input[name$="-valores_texto"]').forEach(inputValores => {
+                    const row = inputValores.closest('tr');
+                    if (!row) return;
+                    const nombreInput = row.querySelector('input[name$="-nombre"]');
+                    if (!nombreInput || !nombreInput.value) return;
+                    const atributoData = data[nombreInput.value];
+                    if (!atributoData) return;
+                    inputValores.dataset.guardados = JSON.stringify(atributoData);
+                    inputValores.dispatchEvent(new Event('input'));
+                });
+            }).catch(() => {});
     }
 
     function poblarSelects(wrap, imagenes) {
@@ -142,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
             imagenes.forEach(img => {
                 const opt = document.createElement('option');
                 opt.value = img.id;
-                opt.textContent = `Imagen ${img.orden}${img.es_principal ? ' ★' : ''}`;
+                opt.textContent = 'Imagen ' + img.orden + (img.es_principal ? ' ★' : '');
                 opt.dataset.url = img.url;
                 select.appendChild(opt);
             });
@@ -170,45 +228,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const tabla = document.createElement('table');
             tabla.className = 'variante-valores-tabla';
-            tabla.innerHTML = `<thead><tr>
-                <th>Valor</th><th>Stock</th><th>Precio extra ($)</th><th>Imagen del producto</th>
-            </tr></thead><tbody></tbody>`;
+            tabla.innerHTML = '<thead><tr><th>Valor</th><th>Stock</th><th>Precio extra ($)</th><th>Imagen del producto</th></tr></thead><tbody></tbody>';
 
             const tbody = tabla.querySelector('tbody');
             const guardados = JSON.parse(inputValores.dataset.guardados || '{}');
 
             valores.forEach(val => {
                 const g = guardados[val] || {};
-                const previewId = `prev-${Math.random().toString(36).slice(2)}`;
+                const previewId = 'prev-' + Math.random().toString(36).slice(2);
                 const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${val}</strong></td>
-                    <td><input type="number" min="0" value="${g.stock ?? 0}"
-                               data-val="${val}" data-tipo="stock"
-                               onchange="guardarVarianteExtra(this)"></td>
-                    <td><input type="number" min="0" value="${g.precio_extra ?? 0}"
-                               data-val="${val}" data-tipo="precio_extra"
-                               onchange="guardarVarianteExtra(this)"></td>
-                    <td>
-                        <div class="img-select-wrap">
-                            <div class="img-select-preview" id="${previewId}">
-                                ${g.imagen_url
-                                    ? `<img src="${g.imagen_url}">`
-                                    : '<span style="font-size:1.1rem;">🖼️</span>'}
-                            </div>
-                            <select class="img-select-dropdown"
-                                    data-val="${val}" data-preview="${previewId}"
-                                    onchange="seleccionarImagenVariante(this)">
-                                <option value="">Sin imagen</option>
-                            </select>
-                        </div>
-                    </td>`;
+                tr.innerHTML =
+                    '<td><strong>' + val + '</strong></td>' +
+                    '<td><input type="number" min="0" value="' + (g.stock || 0) + '" data-val="' + val + '" data-tipo="stock" onchange="guardarVarianteExtra(this)"></td>' +
+                    '<td><input type="number" min="0" value="' + (g.precio_extra || 0) + '" data-val="' + val + '" data-tipo="precio_extra" onchange="guardarVarianteExtra(this)"></td>' +
+                    '<td><div class="img-select-wrap">' +
+                        '<div class="img-select-preview" id="' + previewId + '">' +
+                            (g.imagen_url ? '<img src="' + g.imagen_url + '">' : '<span style="font-size:1.1rem;">🖼️</span>') +
+                        '</div>' +
+                        '<select class="img-select-dropdown" data-val="' + val + '" data-preview="' + previewId + '" onchange="seleccionarImagenVariante(this)">' +
+                            '<option value="">Sin imagen</option>' +
+                        '</select>' +
+                    '</div></td>';
                 tbody.appendChild(tr);
             });
 
             wrap.appendChild(tabla);
-
-            // Poblar selects con imágenes ya cargadas
             if (imagenesProducto.length) poblarSelects(wrap, imagenesProducto);
 
             // Restaurar selección guardada
@@ -226,11 +270,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const opt = select.options[select.selectedIndex];
         const previewEl = document.getElementById(select.dataset.preview);
         if (opt && opt.dataset.url) {
-            previewEl.innerHTML = `<img src="${opt.dataset.url}" style="width:100%;height:100%;object-fit:cover;">`;
+            previewEl.innerHTML = '<img src="' + opt.dataset.url + '" style="width:100%;height:100%;object-fit:cover;">';
         } else {
             previewEl.innerHTML = '<span style="font-size:1.1rem;">🖼️</span>';
         }
-        // Guardar en dataset
         const row = select.closest('tr.form-row, tr.dynamic-atributos');
         if (!row) return;
         const inputValores = row.querySelector('input[name$="-valores_texto"]');
@@ -239,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const val = select.dataset.val;
         if (!guardados[val]) guardados[val] = {};
         guardados[val].imagen_id = select.value;
-        guardados[val].imagen_url = opt ? opt.dataset.url : '';
+        guardados[val].imagen_url = opt ? (opt.dataset.url || '') : '';
         inputValores.dataset.guardados = JSON.stringify(guardados);
         sincronizarHidden(inputValores, guardados);
     };
@@ -259,23 +302,23 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function sincronizarHidden(inputValores, guardados) {
         const hiddenName = inputValores.name.replace('valores_texto', 'valores_extra');
-        let hidden = inputValores.closest('tr').querySelector(`input[name="${hiddenName}"]`);
+        const tr = inputValores.closest('tr');
+        let hidden = tr.querySelector('input[name="' + hiddenName + '"]');
         if (!hidden) {
             hidden = document.createElement('input');
-            hidden.type = 'hidden';
-            hidden.name = hiddenName;
-            inputValores.closest('tr').appendChild(hidden);
+            hidden.type = 'hidden'; hidden.name = hiddenName;
+            tr.appendChild(hidden);
         }
         hidden.value = JSON.stringify(guardados);
     }
 
     document.querySelectorAll('#atributos-group tr.form-row, #atributos-group tr.dynamic-atributos').forEach(initVarianteRow);
 
-    const tbody = document.querySelector('#atributos-group tbody');
-    if (tbody) {
+    const atributosTbody = document.querySelector('#atributos-group tbody');
+    if (atributosTbody) {
         new MutationObserver(() => {
-            tbody.querySelectorAll('tr.form-row, tr.dynamic-atributos').forEach(initVarianteRow);
-        }).observe(tbody, { childList: true });
+            atributosTbody.querySelectorAll('tr.form-row, tr.dynamic-atributos').forEach(initVarianteRow);
+        }).observe(atributosTbody, { childList: true });
     }
 });
 </script>
