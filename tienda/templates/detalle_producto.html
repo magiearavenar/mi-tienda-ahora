@@ -71,6 +71,14 @@
                 <h3 class="text-primary" id="precio-actual">${{ producto.precio|floatformat:0 }}</h3>
             </div>
 
+            {% if producto.imagenes_interior.all %}
+            <div class="mb-4">
+                <button class="btn btn-outline-dark w-100" onclick="abrirFlipbook()" style="border-radius:10px;font-size:0.9rem;padding:0.6rem;">
+                    <i class="fas fa-book-open me-2"></i> Ver interior de la agenda
+                </button>
+            </div>
+            {% endif %}
+
             {% if atributos %}
             <div class="mb-4" id="variantes-container">
                 {% for atributo in atributos %}
@@ -142,11 +150,6 @@
                     <button class="btn btn-secondary btn-lg" disabled>
                         <i class="fas fa-times"></i> Sin Stock
                     </button>
-                {% endif %}
-                {% if producto.imagenes_interior.all %}
-                <button class="btn btn-outline-dark btn-lg" onclick="abrirFlipbook()">
-                    <i class="fas fa-book-open"></i> Ver interior
-                </button>
                 {% endif %}
                 <a href="{% url 'home' %}" class="btn btn-outline-secondary">
                     <i class="fas fa-arrow-left"></i> Volver a la Tienda
