@@ -145,6 +145,20 @@ class Pago(models.Model):
     class Meta:
         ordering = ['-fecha_creacion']
 
+class ImagenInterior(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE, related_name='imagenes_interior')
+    imagen = models.ImageField(upload_to='interior/', max_length=500)
+    orden = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.producto.nombre} - Interior {self.orden}"
+
+    class Meta:
+        ordering = ['orden']
+        verbose_name = "Imagen de Interior"
+        verbose_name_plural = "Imágenes de Interior"
+
+
 class Slide(models.Model):
     titulo = models.CharField(max_length=200, blank=True)
     imagen = models.ImageField(upload_to='slides/', max_length=500)

@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.html import format_html
 from PIL import Image
 import io
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento, ImagenInterior
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
 
@@ -67,6 +67,25 @@ class ImagenProductoInline(admin.TabularInline):
         js = ('admin/js/sortable-images.js',)
 
 
+class ImagenInteriorInline(admin.TabularInline):
+    model = ImagenInterior
+    extra = 0
+    fields = ['orden', 'imagen', 'preview']
+    readonly_fields = ['preview']
+    ordering = ['orden']
+    verbose_name = 'Página de interior'
+    verbose_name_plural = '📖 Imágenes de Interior (Flipbook)'
+
+    def preview(self, obj):
+        if obj.imagen:
+            return format_html(
+                '<img src="{}" style="width:80px;height:80px;object-fit:cover;border-radius:6px;border:2px solid #ddd;">',
+                obj.imagen.url
+            )
+        return ''
+    preview.short_description = 'Vista previa'
+
+
 class VarianteValorInline(admin.TabularInline):
     model = VarianteValor
     extra = 1
@@ -107,7 +126,7 @@ class ProductoAdmin(admin.ModelAdmin):
     list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion', 'tags_adicionales']
     search_fields = ['nombre', 'descripcion']
     list_editable = ['precio', 'stock', 'activo']
-    inlines = [ImagenProductoInline, VarianteAtributoInline, OpcionProductoInline]
+    inlines = [ImagenProductoInline, ImagenInteriorInline, VarianteAtributoInline, OpcionProductoInline]
     filter_horizontal = ['tags_adicionales', 'categoria']
     actions = ['asignar_etiquetas', 'asignar_categoria']
 
