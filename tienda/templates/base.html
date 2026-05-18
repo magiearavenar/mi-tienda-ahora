@@ -174,6 +174,46 @@
             font-size: 0.8em;
             margin-left: 5px;
         }
+
+        /* ── RESPONSIVE GLOBAL ── */
+        @media (max-width: 768px) {
+            .logo { width: 160px !important; }
+
+            /* Nav hamburguesa */
+            .nav-categories .d-flex { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start !important; gap: 0; padding: 0 4px; scrollbar-width: none; }
+            .nav-categories .d-flex::-webkit-scrollbar { display: none; }
+            .category-link { white-space: nowrap; font-size: 0.72rem; padding: 0.4rem 0.6rem; }
+
+            /* Footer columnas apiladas */
+            .footer .row { flex-direction: column; }
+            .footer .col { width: 100% !important; flex: none !important; }
+
+            /* Carrito responsive */
+            .cart-header { display: none !important; }
+            .cart-item { display: flex !important; flex-direction: column !important; gap: 0.5rem !important; padding: 1rem !important; }
+            .item-info { width: 100%; }
+            .item-quantity, .item-price, .item-subtotal, .item-remove { width: 100%; display: flex; align-items: center; gap: 0.5rem; }
+            .item-quantity::before { content: 'Cantidad: '; font-size: 0.8rem; color: #666; }
+            .item-price::before { content: 'Precio: '; font-size: 0.8rem; color: #666; }
+            .item-subtotal::before { content: 'Subtotal: '; font-size: 0.8rem; color: #666; }
+
+            /* Detalle producto */
+            .product-details { margin-top: 1.5rem; }
+
+            /* Tabla info producto */
+            .table td { font-size: 0.82rem; padding: 0.4rem 0.6rem; }
+
+            /* Main padding */
+            main.container { padding-left: 12px !important; padding-right: 12px !important; }
+        }
+
+        @media (max-width: 480px) {
+            .logo { width: 130px !important; }
+            .category-link { font-size: 0.65rem; padding: 0.35rem 0.5rem; }
+            h1, .h1 { font-size: 1.4rem !important; }
+            h2, .h2 { font-size: 1.2rem !important; }
+            .btn-lg { font-size: 0.9rem !important; padding: 0.5rem 1rem !important; }
+        }
     </style>
 </head>
 <body>
