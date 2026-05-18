@@ -28,7 +28,7 @@
             <div class="product-image">
                 {% if producto.imagen_principal %}
                 <a href="{% url 'detalle_producto' producto.id %}">
-                    <img src="{{ producto.imagen_principal.url }}" style="cursor: pointer;">
+                    <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy" style="cursor: pointer;">
                 </a>
                 {% else %}
                 <div class="d-flex align-items-center justify-content-center bg-light h-100">

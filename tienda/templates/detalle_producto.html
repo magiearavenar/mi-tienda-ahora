@@ -21,7 +21,7 @@
                     <div class="carousel-inner">
                         {% for imagen in producto.imagenes.all %}
                         <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                            <img src="{{ imagen.imagen.url }}" class="d-block w-100 rounded" alt="{{ producto.nombre }}">
+                            <img src="{{ imagen.imagen.url }}" class="d-block w-100 rounded" alt="{{ producto.nombre }} - foto {{ forloop.counter }}" {% if not forloop.first %}loading="lazy"{% endif %}>
                         </div>
                         {% endfor %}
                     </div>
@@ -44,7 +44,7 @@
                 <div class="row mt-3">
                     {% for imagen in producto.imagenes.all %}
                     <div class="col-3">
-                        <img src="{{ imagen.imagen.url }}" class="img-thumbnail" style="cursor: pointer; height: 80px; object-fit: cover;" 
+                        <img src="{{ imagen.imagen.url }}" class="img-thumbnail" alt="{{ producto.nombre }} miniatura" loading="lazy" style="cursor: pointer; height: 80px; object-fit: cover;" 
                              onclick="goToSlide({{ forloop.counter0 }})">
                     </div>
                     {% endfor %}
