@@ -57,10 +57,10 @@
 </style>
 {% endblock %}
 
-{% block after_related_objects %}
+{% block inline_admin_formset %}
 {{ block.super }}
-{% if show_bulk_upload and opts.model_name == 'producto' %}
-<div class="bulk-upload-box">
+{% if opts.model_name == 'producto' and inline_admin_formset.opts.verbose_name == 'Imagen de Producto' %}
+<div class="bulk-upload-box" style="margin: 0 0 16px 0;">
     <h4>📦 Subir varias imágenes a la vez</h4>
     <input type="file" id="imagenes_bulk_input" name="imagenes_bulk" multiple accept="image/*"
            style="display:block; margin-top:8px;" onchange="previewBulkImages(this)">
@@ -68,10 +68,6 @@
     <small id="bulk-hint-text">Selecciona varias imágenes con Ctrl+clic (Windows) o Cmd+clic (Mac).</small>
 </div>
 {% endif %}
-{% endblock %}
-
-{% block inline_admin_formset %}
-{{ block.super }}
 {% endblock %}
 
 {% block extrajs %}

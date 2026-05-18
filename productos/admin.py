@@ -161,11 +161,6 @@ class ProductoAdmin(admin.ModelAdmin):
     mostrar_tags.short_description = 'Etiquetas'
     mostrar_tags.allow_tags = True
 
-    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
-        extra_context = extra_context or {}
-        extra_context['show_bulk_upload'] = True
-        return super().changeform_view(request, object_id, form_url, extra_context)
-
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         imagenes = request.FILES.getlist('imagenes_bulk')
