@@ -52,6 +52,7 @@ class ImagenProductoInline(admin.TabularInline):
     fields = ['orden', 'imagen', 'es_principal', 'preview']
     readonly_fields = ['preview']
     ordering = ['orden']
+    template = 'admin/imagenproducto_inline.html'
 
     def preview(self, obj):
         if obj.imagen:
