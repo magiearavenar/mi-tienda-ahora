@@ -309,3 +309,17 @@ div {
     box-shadow: 0 6px 20px rgba(255,193,234,0.6);
     transform: translateY(-2px) scale(1.05);
 }
+
+/* Protección de imágenes */
+img {
+    -webkit-user-drag: none;
+    user-drag: none;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+a img, button img, .carousel-item img, #productCarousel img,
+.instagram-item img, .split-banner-img, .logo {
+    pointer-events: auto;
+}
