@@ -35,3 +35,8 @@ def cloudinary_card(url):
 def cloudinary_banner(url):
     """Imagen para banners — 800px"""
     return cloudinary_opt(url, 'f_auto,q_auto:good,w_800')
+
+@register.filter
+def cloudinary_slide(url):
+    """Imagen para slides principales — calidad alta sin recorte"""
+    return cloudinary_opt(url, 'f_auto,q_auto:best')
