@@ -16,7 +16,7 @@ Disallow: /admin/
 Disallow: /carrito/
 Disallow: /checkout/
 
-Sitemap: https://mundo-magie-production.up.railway.app/sitemap.xml"""
+Sitemap: https://mundomagie.cl/sitemap.xml"""
     return HttpResponse(content, content_type="text/plain")
 
 def sitemap_xml(request):

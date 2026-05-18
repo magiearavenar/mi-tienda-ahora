@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block title %}{% if categoria %}{{ categoria.nombre }} - Mundo Magie{% else %}Productos - Mundo Magie{% endif %}{% endblock %}
+{% block description %}{% if categoria %}Descubre todos los productos de {{ categoria.nombre }} en Mundo Magie. Agendas y artículos únicos hechos con amor.{% else %}Explora todos nuestros productos en Mundo Magie.{% endif %}{% endblock %}
+{% block og_title %}{% if categoria %}{{ categoria.nombre }} - Mundo Magie{% else %}Productos - Mundo Magie{% endif %}{% endblock %}
+
 {% block categories %}
 {% for cat in categorias %}
 <a href="{% url 'productos_categoria' cat.id %}" class="category-link {% if cat.id == categoria.id %}bg-light{% endif %}">{{ cat.nombre }}</a>

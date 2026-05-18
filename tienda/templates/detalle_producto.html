@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 
+{% block title %}{{ producto.nombre }} - Mundo Magie{% endblock %}
+{% block description %}{{ producto.descripcion|truncatewords:25 }}{% endblock %}
+{% block og_title %}{{ producto.nombre }} - Mundo Magie{% endblock %}
+{% block og_description %}{{ producto.descripcion|truncatewords:25 }}{% endblock %}
+{% block keywords %}{{ producto.nombre }}, {% for cat in producto.categoria.all %}{{ cat.nombre }}, {% endfor %}agendas, mundo magie, tienda online chile{% endblock %}
+
 {% block categories %}
 {% for categoria in categorias %}
 <a href="{% url 'productos_categoria' categoria.id %}" class="category-link">{{ categoria.nombre }}</a>
@@ -279,6 +285,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const carousel = document.querySelector('#productCarousel');
     if (carousel) new bootstrap.Carousel(carousel, { interval: false });
 });
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ producto.nombre }}",
+  "description": "{{ producto.descripcion|truncatewords:50|escapejs }}",
+  "brand": { "@type": "Brand", "name": "Mundo Magie" },
+  {% if producto.imagen_principal %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ producto.imagen_principal.url }}",{% endif %}
+  "offers": {
+    "@type": "Offer",
+    "priceCurrency": "CLP",
+    "price": "{{ producto.precio|floatformat:0 }}",
+    "availability": "{% if producto.stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "url": "{{ request.build_absolute_uri }}",
+    "seller": { "@type": "Organization", "name": "Mundo Magie" }
+  }
+}
 </script>
 
 {% if producto.imagenes_interior.all %}
