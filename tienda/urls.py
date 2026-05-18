@@ -16,7 +16,7 @@ Disallow: /admin/
 Disallow: /carrito/
 Disallow: /checkout/
 
-Sitemap: https://mundomagie.cl/sitemap.xml"""
+Sitemap: https://www.mundomagie.cl/sitemap.xml"""
     return HttpResponse(content, content_type="text/plain")
 
 def sitemap_xml(request):

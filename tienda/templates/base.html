@@ -251,7 +251,7 @@
                 
                 <div class="text-center">
                     <a href="{% url 'home' %}">
-                        <img src="/static/images/logo.png" alt="Mundo Magie - Tienda online" class="logo" width="300" height="80" onerror="this.style.display='none'">
+                        <img src="/static/images/logo.png" alt="Mundo Magie - Tienda online" class="logo" width="300" height="80" fetchpriority="high" onerror="this.style.display='none'">
                     </a>
                 </div>
                 
@@ -343,7 +343,7 @@
                 <!-- Logo en el centro -->
                 <div class="col mb-4 text-center">
                     <a href="{% url 'home' %}">
-                        <img src="/static/images/logo.png" alt="Mundo Magie Logo" style="max-width: 250px; height: auto; opacity: 0.8; margin-top: -20px;" onerror="this.style.display='none'">
+                        <img src="/static/images/logo.png" alt="Mundo Magie Logo" loading="lazy" style="max-width: 250px; height: auto; opacity: 0.8; margin-top: -20px;" onerror="this.style.display='none'">
                     </a>
                 </div>
                 
