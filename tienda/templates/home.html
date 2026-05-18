@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load cloudinary_tags %}
 
 {% block categories %}
 {% for categoria in categorias %}
@@ -81,7 +82,7 @@
                         <div class="product-image-carousel">
                             {% if producto.imagen_principal %}
                             <a href="{% url 'detalle_producto' producto.id %}">
-                                <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy" width="280" height="280">
+                                <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy" width="280" height="280">
                             </a>
                             {% else %}
                             <div class="no-image">
@@ -136,7 +137,7 @@
         <!-- Columna izquierda: banner promo -->
         <div class="split-banner-left">
             {% if seccion_data.seccion.banner_imagen %}
-            <img src="{{ seccion_data.seccion.banner_imagen.url }}" alt="{{ seccion_data.seccion.banner_titulo|default:seccion_data.seccion.categoria.nombre }}" class="split-banner-img" loading="lazy">
+            <img src="{{ seccion_data.seccion.banner_imagen.url|cloudinary_banner }}" alt="{{ seccion_data.seccion.banner_titulo|default:seccion_data.seccion.categoria.nombre }}" class="split-banner-img" loading="lazy">
             {% endif %}
             <div class="split-banner-overlay">
                 {% if seccion_data.seccion.banner_titulo %}
@@ -164,7 +165,7 @@
                                 <div class="product-image-carousel">
                                     {% if producto.imagen_principal %}
                                     <a href="{% url 'detalle_producto' producto.id %}">
-                                        <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy">
+                                        <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy">
                                     </a>
                                     {% else %}
                                     <div class="no-image"><i class="fas fa-image"></i></div>
