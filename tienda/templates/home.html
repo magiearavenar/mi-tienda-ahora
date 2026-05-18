@@ -130,56 +130,74 @@
 </div>
 
 {% for seccion_data in secciones_categorias %}
-<div class="category-section mb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="category-title">{{ seccion_data.seccion.categoria.nombre|upper }}</h4>
-        <a href="{% url 'productos_categoria' seccion_data.seccion.categoria.id %}" class="ver-mas-link">Ver más productos →</a>
-    </div>
-    
-    <div class="position-relative">
-        <div class="carousel-container" id="carousel-{{ seccion_data.seccion.categoria.id }}">
-            <div class="carousel-track">
-                {% for producto in seccion_data.productos %}
-                <div class="carousel-item-custom">
-                    <div class="product-card-carousel">
-                        <div class="product-image-carousel">
-                            {% if producto.imagen_principal %}
-                            <a href="{% url 'detalle_producto' producto.id %}">
-                                <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}">
-                            </a>
-                            {% else %}
-                            <div class="no-image">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="product-info-carousel">
-                            <h6 class="product-name">{{ producto.nombre }}</h6>
-                            <div class="product-price-container">
-                                <p class="product-price">${{ producto.precio|floatformat:0 }}</p>
-                                <button class="add-to-cart-btn" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})" title="Agregar al carrito">
-                                    <i class="fas fa-shopping-cart"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
+<div class="split-banner-section mb-5">
+    <div class="split-banner-grid">
+
+        <!-- Columna izquierda: banner promo -->
+        <div class="split-banner-left">
+            {% if seccion_data.seccion.banner_imagen %}
+            <img src="{{ seccion_data.seccion.banner_imagen.url }}" alt="{{ seccion_data.seccion.banner_titulo }}" class="split-banner-img">
+            {% endif %}
+            <div class="split-banner-overlay">
+                {% if seccion_data.seccion.banner_titulo %}
+                <h2 class="split-banner-titulo">{{ seccion_data.seccion.banner_titulo }}</h2>
+                {% else %}
+                <h2 class="split-banner-titulo">{{ seccion_data.seccion.categoria.nombre }}</h2>
+                {% endif %}
+                {% if seccion_data.seccion.banner_subtitulo %}
+                <p class="split-banner-subtitulo">{{ seccion_data.seccion.banner_subtitulo }}</p>
+                {% endif %}
+                <a href="{% url 'productos_categoria' seccion_data.seccion.categoria.id %}" class="split-banner-btn">
+                    {{ seccion_data.seccion.banner_boton_texto|default:'Ver todo' }}
+                </a>
             </div>
         </div>
-        
-        <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', -1)">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', 1)">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-        
-        <div class="carousel-dots" id="dots-{{ seccion_data.seccion.categoria.id }}">
-            {% for i in "12345" %}
-            <span class="dot {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-{{ seccion_data.seccion.categoria.id }}', {{ forloop.counter }})"></span>
-            {% endfor %}
+
+        <!-- Columna derecha: carrusel de productos -->
+        <div class="split-banner-right">
+            <div class="position-relative">
+                <div class="carousel-container" id="carousel-{{ seccion_data.seccion.categoria.id }}">
+                    <div class="carousel-track">
+                        {% for producto in seccion_data.productos %}
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    {% if producto.imagen_principal %}
+                                    <a href="{% url 'detalle_producto' producto.id %}">
+                                        <img src="{{ producto.imagen_principal.url }}" alt="{{ producto.nombre }}">
+                                    </a>
+                                    {% else %}
+                                    <div class="no-image"><i class="fas fa-image"></i></div>
+                                    {% endif %}
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">{{ producto.nombre }}</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">${{ producto.precio|floatformat:0 }}</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <div class="carousel-dots" id="dots-{{ seccion_data.seccion.categoria.id }}">
+                    {% for i in "123" %}
+                    <span class="dot {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-{{ seccion_data.seccion.categoria.id }}', {{ forloop.counter }})"></span>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
+
     </div>
 </div>
 {% endfor %}
@@ -250,6 +268,112 @@
 <style>
 .category-section {
     margin-bottom: 3rem;
+}
+
+/* Split Banner Layout */
+.split-banner-section {
+    margin-bottom: 3rem;
+}
+
+.split-banner-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1rem;
+    align-items: stretch;
+    min-height: 380px;
+}
+
+.split-banner-left {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #2c3e50, #4a6fa5);
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.split-banner-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.split-banner-overlay {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+}
+
+.split-banner-titulo {
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.split-banner-subtitulo {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.82rem;
+    margin: 0 0 0.8rem;
+    line-height: 1.4;
+}
+
+.split-banner-btn {
+    display: inline-block;
+    background: #fff;
+    color: #222;
+    padding: 0.4rem 1.1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.split-banner-btn:hover {
+    background: var(--color-primario, #495057);
+    color: #fff;
+}
+
+.split-banner-right {
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-item-split {
+    flex: 0 0 calc(25% - 0.75rem);
+    min-width: 160px;
+    max-width: 200px;
+}
+
+@media (max-width: 992px) {
+    .split-banner-grid {
+        grid-template-columns: 220px 1fr;
+    }
+    .carousel-item-split {
+        flex: 0 0 calc(33.33% - 0.67rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .split-banner-grid {
+        grid-template-columns: 1fr;
+    }
+    .split-banner-left {
+        min-height: 220px;
+    }
+    .carousel-item-split {
+        flex: 0 0 calc(50% - 0.5rem);
+    }
 }
 
 .category-title {
@@ -528,28 +652,17 @@ function moveCarousel(carouselId, direction) {
     const container = document.getElementById(carouselId);
     const track = container.querySelector('.carousel-track');
     const items = track.querySelectorAll('.carousel-item-custom');
-    const itemWidth = items[0].offsetWidth + 16; // width + gap
+    const itemWidth = items[0].offsetWidth + 16;
     
-    // Para recién llegados, mostrar 4 productos por página
-    const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : Math.floor(container.offsetWidth / itemWidth);
+    const isSplit = items[0].classList.contains('carousel-item-split');
+    const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : (isSplit ? 4 : Math.floor(container.offsetWidth / itemWidth));
     const maxPosition = Math.max(0, Math.ceil(items.length / itemsPerPage) - 1);
     
-    if (!carouselPositions[carouselId]) {
-        carouselPositions[carouselId] = 0;
-    }
+    if (!carouselPositions[carouselId]) carouselPositions[carouselId] = 0;
     
-    carouselPositions[carouselId] += direction;
+    carouselPositions[carouselId] = Math.min(Math.max(carouselPositions[carouselId] + direction, 0), maxPosition);
     
-    if (carouselPositions[carouselId] < 0) {
-        carouselPositions[carouselId] = 0;
-    }
-    if (carouselPositions[carouselId] > maxPosition) {
-        carouselPositions[carouselId] = maxPosition;
-    }
-    
-    const translateX = -carouselPositions[carouselId] * itemWidth * itemsPerPage;
-    track.style.transform = `translateX(${translateX}px)`;
-    
+    track.style.transform = `translateX(${-carouselPositions[carouselId] * itemWidth * itemsPerPage}px)`;
     updateDots(carouselId);
 }
 

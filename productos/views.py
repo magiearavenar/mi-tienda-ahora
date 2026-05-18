@@ -29,7 +29,7 @@ def home(request):
     if instagram_config:
         instagram_posts = InstagramService().get_user_media(instagram_config.cantidad_posts)
 
-    secciones_categorias = SeccionCategoria.objects.filter(activo=True)[:3]
+    secciones_categorias = SeccionCategoria.objects.filter(activo=True)
     secciones_con_productos = []
     for seccion in secciones_categorias:
         productos_seccion = Producto.objects.filter(categoria=seccion.categoria, activo=True)[:12]

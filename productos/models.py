@@ -180,10 +180,15 @@ class SeccionCategoria(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, null=True, blank=True)
     orden = models.IntegerField(default=1, help_text='Orden de aparición (1, 2, 3)')
     activo = models.BooleanField(default=True)
-    
+    # Split banner
+    banner_imagen = models.ImageField(upload_to='banners/', blank=True, null=True, max_length=500, help_text='Imagen del banner izquierdo')
+    banner_titulo = models.CharField(max_length=100, blank=True, default='', help_text='Título del banner (ej: Recién llegados)')
+    banner_subtitulo = models.CharField(max_length=200, blank=True, default='', help_text='Subtítulo o descripción breve')
+    banner_boton_texto = models.CharField(max_length=50, blank=True, default='Ver todo', help_text='Texto del botón CTA')
+
     def __str__(self):
-        return f"Sección {self.orden} - {self.categoria.nombre}"
-    
+        return f"Sección {self.orden} - {self.categoria.nombre if self.categoria else 'Sin categoría'}"
+
     class Meta:
         ordering = ['orden']
         verbose_name = "Sección de Categoría"
