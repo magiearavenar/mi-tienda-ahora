@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.utils.html import format_html
 from PIL import Image
 import io
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento, ImagenInterior
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento, ImagenInterior, Resena
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
 
@@ -473,6 +473,20 @@ class DescuentoAdmin(admin.ModelAdmin):
         }),
     )
     readonly_fields = ['usos_actuales']
+
+
+@admin.register(Resena)
+class ResenaAdmin(admin.ModelAdmin):
+    list_display = ['producto', 'nombre', 'puntuacion', 'aprobada', 'fecha']
+    list_filter = ['aprobada', 'puntuacion']
+    list_editable = ['aprobada']
+    search_fields = ['nombre', 'comentario', 'producto__nombre']
+    actions = ['aprobar_resenas']
+
+    def aprobar_resenas(self, request, queryset):
+        queryset.update(aprobada=True)
+        self.message_user(request, f'{queryset.count()} reseña(s) aprobada(s).')
+    aprobar_resenas.short_description = '✅ Aprobar reseñas seleccionadas'
 
 
 @admin.register(InstagramConfig)

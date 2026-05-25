@@ -12,7 +12,7 @@ from django.db import models
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena
 from .services import FlowService, MercadoPagoService
 from .instagram_service import InstagramService
 
@@ -64,6 +64,8 @@ def detalle_producto(request, producto_id):
     categorias = Categoria.objects.filter(visible_navegacion=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     atributos = producto.atributos.prefetch_related('valores').all()
+    resenas = producto.resenas.filter(aprobada=True)
+    promedio_resenas = resenas.aggregate(avg=models.Avg('puntuacion'))['avg']
     # Serializar variantes para JS
     variantes_json = []
     for atributo in atributos:
@@ -82,10 +84,30 @@ def detalle_producto(request, producto_id):
         'config': config,
         'atributos': atributos,
         'variantes_json': variantes_json,
+        'resenas': resenas,
+        'promedio_resenas': promedio_resenas,
+        'total_resenas': resenas.count(),
     })
 
 def carrito(request):
     return render(request, 'carrito.html')
+
+
+@require_POST
+def crear_resena(request, producto_id):
+    producto = get_object_or_404(Producto, id=producto_id, activo=True)
+    nombre = request.POST.get('nombre', '').strip()
+    puntuacion = int(request.POST.get('puntuacion', 5))
+    comentario = request.POST.get('comentario', '').strip()
+    if nombre and comentario and 1 <= puntuacion <= 5:
+        Resena.objects.create(
+            producto=producto, nombre=nombre,
+            puntuacion=puntuacion, comentario=comentario
+        )
+        messages.success(request, 'Tu reseña fue enviada y será publicada tras revisión.')
+    else:
+        messages.error(request, 'Por favor completa todos los campos.')
+    return redirect('detalle_producto', producto_id=producto_id)
 
 def registro(request):
     if request.method == 'POST':

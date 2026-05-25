@@ -168,6 +168,56 @@
 
 <div class="row mt-5">
     <div class="col-12">
+        <h4>Reseñas de clientes</h4>
+        {% if promedio_resenas %}
+        <p class="mb-3">
+            <span class="text-warning">{% for i in "12345" %}{% if forloop.counter <= promedio_resenas|floatformat:0|add:"0" %}★{% else %}☆{% endif %}{% endfor %}</span>
+            <strong>{{ promedio_resenas|floatformat:1 }}</strong> / 5 ({{ total_resenas }} reseña{{ total_resenas|pluralize:"s" }})
+        </p>
+        {% endif %}
+        {% for resena in resenas %}
+        <div class="border rounded p-3 mb-2">
+            <strong>{{ resena.nombre }}</strong>
+            <span class="text-warning ms-2">{% for i in "12345" %}{% if forloop.counter <= resena.puntuacion %}★{% else %}☆{% endif %}{% endfor %}</span>
+            <small class="text-muted ms-2">{{ resena.fecha|date:"d/m/Y" }}</small>
+            <p class="mb-0 mt-1">{{ resena.comentario }}</p>
+        </div>
+        {% empty %}
+        <p class="text-muted">Aún no hay reseñas. ¡Sé el primero!</p>
+        {% endfor %}
+
+        <div class="mt-4">
+            <h5>Deja tu reseña</h5>
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+            <form method="post" action="{% url 'crear_resena' producto.id %}">
+                {% csrf_token %}
+                <div class="mb-2">
+                    <input type="text" name="nombre" class="form-control" placeholder="Tu nombre" required>
+                </div>
+                <div class="mb-2">
+                    <select name="puntuacion" class="form-select">
+                        <option value="5">★★★★★ (5)</option>
+                        <option value="4">★★★★☆ (4)</option>
+                        <option value="3">★★★☆☆ (3)</option>
+                        <option value="2">★★☆☆☆ (2)</option>
+                        <option value="1">★☆☆☆☆ (1)</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <textarea name="comentario" class="form-control" rows="3" placeholder="Tu comentario..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Enviar reseña</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-12">
         <h4>Información del Producto</h4>
         <div class="table-responsive">
             <table class="table table-bordered">
@@ -296,6 +346,18 @@ document.addEventListener('DOMContentLoaded', function() {
   "description": "{{ producto.descripcion|truncatewords:50|escapejs }}",
   "brand": { "@type": "Brand", "name": "Mundo Magie" },
   "image": "{% if producto.imagenes.all %}{{ producto.imagenes.first.imagen.url }}{% elif producto.imagen %}{{ producto.imagen.url }}{% else %}https://mundomagie.cl/static/img/logo.png{% endif %}",
+  {% if promedio_resenas %}"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ promedio_resenas|floatformat:1 }}",
+    "reviewCount": "{{ total_resenas }}"
+  },{% endif %}
+  {% if resenas %}"review": [{% for resena in resenas %}{
+    "@type": "Review",
+    "author": { "@type": "Person", "name": "{{ resena.nombre|escapejs }}" },
+    "datePublished": "{{ resena.fecha|date:'Y-m-d' }}",
+    "reviewBody": "{{ resena.comentario|escapejs }}",
+    "reviewRating": { "@type": "Rating", "ratingValue": "{{ resena.puntuacion }}" }
+  }{% if not forloop.last %},{% endif %}{% endfor %}],{% endif %}
   "offers": {
     "@type": "Offer",
     "priceCurrency": "CLP",
