@@ -295,14 +295,33 @@ document.addEventListener('DOMContentLoaded', function() {
   "name": "{{ producto.nombre }}",
   "description": "{{ producto.descripcion|truncatewords:50|escapejs }}",
   "brand": { "@type": "Brand", "name": "Mundo Magie" },
-  {% if producto.imagen_principal %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ producto.imagen_principal.url }}",{% endif %}
+  "image": "{% if producto.imagenes.all %}{{ producto.imagenes.first.imagen.url }}{% elif producto.imagen %}{{ producto.imagen.url }}{% else %}https://mundomagie.cl/static/img/logo.png{% endif %}",
   "offers": {
     "@type": "Offer",
     "priceCurrency": "CLP",
     "price": "{{ producto.precio|floatformat:0 }}",
     "availability": "{% if producto.stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
     "url": "{{ request.build_absolute_uri }}",
-    "seller": { "@type": "Organization", "name": "Mundo Magie" }
+    "seller": { "@type": "Organization", "name": "Mundo Magie" },
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": "CL"
+      },
+      "deliveryTime": {
+        "@type": "ShippingDeliveryTime",
+        "handlingTime": { "@type": "QuantitativeValue", "minValue": 1, "maxValue": 3, "unitCode": "DAY" },
+        "transitTime": { "@type": "QuantitativeValue", "minValue": 2, "maxValue": 5, "unitCode": "DAY" }
+      }
+    },
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": "CL",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 30,
+      "returnMethod": "https://schema.org/ReturnByMail"
+    }
   }
 }
 </script>
