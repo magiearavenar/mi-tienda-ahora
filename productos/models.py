@@ -48,6 +48,13 @@ class Producto(models.Model):
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
+    # Campos Google Shopping
+    marca = models.CharField(max_length=100, default='Mundo Magie', help_text='Marca del producto')
+    mpn = models.CharField(max_length=100, blank=True, help_text='Número de parte del fabricante (único por producto)')
+    google_category = models.CharField(max_length=300, blank=True, help_text='Categoría de Google (ej: Hogar > Decoración)')
+    condicion = models.CharField(max_length=20, choices=[('new', 'Nuevo'), ('refurbished', 'Reacondicionado'), ('used', 'Usado')], default='new')
+    sincronizar_google = models.BooleanField(default=True, help_text='¿Sincronizar con Google Shopping?')
+    
     # Campos de personalización
     permite_personalizacion = models.BooleanField(default=False, help_text='¿Este producto permite personalización?')
     texto_personalizacion = models.CharField(max_length=200, blank=True, help_text='Ej: ¿Quieres ponerle nombre personalizado?')

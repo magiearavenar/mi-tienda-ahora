@@ -16,7 +16,8 @@ Disallow: /admin/
 Disallow: /carrito/
 Disallow: /checkout/
 
-Sitemap: https://www.mundomagie.cl/sitemap.xml"""
+Sitemap: https://www.mundomagie.cl/sitemap.xml
+Sitemap: https://www.mundomagie.cl/feed/google-shopping.xml"""
     return HttpResponse(content, content_type="text/plain")
 
 def sitemap_xml(request):
@@ -70,6 +71,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('robots.txt', robots_txt),
     path('sitemap.xml', sitemap_xml),
+    path('', include('google_merchant.urls')),
     path('', include('productos.urls')),
 ]
 

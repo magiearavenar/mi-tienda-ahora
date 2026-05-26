@@ -187,6 +187,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap4',
     'productos',
+    'google_merchant',
 ]
 
 MIDDLEWARE = [
@@ -318,6 +319,10 @@ MERCADOPAGO_ACCESS_TOKEN = os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')
 MERCADOPAGO_SANDBOX = os.environ.get('MERCADOPAGO_SANDBOX', 'True').lower() == 'true'
 
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
+
+# Google Merchant Center
+GOOGLE_MERCHANT_ID = os.environ.get('GOOGLE_MERCHANT_ID', '647635808')
+GOOGLE_MERCHANT_CREDENTIALS = os.environ.get('GOOGLE_MERCHANT_CREDENTIALS', '')  # Ruta al JSON de credenciales
 
 # Instagram API
 INSTAGRAM_ACCESS_TOKEN = os.environ.get('INSTAGRAM_ACCESS_TOKEN', '')
