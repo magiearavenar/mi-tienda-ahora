@@ -138,6 +138,11 @@ class ProductoAdmin(admin.ModelAdmin):
         ('Personalización', {
             'fields': ('permite_personalizacion', 'texto_personalizacion', 'placeholder_personalizacion'),
         }),
+        ('Google Shopping', {
+            'fields': ('sincronizar_google', 'marca', 'mpn', 'condicion', 'google_category'),
+            'classes': ('collapse',),
+            'description': 'Configuración para Google Shopping. La categoría de Google mejora el posicionamiento.'
+        }),
     )
 
     def mostrar_categoria(self, obj):

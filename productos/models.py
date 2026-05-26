@@ -49,9 +49,30 @@ class Producto(models.Model):
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     
     # Campos Google Shopping
+    GOOGLE_CATEGORIES = [
+        ('', '-- Seleccionar --'),
+        ('Arts & Entertainment > Party & Celebration > Party Supplies', 'Artículos de Fiesta'),
+        ('Arts & Entertainment > Party & Celebration > Party Favors', 'Sorpresas / Cotillón'),
+        ('Arts & Entertainment > Party & Celebration > Gift Wrapping', 'Envoltorios de Regalo'),
+        ('Arts & Entertainment > Party & Celebration > Party Decorations', 'Decoración de Fiestas'),
+        ('Arts & Entertainment > Party & Celebration > Banners', 'Banners y Guirnaldas'),
+        ('Arts & Entertainment > Party & Celebration > Invitations', 'Invitaciones'),
+        ('Arts & Entertainment > Party & Celebration > Party Hats', 'Gorros de Fiesta'),
+        ('Home & Garden > Decor', 'Decoración del Hogar'),
+        ('Home & Garden > Decor > Candles', 'Velas Decorativas'),
+        ('Food, Beverages & Tobacco > Food Items > Candy & Chocolate', 'Dulces y Chocolates'),
+        ('Toys & Games', 'Juguetes'),
+        ('Toys & Games > Puzzles', 'Puzzles'),
+        ('Toys & Games > Stuffed Animals', 'Peluches'),
+        ('Baby & Toddler > Baby Shower', 'Baby Shower'),
+        ('Office Supplies > Paper Products > Stationery', 'Papelería'),
+        ('Office Supplies > Paper Products > Gift Cards', 'Tarjetas de Regalo'),
+        ('Apparel & Accessories > Costumes & Accessories', 'Disfraces y Accesorios'),
+        ('Arts & Entertainment > Crafts > Craft Supplies', 'Manualidades'),
+    ]
     marca = models.CharField(max_length=100, default='Mundo Magie', help_text='Marca del producto')
     mpn = models.CharField(max_length=100, blank=True, help_text='Número de parte del fabricante (único por producto)')
-    google_category = models.CharField(max_length=300, blank=True, help_text='Categoría de Google (ej: Hogar > Decoración)')
+    google_category = models.CharField(max_length=300, blank=True, choices=GOOGLE_CATEGORIES, help_text='Categoría de Google Shopping')
     condicion = models.CharField(max_length=20, choices=[('new', 'Nuevo'), ('refurbished', 'Reacondicionado'), ('used', 'Usado')], default='new')
     sincronizar_google = models.BooleanField(default=True, help_text='¿Sincronizar con Google Shopping?')
     
