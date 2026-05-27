@@ -101,10 +101,7 @@
                                 data-stock="{{ valor.stock }}"
                                 {% if valor.imagen_producto %}data-imagen="{{ valor.imagen_producto.imagen.url }}"{% endif %}
                                 {% if valor.stock == 0 %}disabled{% endif %}>
-                            {{ valor.valor }}
-                            {% if valor.precio_extra > 0 %}(+${{ valor.precio_extra|floatformat:0 }}){% endif %}
-                            {% if valor.precio_extra < 0 %}(-${{ valor.precio_extra|floatformat:0 }}){% endif %}
-                            {% if valor.stock == 0 %} — Sin stock{% endif %}
+                            {{ valor.valor }}{% if valor.stock == 0 %} — Sin stock{% endif %}
                         </option>
                         {% endif %}
                         {% endfor %}
@@ -246,6 +243,22 @@
 const precioBase = {{ producto.precio }};
 const variantesData = {{ variantes_json|safe }};
 
+// Al cargar, mostrar precio final en cada opción del dropdown
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.variante-select').forEach(select => {
+        for (let i = 1; i < select.options.length; i++) {
+            const opt = select.options[i];
+            const extra = parseFloat(opt.dataset.precioExtra || 0);
+            const precioFinal = precioBase + extra;
+            const textoOriginal = opt.text.split(' — $')[0].split(' — Sin')[0].trim();
+            const sinStock = opt.disabled ? ' — Sin stock' : '';
+            opt.text = `${textoOriginal} — $${Math.round(precioFinal).toLocaleString('es-CL')}${sinStock}`;
+        }
+    });
+    const carousel = document.querySelector('#productCarousel');
+    if (carousel) new bootstrap.Carousel(carousel, { interval: false });
+});
+
 function actualizarVariante() {
     let precioExtra = 0;
     let stockMinimo = null;
@@ -274,9 +287,7 @@ function actualizarVariante() {
         stockEl.textContent = '';
     }
 
-    // Cambiar imagen principal si la variante tiene imagen
     if (imagenVariante) {
-        // Buscar el slide que tenga esa imagen y saltar a él
         const items = document.querySelectorAll('#productCarousel .carousel-item');
         let slideIndex = -1;
         items.forEach((item, i) => {
@@ -286,7 +297,6 @@ function actualizarVariante() {
         if (slideIndex >= 0) {
             goToSlide(slideIndex);
         } else {
-            // Si no está en el carousel, cambiar la imagen activa
             const activeImg = document.querySelector('#productCarousel .carousel-item.active img');
             if (activeImg) activeImg.src = imagenVariante;
         }
@@ -301,7 +311,8 @@ function actualizarPrecioOpcion() {
 
 function agregarAlCarritoConOpcion() {
     const cantidad = parseInt(document.getElementById('cantidad').value);
-    const precioTexto = document.getElementById('precio-actual').textContent.replace('$', '').replace(/\./g, '').replace(',', '.');
+    const precioEl = document.getElementById('precio-actual');
+    const precioTexto = precioEl.textContent.replace('Desde', '').replace('$', '').replace(/\./g, '').replace(',', '.').trim();
     const precioFinal = parseFloat(precioTexto);
     let nombreProducto = '{{ producto.nombre }}';
 
@@ -309,7 +320,7 @@ function agregarAlCarritoConOpcion() {
     const variantes = [];
     document.querySelectorAll('.variante-select').forEach(select => {
         const opt = select.options[select.selectedIndex];
-        if (opt && opt.value) variantes.push(`${select.dataset.atributo}: ${opt.text.split('(')[0].trim()}`);
+        if (opt && opt.value) variantes.push(`${select.dataset.atributo}: ${opt.text.split(' \u2014 ')[0].trim()}`);
     });
     if (variantes.length) nombreProducto += ` (${variantes.join(', ')})`;
 
@@ -331,11 +342,6 @@ function goToSlide(slideIndex) {
         bsCarousel.to(slideIndex);
     }
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    const carousel = document.querySelector('#productCarousel');
-    if (carousel) new bootstrap.Carousel(carousel, { interval: false });
-});
 </script>
 
 <script type="application/ld+json">
