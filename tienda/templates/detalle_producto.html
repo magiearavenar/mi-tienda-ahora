@@ -97,7 +97,7 @@
                         {% for valor in atributo.valores.all %}
                         {% if valor.activo %}
                         <option value="{{ valor.id }}"
-                                data-precio="{% if valor.precio %}{{ valor.precio }}{% else %}{{ producto.precio }}{% endif %}"
+                                data-precio="{{ valor.precio }}"
                                 data-stock="{{ valor.stock }}"
                                 {% if valor.imagen_producto %}data-imagen="{{ valor.imagen_producto.imagen.url }}"{% endif %}
                                 {% if valor.stock == 0 %}disabled{% endif %}>
@@ -248,7 +248,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.variante-select').forEach(select => {
         for (let i = 1; i < select.options.length; i++) {
             const opt = select.options[i];
-            const precio = parseFloat(opt.dataset.precio || precioBase);
+            const precio = parseFloat(opt.dataset.precio) || precioBase;
+            opt.dataset.precioReal = precio;
             const textoOriginal = opt.text.split(' \u2014 ')[0].trim();
             const sinStock = opt.disabled ? ' \u2014 Sin stock' : '';
             opt.text = textoOriginal + ' \u2014 $' + Math.round(precio).toLocaleString('es-CL') + sinStock;
@@ -267,8 +268,8 @@ function actualizarVariante() {
     document.querySelectorAll('.variante-select').forEach(select => {
         const opt = select.options[select.selectedIndex];
         if (!opt || !opt.value) { seleccionCompleta = false; return; }
-        const precio = parseFloat(opt.dataset.precio || precioBase);
-        if (precio > 0) precioFinal = precio;
+        const precio = parseFloat(opt.dataset.precioReal || opt.dataset.precio) || precioBase;
+        precioFinal = precio;
         const stock = parseInt(opt.dataset.stock);
         if (stockMinimo === null || stock < stockMinimo) stockMinimo = stock;
         if (opt.dataset.imagen) imagenVariante = opt.dataset.imagen;
