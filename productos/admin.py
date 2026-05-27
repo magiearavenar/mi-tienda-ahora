@@ -133,7 +133,7 @@ class ProductoAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Información Básica', {
-            'fields': ('nombre', 'descripcion', 'precio', 'categoria', 'tags_adicionales', 'stock', 'activo')
+            'fields': ('nombre', 'descripcion', 'precio', 'imagen', 'imagen_url', 'categoria', 'tags_adicionales', 'stock', 'activo')
         }),
         ('Personalización', {
             'fields': ('permite_personalizacion', 'texto_personalizacion', 'placeholder_personalizacion'),
