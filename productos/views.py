@@ -83,7 +83,7 @@ def detalle_producto(request, producto_id):
         'categorias': categorias,
         'config': config,
         'atributos': atributos,
-        'variantes_json': variantes_json,
+        'variantes_json': json.dumps(variantes_json),
         'resenas': resenas,
         'promedio_resenas': promedio_resenas,
         'total_resenas': resenas.count(),

@@ -250,9 +250,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const opt = select.options[i];
             const extra = parseFloat(opt.dataset.precioExtra || 0);
             const precioFinal = precioBase + extra;
-            const textoOriginal = opt.text.split(' — $')[0].split(' — Sin')[0].trim();
-            const sinStock = opt.disabled ? ' — Sin stock' : '';
-            opt.text = `${textoOriginal} — $${Math.round(precioFinal).toLocaleString('es-CL')}${sinStock}`;
+            const textoOriginal = opt.text.split(' \u2014 ')[0].split(' \u2014 Sin')[0].trim();
+            const sinStock = opt.disabled ? ' \u2014 Sin stock' : '';
+            opt.text = textoOriginal + ' \u2014 $' + Math.round(precioFinal).toLocaleString('es-CL') + sinStock;
         }
     });
     const carousel = document.querySelector('#productCarousel');
