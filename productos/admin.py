@@ -90,7 +90,7 @@ class ImagenInteriorInline(admin.TabularInline):
 class VarianteValorInline(admin.TabularInline):
     model = VarianteValor
     extra = 1
-    fields = ['valor', 'precio_extra', 'stock', 'activo', 'orden']
+    fields = ['valor', 'precio', 'stock', 'activo', 'orden']
 
 
 @admin.register(VarianteAtributo)
@@ -210,7 +210,7 @@ class ProductoAdmin(admin.ModelAdmin):
                         valor_obj = atributo.valores.filter(valor=val_nombre).first()
                         if valor_obj:
                             valor_obj.stock = int(datos.get('stock', 0))
-                            valor_obj.precio_extra = float(datos.get('precio_extra', 0))
+                            valor_obj.precio = float(datos.get('precio', 0))
                             imagen_id = datos.get('imagen_id')
                             if imagen_id:
                                 try:

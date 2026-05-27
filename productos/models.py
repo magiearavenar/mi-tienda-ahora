@@ -119,13 +119,19 @@ class Producto(models.Model):
             precios.append(op.precio)
         for attr in self.atributos.all():
             for val in attr.valores.filter(activo=True):
-                precios.append(self.precio + val.precio_extra)
+                if val.precio > 0:
+                    precios.append(val.precio)
         return min(precios)
 
     @property
     def tiene_rango_precios(self):
         """True si hay variantes/opciones con precios distintos al base."""
-        return self.precio_desde != self.precio or self.opciones.exists() or self.atributos.filter(valores__precio_extra__gt=0).exists()
+        for attr in self.atributos.all():
+            if attr.valores.filter(activo=True, precio__gt=0).exists():
+                return True
+        if self.opciones.exists():
+            return True
+        return False
     
     class Meta:
         ordering = ['-fecha_creacion']
@@ -404,7 +410,7 @@ class VarianteAtributo(models.Model):
 class VarianteValor(models.Model):
     atributo = models.ForeignKey(VarianteAtributo, on_delete=models.CASCADE, related_name='valores')
     valor = models.CharField(max_length=100)
-    precio_extra = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    precio = models.DecimalField(max_digits=10, decimal_places=2, default=0, help_text='Precio real de esta variante (ej: 15000, 18000). Si es 0, usa el precio base del producto.')
     stock = models.IntegerField(default=0)
     imagen_producto = models.ForeignKey(
         'ImagenProducto', on_delete=models.SET_NULL, null=True, blank=True,
@@ -413,6 +419,12 @@ class VarianteValor(models.Model):
     )
     activo = models.BooleanField(default=True)
     orden = models.IntegerField(default=0)
+
+    def get_precio(self):
+        """Retorna el precio real: si tiene precio propio lo usa, si no usa el del producto."""
+        if self.precio > 0:
+            return self.precio
+        return self.atributo.producto.precio
 
     def __str__(self):
         return f'{self.atributo.nombre}: {self.valor}'

@@ -93,11 +93,11 @@
                     <label class="form-label fw-semibold">{{ atributo.nombre }}</label>
                     <select class="form-select variante-select" data-atributo="{{ atributo.nombre }}"
                             onchange="actualizarVariante()">
-                        <option value="" data-precio-extra="0" data-stock="-1">Selecciona {{ atributo.nombre }}</option>
+                        <option value="" data-precio="0" data-stock="-1">Selecciona {{ atributo.nombre }}</option>
                         {% for valor in atributo.valores.all %}
                         {% if valor.activo %}
                         <option value="{{ valor.id }}"
-                                data-precio-extra="{{ valor.precio_extra }}"
+                                data-precio="{% if valor.precio %}{{ valor.precio }}{% else %}{{ producto.precio }}{% endif %}"
                                 data-stock="{{ valor.stock }}"
                                 {% if valor.imagen_producto %}data-imagen="{{ valor.imagen_producto.imagen.url }}"{% endif %}
                                 {% if valor.stock == 0 %}disabled{% endif %}>
@@ -248,11 +248,10 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.variante-select').forEach(select => {
         for (let i = 1; i < select.options.length; i++) {
             const opt = select.options[i];
-            const extra = parseFloat(opt.dataset.precioExtra || 0);
-            const precioFinal = precioBase + extra;
-            const textoOriginal = opt.text.split(' \u2014 ')[0].split(' \u2014 Sin')[0].trim();
+            const precio = parseFloat(opt.dataset.precio || precioBase);
+            const textoOriginal = opt.text.split(' \u2014 ')[0].trim();
             const sinStock = opt.disabled ? ' \u2014 Sin stock' : '';
-            opt.text = textoOriginal + ' \u2014 $' + Math.round(precioFinal).toLocaleString('es-CL') + sinStock;
+            opt.text = textoOriginal + ' \u2014 $' + Math.round(precio).toLocaleString('es-CL') + sinStock;
         }
     });
     const carousel = document.querySelector('#productCarousel');
@@ -260,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function actualizarVariante() {
-    let precioExtra = 0;
+    let precioFinal = precioBase;
     let stockMinimo = null;
     let seleccionCompleta = true;
     let imagenVariante = null;
@@ -268,18 +267,18 @@ function actualizarVariante() {
     document.querySelectorAll('.variante-select').forEach(select => {
         const opt = select.options[select.selectedIndex];
         if (!opt || !opt.value) { seleccionCompleta = false; return; }
-        precioExtra += parseFloat(opt.dataset.precioExtra || 0);
+        const precio = parseFloat(opt.dataset.precio || precioBase);
+        if (precio > 0) precioFinal = precio;
         const stock = parseInt(opt.dataset.stock);
         if (stockMinimo === null || stock < stockMinimo) stockMinimo = stock;
         if (opt.dataset.imagen) imagenVariante = opt.dataset.imagen;
     });
 
-    const precioFinal = precioBase + precioExtra;
-    document.getElementById('precio-actual').innerHTML = `$${Math.round(precioFinal).toLocaleString('es-CL')}`;
+    document.getElementById('precio-actual').innerHTML = '$' + Math.round(precioFinal).toLocaleString('es-CL');
 
     const stockEl = document.getElementById('stock-variante');
     if (seleccionCompleta && stockMinimo !== null) {
-        stockEl.textContent = stockMinimo > 0 ? `Stock disponible: ${stockMinimo}` : 'Sin stock para esta combinación';
+        stockEl.textContent = stockMinimo > 0 ? 'Stock disponible: ' + stockMinimo : 'Sin stock para esta combinaci\u00f3n';
         stockEl.style.color = stockMinimo > 0 ? '#28a745' : '#dc3545';
         const input = document.getElementById('cantidad');
         if (input) input.max = stockMinimo;

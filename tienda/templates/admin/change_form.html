@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch('/variantes-datos/' + productoId + '/')
             .then(r => r.json())
             .then(data => {
-                // data = { 'NombreAtributo': { 'valor': { stock, precio_extra, imagen_id, imagen_url } } }
+                // data = { 'NombreAtributo': { 'valor': { stock, precio, imagen_id, imagen_url } } }
                 document.querySelectorAll('input[name$="-valores_texto"]').forEach(inputValores => {
                     const row = inputValores.closest('tr');
                     if (!row) return;
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const tabla = document.createElement('table');
             tabla.className = 'variante-valores-tabla';
-            tabla.innerHTML = '<thead><tr><th>Valor</th><th>Stock</th><th>Precio extra ($)</th><th>Imagen del producto</th></tr></thead><tbody></tbody>';
+            tabla.innerHTML = '<thead><tr><th>Valor</th><th>Stock</th><th>Precio ($)</th><th>Imagen del producto</th></tr></thead><tbody></tbody>';
 
             const tbody = tabla.querySelector('tbody');
             const guardados = JSON.parse(inputValores.dataset.guardados || '{}');
@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tr.innerHTML =
                     '<td><strong>' + val + '</strong></td>' +
                     '<td><input type="number" min="0" value="' + (g.stock || 0) + '" data-val="' + val + '" data-tipo="stock" onchange="guardarVarianteExtra(this)"></td>' +
-                    '<td><input type="number" min="0" value="' + (g.precio_extra || 0) + '" data-val="' + val + '" data-tipo="precio_extra" onchange="guardarVarianteExtra(this)"></td>' +
+                    '<td><input type="number" min="0" value="' + (g.precio || 0) + '" data-val="' + val + '" data-tipo="precio" onchange="guardarVarianteExtra(this)"></td>' +
                     '<td><div class="img-select-wrap">' +
                         '<div class="img-select-preview" id="' + previewId + '">' +
                             (g.imagen_url ? '<img src="' + g.imagen_url + '">' : '<span style="font-size:1.1rem;">🖼️</span>') +

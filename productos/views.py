@@ -74,7 +74,7 @@ def detalle_producto(request, producto_id):
             valores.append({
                 'id': v.id,
                 'valor': v.valor,
-                'precio_extra': float(v.precio_extra),
+                'precio': float(v.precio) if v.precio > 0 else float(producto.precio),
                 'stock': v.stock,
             })
         variantes_json.append({'nombre': atributo.nombre, 'valores': valores})
@@ -522,7 +522,7 @@ def variantes_datos(request, producto_id):
             for v in atributo.valores.all():
                 valores_data[v.valor] = {
                     'stock': v.stock,
-                    'precio_extra': float(v.precio_extra),
+                    'precio': float(v.precio),
                     'imagen_id': v.imagen_producto_id or '',
                     'imagen_url': v.imagen_producto.imagen.url if v.imagen_producto and v.imagen_producto.imagen else '',
                 }
