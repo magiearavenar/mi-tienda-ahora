@@ -75,7 +75,7 @@
             </div>
             
             <div class="mb-4">
-                <h3 class="text-primary" id="precio-actual">${{ producto.precio|floatformat:0 }}</h3>
+                <h3 class="text-primary" id="precio-actual">{% if producto.tiene_rango_precios %}<small style="font-weight:400;font-size:1rem;">Desde</small> {% endif %}${{ producto.precio_desde|floatformat:0 }}</h3>
             </div>
 
             {% if producto.imagenes_interior.all %}
@@ -262,7 +262,7 @@ function actualizarVariante() {
     });
 
     const precioFinal = precioBase + precioExtra;
-    document.getElementById('precio-actual').textContent = `$${Math.round(precioFinal).toLocaleString('es-CL')}`;
+    document.getElementById('precio-actual').innerHTML = `$${Math.round(precioFinal).toLocaleString('es-CL')}`;
 
     const stockEl = document.getElementById('stock-variante');
     if (seleccionCompleta && stockMinimo !== null) {
@@ -296,7 +296,7 @@ function actualizarVariante() {
 function actualizarPrecioOpcion() {
     const select = document.getElementById('opcion');
     const precio = parseFloat(select.value);
-    document.getElementById('precio-actual').textContent = `$${Math.round(precio).toLocaleString('es-CL')}`;
+    document.getElementById('precio-actual').innerHTML = `$${Math.round(precio).toLocaleString('es-CL')}`;
 }
 
 function agregarAlCarritoConOpcion() {

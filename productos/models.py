@@ -111,6 +111,22 @@ class Producto(models.Model):
         
         return imagenes
     
+    @property
+    def precio_desde(self):
+        """Retorna el precio mínimo considerando variantes y opciones."""
+        precios = [self.precio]
+        for op in self.opciones.all():
+            precios.append(op.precio)
+        for attr in self.atributos.all():
+            for val in attr.valores.filter(activo=True):
+                precios.append(self.precio + val.precio_extra)
+        return min(precios)
+
+    @property
+    def tiene_rango_precios(self):
+        """True si hay variantes/opciones con precios distintos al base."""
+        return self.precio_desde != self.precio or self.opciones.exists() or self.atributos.filter(valores__precio_extra__gt=0).exists()
+    
     class Meta:
         ordering = ['-fecha_creacion']
 
