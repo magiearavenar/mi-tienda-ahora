@@ -66,6 +66,17 @@ def detalle_producto(request, producto_id):
     atributos = producto.atributos.prefetch_related('valores').all()
     resenas = producto.resenas.filter(aprobada=True)
     promedio_resenas = resenas.aggregate(avg=models.Avg('puntuacion'))['avg']
+
+    # Precio minimo para mostrar "Desde $X"
+    precio_minimo = float(producto.precio)
+    tiene_variantes = False
+    for atributo in atributos:
+        for v in atributo.valores.filter(activo=True):
+            tiene_variantes = True
+            precio_variante = float(producto.precio) + float(v.precio_extra)
+            if precio_variante < precio_minimo:
+                precio_minimo = precio_variante
+
     # Serializar variantes para JS
     variantes_json = []
     for atributo in atributos:
@@ -74,16 +85,30 @@ def detalle_producto(request, producto_id):
             valores.append({
                 'id': v.id,
                 'valor': v.valor,
-                'precio': float(v.precio) if v.precio > 0 else float(producto.precio),
+                'precio_extra': float(v.precio_extra),
                 'stock': v.stock,
+                'imagen': v.imagen_producto.imagen.url if v.imagen_producto and v.imagen_producto.imagen else None,
             })
         variantes_json.append({'nombre': atributo.nombre, 'valores': valores})
+
+    # Opciones de precio
+    opciones_json = []
+    for op in producto.opciones.all():
+        opciones_json.append({
+            'id': op.id,
+            'nombre': op.nombre,
+            'precio': float(op.precio),
+        })
+
     return render(request, 'detalle_producto.html', {
         'producto': producto,
         'categorias': categorias,
         'config': config,
         'atributos': atributos,
         'variantes_json': json.dumps(variantes_json),
+        'opciones_json': json.dumps(opciones_json),
+        'precio_minimo': precio_minimo,
+        'tiene_variantes': tiene_variantes,
         'resenas': resenas,
         'promedio_resenas': promedio_resenas,
         'total_resenas': resenas.count(),
