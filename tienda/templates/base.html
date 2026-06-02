@@ -223,6 +223,12 @@
             h2, .h2 { font-size: 1.2rem !important; }
             .btn-lg { font-size: 0.9rem !important; padding: 0.5rem 1rem !important; }
         }
+
+        .swal-magie { border-radius: 20px !important; font-family: 'Montserrat', sans-serif !important; }
+        .swal-magie-title { font-size: 1.3rem !important; color: #444 !important; }
+        .swal2-timer-progress-bar { background: var(--color-primario) !important; }
+        .swal2-icon.swal2-success .swal2-success-ring { border-color: var(--color-primario) !important; }
+        .swal2-icon.swal2-success [class^='swal2-success-line'] { background: var(--color-primario) !important; }
     </style>
 </head>
 <body>
@@ -397,6 +403,7 @@
     </a>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Bloquear clic derecho
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
@@ -447,13 +454,10 @@
             if (item) {
                 item.cantidad += cantidad;
             } else {
-                // Obtener imagen del endpoint
-                let imagenUrl = null;
                 fetch(`/obtener-imagen/${id}/`)
                     .then(response => response.json())
                     .then(data => {
                         if (data.imagen) {
-                            // Actualizar el item en el carrito con la imagen
                             const itemIndex = carrito.findIndex(p => p.id === id && p.personalizacion === personalizacion);
                             if (itemIndex !== -1) {
                                 carrito[itemIndex].imagen = data.imagen;
@@ -474,6 +478,32 @@
             }
             localStorage.setItem('carrito', JSON.stringify(carrito));
             actualizarContadorCarrito();
+
+            const colorPrimario = getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#ffc1ea';
+            const colorSecundario = getComputedStyle(document.documentElement).getPropertyValue('--color-secundario').trim() || '#d2a8dd';
+
+            Swal.fire({
+                title: '¡Agregado! 💖',
+                html: `<b>${nombre}</b><br><span style="color:#888;font-size:0.9rem;">Cantidad: ${cantidad} &bull; $${Math.round(precio).toLocaleString('es-CL')}</span>`,
+                icon: 'success',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Ver carrito 🛒',
+                cancelButtonText: 'Seguir comprando',
+                confirmButtonColor: colorPrimario,
+                cancelButtonColor: colorSecundario,
+                timer: 4000,
+                timerProgressBar: true,
+                position: 'center',
+                customClass: {
+                    popup: 'swal-magie',
+                    title: 'swal-magie-title',
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/carrito/';
+                }
+            });
         }
         
         // Actualizar contador al cargar la página
