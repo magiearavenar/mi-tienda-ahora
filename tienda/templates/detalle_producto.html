@@ -229,108 +229,95 @@
 
 <!-- JS del producto — funciones en window para que onclick inline funcione -->
 <script>
-(function() {
-    var precioBase = {{ producto.precio }};
-    var opcionesData = {{ opciones_json|safe }};
+var PRODUCTO_ID = {{ producto.id }};
+var PRECIO_BASE = {{ producto.precio }};
+var OPCIONES_DATA = {{ opciones_json|safe }};
 
-    function getPrecioActual() {
-        var selectOpcion = document.getElementById('opcion');
-        var precio = selectOpcion ? parseFloat(selectOpcion.value) : precioBase;
-        document.querySelectorAll('.variante-select').forEach(function(s) {
-            var opt = s.options[s.selectedIndex];
-            if (opt && opt.value) precio += parseFloat(opt.dataset.precioExtra || 0);
-        });
-        return precio;
-    }
-
-    function mostrarPrecio(precio) {
-        document.getElementById('precio-actual').innerHTML = '$' + Math.round(precio).toLocaleString('es-CL');
-        var tablaEl = document.getElementById('precio-tabla');
-        if (tablaEl) tablaEl.textContent = '$' + Math.round(precio).toLocaleString('es-CL');
-    }
-
-    window.actualizarVariante = function() {
-        var stockMinimo = null;
-        var imagenVariante = null;
-
-        document.querySelectorAll('.variante-select').forEach(function(select) {
-            var opt = select.options[select.selectedIndex];
-            if (!opt || !opt.value) return;
-            var stock = parseInt(opt.dataset.stock);
-            if (stockMinimo === null || stock < stockMinimo) stockMinimo = stock;
-            if (opt.dataset.imagen) imagenVariante = opt.dataset.imagen;
-        });
-
-        mostrarPrecio(getPrecioActual());
-
-        var stockEl = document.getElementById('stock-variante');
-        if (stockEl && stockMinimo !== null) {
-            stockEl.textContent = stockMinimo > 0 ? 'Stock disponible: ' + stockMinimo : 'Sin stock para esta combinación';
-            stockEl.style.color = stockMinimo > 0 ? '#28a745' : '#dc3545';
-            var input = document.getElementById('cantidad');
-            if (input) input.max = stockMinimo;
-        }
-
-        if (imagenVariante) {
-            var items = document.querySelectorAll('#productCarousel .carousel-item');
-            var idx = -1;
-            items.forEach(function(item, i) {
-                var img = item.querySelector('img');
-                if (img && img.src === imagenVariante) idx = i;
-            });
-            if (idx >= 0) window.goToSlide(idx);
-        }
-    };
-
-    window.actualizarPrecioOpcion = function() {
-        mostrarPrecio(getPrecioActual());
-    };
-
-    window.agregarAlCarritoConOpcion = function() {
-        var cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-        var precio = getPrecioActual();
-
-        if (!precio || precio <= 0) {
-            alert('Por favor selecciona las opciones del producto');
-            return;
-        }
-
-        var nombreProducto = '{{ producto.nombre|escapejs }}';
-
-        var variantes = [];
-        document.querySelectorAll('.variante-select').forEach(function(select) {
-            var opt = select.options[select.selectedIndex];
-            if (opt && opt.value) {
-                variantes.push(select.dataset.atributo + ': ' + opt.text.split('(')[0].split('—')[0].trim());
-            }
-        });
-        if (variantes.length) nombreProducto += ' (' + variantes.join(', ') + ')';
-
-        var selectOpcion = document.getElementById('opcion');
-        if (selectOpcion && selectOpcion.options[selectOpcion.selectedIndex]) {
-            nombreProducto += ' - ' + selectOpcion.options[selectOpcion.selectedIndex].dataset.nombre;
-        }
-
-        var personalizacionField = document.getElementById('personalizacion');
-        var personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
-
-        agregarAlCarrito({{ producto.id }}, nombreProducto, precio, cantidad, personalizacion);
-    };
-
-    window.goToSlide = function(slideIndex) {
-        var carousel = document.querySelector('#productCarousel');
-        if (carousel) {
-            var bsCarousel = bootstrap.Carousel.getInstance(carousel) || new bootstrap.Carousel(carousel);
-            bsCarousel.to(slideIndex);
-        }
-    };
-
-    document.addEventListener('DOMContentLoaded', function() {
-        var carousel = document.querySelector('#productCarousel');
-        if (carousel) new bootstrap.Carousel(carousel, { interval: false });
-        if (opcionesData.length > 0) mostrarPrecio(opcionesData[0].precio);
+function getPrecioActual() {
+    var selectOpcion = document.getElementById('opcion');
+    var precio = selectOpcion ? parseFloat(selectOpcion.value) : PRECIO_BASE;
+    document.querySelectorAll('.variante-select').forEach(function(s) {
+        var opt = s.options[s.selectedIndex];
+        if (opt && opt.value) precio += parseFloat(opt.dataset.precioExtra || 0);
     });
-})();
+    return precio;
+}
+
+function mostrarPrecio(precio) {
+    document.getElementById('precio-actual').innerHTML = '$' + Math.round(precio).toLocaleString('es-CL');
+    var tablaEl = document.getElementById('precio-tabla');
+    if (tablaEl) tablaEl.textContent = '$' + Math.round(precio).toLocaleString('es-CL');
+}
+
+function actualizarVariante() {
+    var stockMinimo = null;
+    var imagenVariante = null;
+    document.querySelectorAll('.variante-select').forEach(function(select) {
+        var opt = select.options[select.selectedIndex];
+        if (!opt || !opt.value) return;
+        var stock = parseInt(opt.dataset.stock);
+        if (stockMinimo === null || stock < stockMinimo) stockMinimo = stock;
+        if (opt.dataset.imagen) imagenVariante = opt.dataset.imagen;
+    });
+    mostrarPrecio(getPrecioActual());
+    var stockEl = document.getElementById('stock-variante');
+    if (stockEl && stockMinimo !== null) {
+        stockEl.textContent = stockMinimo > 0 ? 'Stock disponible: ' + stockMinimo : 'Sin stock para esta combinación';
+        stockEl.style.color = stockMinimo > 0 ? '#28a745' : '#dc3545';
+        var input = document.getElementById('cantidad');
+        if (input) input.max = stockMinimo;
+    }
+    if (imagenVariante) {
+        var items = document.querySelectorAll('#productCarousel .carousel-item');
+        var idx = -1;
+        items.forEach(function(item, i) {
+            var img = item.querySelector('img');
+            if (img && img.src === imagenVariante) idx = i;
+        });
+        if (idx >= 0) goToSlide(idx);
+    }
+}
+
+function actualizarPrecioOpcion() {
+    mostrarPrecio(getPrecioActual());
+}
+
+function agregarAlCarritoConOpcion() {
+    var cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+    var precio = getPrecioActual();
+    if (!precio || precio <= 0) {
+        alert('Por favor selecciona las opciones del producto');
+        return;
+    }
+    var nombreProducto = '{{ producto.nombre|escapejs }}';
+    var variantes = [];
+    document.querySelectorAll('.variante-select').forEach(function(select) {
+        var opt = select.options[select.selectedIndex];
+        if (opt && opt.value) variantes.push(select.dataset.atributo + ': ' + opt.text.split('(')[0].split('—')[0].trim());
+    });
+    if (variantes.length) nombreProducto += ' (' + variantes.join(', ') + ')';
+    var selectOpcion = document.getElementById('opcion');
+    if (selectOpcion && selectOpcion.options[selectOpcion.selectedIndex]) {
+        nombreProducto += ' - ' + selectOpcion.options[selectOpcion.selectedIndex].dataset.nombre;
+    }
+    var personalizacionField = document.getElementById('personalizacion');
+    var personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
+    agregarAlCarrito(PRODUCTO_ID, nombreProducto, precio, cantidad, personalizacion);
+}
+
+function goToSlide(slideIndex) {
+    var carousel = document.querySelector('#productCarousel');
+    if (carousel) {
+        var bsCarousel = bootstrap.Carousel.getInstance(carousel) || new bootstrap.Carousel(carousel);
+        bsCarousel.to(slideIndex);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var carousel = document.querySelector('#productCarousel');
+    if (carousel) new bootstrap.Carousel(carousel, { interval: false });
+    if (OPCIONES_DATA.length > 0) mostrarPrecio(OPCIONES_DATA[0].precio);
+});
 </script>
 
 <script type="application/ld+json">
