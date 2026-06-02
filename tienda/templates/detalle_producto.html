@@ -73,7 +73,6 @@
                 {% endif %}
             </div>
 
-            <!-- PRECIO -->
             <div class="mb-4">
                 <h3 class="text-primary" id="precio-actual">
                     {% if tiene_variantes or producto.opciones.all %}
@@ -84,7 +83,6 @@
                 </h3>
             </div>
 
-            <!-- BOTON VER INTERIOR -->
             {% if producto.imagenes_interior.all %}
             <div class="mb-4">
                 <button class="btn btn-outline-dark w-100" onclick="abrirFlipbook()" style="border-radius:10px;font-size:0.9rem;padding:0.6rem;">
@@ -93,7 +91,6 @@
             </div>
             {% endif %}
 
-            <!-- VARIANTES -->
             {% if atributos %}
             <div class="mb-4" id="variantes-container">
                 {% for atributo in atributos %}
@@ -119,14 +116,15 @@
             </div>
             {% endif %}
 
-            <!-- OPCIONES -->
             <div class="row mb-4">
                 {% if producto.opciones.all %}
                 <div class="col-md-6">
-                    <label for="opcion" class="form-label">Opciones:</label>
+                    <label for="opcion" class="form-label fw-semibold">Presentación:</label>
                     <select id="opcion" class="form-select" onchange="actualizarPrecioOpcion()">
                         {% for opcion in producto.opciones.all %}
-                        <option value="{{ opcion.precio }}" data-nombre="{{ opcion.nombre }}">{{ opcion.nombre }} - ${{ opcion.precio|floatformat:0 }}</option>
+                        <option value="{{ opcion.precio }}" data-nombre="{{ opcion.nombre }}" {% if forloop.first %}selected{% endif %}>
+                            {{ opcion.nombre }} — ${{ opcion.precio|floatformat:0 }}
+                        </option>
                         {% endfor %}
                     </select>
                 </div>
@@ -134,12 +132,11 @@
                 {% else %}
                 <div class="col-md-12">
                 {% endif %}
-                    <label for="cantidad" class="form-label">Cantidad:</label>
+                    <label for="cantidad" class="form-label fw-semibold">Cantidad:</label>
                     <input type="number" id="cantidad" class="form-control" value="1" min="1" max="{{ producto.stock }}">
                 </div>
             </div>
 
-            <!-- PERSONALIZACIÓN -->
             {% if producto.permite_personalizacion %}
             <div class="mb-4">
                 <label for="personalizacion" class="form-label">{{ producto.texto_personalizacion|default:"Personalización" }}</label>
@@ -155,7 +152,7 @@
 
             <div class="d-grid gap-2">
                 {% if producto.stock > 0 %}
-                    <button class="btn btn-primary btn-lg" id="btn-agregar" onclick="agregarAlCarritoConOpcion()">
+                    <button class="btn btn-primary btn-lg" onclick="agregarAlCarritoConOpcion()">
                         <i class="fas fa-cart-plus"></i> Agregar al Carrito
                     </button>
                 {% else %}
@@ -171,7 +168,7 @@
     </div>
 </div>
 
-<!-- RESEÑAS -->
+{% if resenas or True %}
 <div class="row mt-5">
     <div class="col-12">
         <h4>Reseñas de clientes</h4>
@@ -214,8 +211,8 @@
         </div>
     </div>
 </div>
+{% endif %}
 
-<!-- INFO PRODUCTO -->
 <div class="row mt-5">
     <div class="col-12">
         <h4>Información del Producto</h4>
@@ -224,113 +221,116 @@
                 <tr><td><strong>Nombre</strong></td><td>{{ producto.nombre }}</td></tr>
                 <tr><td><strong>Categoría</strong></td><td>{% for cat in producto.categoria.all %}{{ cat.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</td></tr>
                 <tr><td><strong>Precio</strong></td><td id="precio-tabla">${{ producto.precio|floatformat:0 }}</td></tr>
-                <tr><td><strong>Stock Disponible</strong></td><td>{{ producto.stock }} unidades</td></tr>
+                <tr><td><strong>Stock</strong></td><td>{{ producto.stock }} unidades</td></tr>
             </table>
         </div>
     </div>
 </div>
 
+<!-- JS del producto — funciones en window para que onclick inline funcione -->
 <script>
-const precioBase = {{ producto.precio }};
-const variantesData = {{ variantes_json|safe }};
-const opcionesData = {{ opciones_json|safe }};
+(function() {
+    var precioBase = {{ producto.precio }};
+    var opcionesData = {{ opciones_json|safe }};
 
-document.addEventListener('DOMContentLoaded', function() {
-    const carousel = document.querySelector('#productCarousel');
-    if (carousel) new bootstrap.Carousel(carousel, { interval: false });
-    // Inicializar precio con primera opcion si existe
-    if (opcionesData.length > 0) {
-        mostrarPrecio(opcionesData[0].precio);
+    function getPrecioActual() {
+        var selectOpcion = document.getElementById('opcion');
+        var precio = selectOpcion ? parseFloat(selectOpcion.value) : precioBase;
+        document.querySelectorAll('.variante-select').forEach(function(s) {
+            var opt = s.options[s.selectedIndex];
+            if (opt && opt.value) precio += parseFloat(opt.dataset.precioExtra || 0);
+        });
+        return precio;
     }
-});
 
-function getPrecioActual() {
-    const selectOpcion = document.getElementById('opcion');
-    let precio = selectOpcion ? parseFloat(selectOpcion.value) : precioBase;
-    document.querySelectorAll('.variante-select').forEach(s => {
-        const opt = s.options[s.selectedIndex];
-        if (opt && opt.value) precio += parseFloat(opt.dataset.precioExtra || 0);
+    function mostrarPrecio(precio) {
+        document.getElementById('precio-actual').innerHTML = '$' + Math.round(precio).toLocaleString('es-CL');
+        var tablaEl = document.getElementById('precio-tabla');
+        if (tablaEl) tablaEl.textContent = '$' + Math.round(precio).toLocaleString('es-CL');
+    }
+
+    window.actualizarVariante = function() {
+        var stockMinimo = null;
+        var imagenVariante = null;
+
+        document.querySelectorAll('.variante-select').forEach(function(select) {
+            var opt = select.options[select.selectedIndex];
+            if (!opt || !opt.value) return;
+            var stock = parseInt(opt.dataset.stock);
+            if (stockMinimo === null || stock < stockMinimo) stockMinimo = stock;
+            if (opt.dataset.imagen) imagenVariante = opt.dataset.imagen;
+        });
+
+        mostrarPrecio(getPrecioActual());
+
+        var stockEl = document.getElementById('stock-variante');
+        if (stockEl && stockMinimo !== null) {
+            stockEl.textContent = stockMinimo > 0 ? 'Stock disponible: ' + stockMinimo : 'Sin stock para esta combinación';
+            stockEl.style.color = stockMinimo > 0 ? '#28a745' : '#dc3545';
+            var input = document.getElementById('cantidad');
+            if (input) input.max = stockMinimo;
+        }
+
+        if (imagenVariante) {
+            var items = document.querySelectorAll('#productCarousel .carousel-item');
+            var idx = -1;
+            items.forEach(function(item, i) {
+                var img = item.querySelector('img');
+                if (img && img.src === imagenVariante) idx = i;
+            });
+            if (idx >= 0) window.goToSlide(idx);
+        }
+    };
+
+    window.actualizarPrecioOpcion = function() {
+        mostrarPrecio(getPrecioActual());
+    };
+
+    window.agregarAlCarritoConOpcion = function() {
+        var cantidad = parseInt(document.getElementById('cantidad').value) || 1;
+        var precio = getPrecioActual();
+
+        if (!precio || precio <= 0) {
+            alert('Por favor selecciona las opciones del producto');
+            return;
+        }
+
+        var nombreProducto = '{{ producto.nombre|escapejs }}';
+
+        var variantes = [];
+        document.querySelectorAll('.variante-select').forEach(function(select) {
+            var opt = select.options[select.selectedIndex];
+            if (opt && opt.value) {
+                variantes.push(select.dataset.atributo + ': ' + opt.text.split('(')[0].split('—')[0].trim());
+            }
+        });
+        if (variantes.length) nombreProducto += ' (' + variantes.join(', ') + ')';
+
+        var selectOpcion = document.getElementById('opcion');
+        if (selectOpcion && selectOpcion.options[selectOpcion.selectedIndex]) {
+            nombreProducto += ' - ' + selectOpcion.options[selectOpcion.selectedIndex].dataset.nombre;
+        }
+
+        var personalizacionField = document.getElementById('personalizacion');
+        var personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
+
+        agregarAlCarrito({{ producto.id }}, nombreProducto, precio, cantidad, personalizacion);
+    };
+
+    window.goToSlide = function(slideIndex) {
+        var carousel = document.querySelector('#productCarousel');
+        if (carousel) {
+            var bsCarousel = bootstrap.Carousel.getInstance(carousel) || new bootstrap.Carousel(carousel);
+            bsCarousel.to(slideIndex);
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var carousel = document.querySelector('#productCarousel');
+        if (carousel) new bootstrap.Carousel(carousel, { interval: false });
+        if (opcionesData.length > 0) mostrarPrecio(opcionesData[0].precio);
     });
-    return precio;
-}
-
-function actualizarVariante() {
-    let stockMinimo = null;
-    let imagenVariante = null;
-    let seleccionCompleta = true;
-
-    document.querySelectorAll('.variante-select').forEach(select => {
-        const opt = select.options[select.selectedIndex];
-        if (!opt || !opt.value) { seleccionCompleta = false; return; }
-        const stock = parseInt(opt.dataset.stock);
-        if (stockMinimo === null || stock < stockMinimo) stockMinimo = stock;
-        if (opt.dataset.imagen) imagenVariante = opt.dataset.imagen;
-    });
-
-    mostrarPrecio(getPrecioActual());
-
-    const stockEl = document.getElementById('stock-variante');
-    if (seleccionCompleta && stockMinimo !== null) {
-        stockEl.textContent = stockMinimo > 0 ? 'Stock disponible: ' + stockMinimo : 'Sin stock para esta combinaci\u00f3n';
-        stockEl.style.color = stockMinimo > 0 ? '#28a745' : '#dc3545';
-        const input = document.getElementById('cantidad');
-        if (input) input.max = stockMinimo;
-    } else {
-        stockEl.textContent = '';
-    }
-
-    if (imagenVariante) {
-        const items = document.querySelectorAll('#productCarousel .carousel-item');
-        let idx = -1;
-        items.forEach((item, i) => { const img = item.querySelector('img'); if (img && img.src === imagenVariante) idx = i; });
-        if (idx >= 0) goToSlide(idx);
-    }
-}
-
-function actualizarPrecioOpcion() {
-    mostrarPrecio(getPrecioActual());
-}
-
-function mostrarPrecio(precio) {
-    document.getElementById('precio-actual').innerHTML = '$' + Math.round(precio).toLocaleString('es-CL');
-    const tablaEl = document.getElementById('precio-tabla');
-    if (tablaEl) tablaEl.textContent = '$' + Math.round(precio).toLocaleString('es-CL');
-}
-
-function agregarAlCarritoConOpcion() {
-    const cantidad = parseInt(document.getElementById('cantidad').value) || 1;
-    const precio = getPrecioActual();
-
-    if (!precio || precio <= 0) {
-        alert('Por favor selecciona las opciones del producto');
-        return;
-    }
-
-    let nombreProducto = '{{ producto.nombre }}';
-
-    const variantes = [];
-    document.querySelectorAll('.variante-select').forEach(select => {
-        const opt = select.options[select.selectedIndex];
-        if (opt && opt.value) variantes.push(select.dataset.atributo + ': ' + opt.text.split('(')[0].split('\u2014')[0].trim());
-    });
-    if (variantes.length) nombreProducto += ' (' + variantes.join(', ') + ')';
-
-    const selectOpcion = document.getElementById('opcion');
-    if (selectOpcion) nombreProducto += ' - ' + selectOpcion.options[selectOpcion.selectedIndex].dataset.nombre;
-
-    const personalizacionField = document.getElementById('personalizacion');
-    const personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
-
-    agregarAlCarrito({{ producto.id }}, nombreProducto, precio, cantidad, personalizacion);
-}
-
-function goToSlide(slideIndex) {
-    const carousel = document.querySelector('#productCarousel');
-    if (carousel) {
-        const bsCarousel = bootstrap.Carousel.getInstance(carousel) || new bootstrap.Carousel(carousel);
-        bsCarousel.to(slideIndex);
-    }
-}
+})();
 </script>
 
 <script type="application/ld+json">
@@ -370,49 +370,50 @@ function goToSlide(slideIndex) {
         <p style="color:rgba(255,255,255,0.5);text-align:center;font-size:0.75rem;margin-top:8px;">Arrastra o desliza para pasar páginas &bull; ESC para cerrar</p>
     </div>
 </div>
-
 <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.js"></script>
 <script>
-const imagenesInterior = [{% for img in producto.imagenes_interior.all %}"{{ img.imagen.url }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-let pageFlip = null;
+(function() {
+    var imagenesInterior = [{% for img in producto.imagenes_interior.all %}"{{ img.imagen.url }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+    var pageFlip = null;
 
-function abrirFlipbook() {
-    document.getElementById('flipbook-modal').style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    if (!pageFlip) iniciarFlipbook();
-}
-function cerrarFlipbook() {
-    document.getElementById('flipbook-modal').style.display = 'none';
-    document.body.style.overflow = '';
-}
-function iniciarFlipbook() {
-    const container = document.getElementById('flipbook-container');
-    const isMobile = window.innerWidth < 640;
-    const maxAncho = Math.min(window.innerWidth - 32, 880);
-    const pageW = isMobile ? maxAncho : Math.floor(maxAncho / 2);
-    const pageH = Math.floor(pageW * 1.41);
-    const finalH = Math.min(pageH, window.innerHeight - 140);
-    const finalW = Math.floor(finalH / 1.41);
-    container.innerHTML = '';
-    const el = document.createElement('div');
-    container.appendChild(el);
-    pageFlip = new St.PageFlip(el, { width: finalW, height: finalH, size: 'fixed', showCover: true, mobileScrollSupport: true, usePortrait: isMobile, flippingTime: 700, useMouseEvents: true });
-    pageFlip.loadFromImages(imagenesInterior);
-    pageFlip.on('flip', actualizarInfoFlip);
-    setTimeout(actualizarInfoFlip, 600);
-}
-function actualizarInfoFlip() {
-    if (!pageFlip) return;
-    document.getElementById('flip-page-info').textContent = 'Página ' + (pageFlip.getCurrentPageIndex() + 1) + ' de ' + imagenesInterior.length;
-}
-function flipPrev() { if (pageFlip) { pageFlip.flipPrev(); setTimeout(actualizarInfoFlip, 750); } }
-function flipNext() { if (pageFlip) { pageFlip.flipNext(); setTimeout(actualizarInfoFlip, 750); } }
-document.getElementById('flipbook-modal').addEventListener('click', function(e) { if (e.target === this) cerrarFlipbook(); });
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') cerrarFlipbook();
-    if (e.key === 'ArrowRight') flipNext();
-    if (e.key === 'ArrowLeft') flipPrev();
-});
+    window.abrirFlipbook = function() {
+        document.getElementById('flipbook-modal').style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        if (!pageFlip) iniciarFlipbook();
+    };
+    window.cerrarFlipbook = function() {
+        document.getElementById('flipbook-modal').style.display = 'none';
+        document.body.style.overflow = '';
+    };
+    function iniciarFlipbook() {
+        var container = document.getElementById('flipbook-container');
+        var isMobile = window.innerWidth < 640;
+        var maxAncho = Math.min(window.innerWidth - 32, 880);
+        var pageW = isMobile ? maxAncho : Math.floor(maxAncho / 2);
+        var pageH = Math.floor(pageW * 1.41);
+        var finalH = Math.min(pageH, window.innerHeight - 140);
+        var finalW = Math.floor(finalH / 1.41);
+        container.innerHTML = '';
+        var el = document.createElement('div');
+        container.appendChild(el);
+        pageFlip = new St.PageFlip(el, { width: finalW, height: finalH, size: 'fixed', showCover: true, mobileScrollSupport: true, usePortrait: isMobile, flippingTime: 700, useMouseEvents: true });
+        pageFlip.loadFromImages(imagenesInterior);
+        pageFlip.on('flip', actualizarInfoFlip);
+        setTimeout(actualizarInfoFlip, 600);
+    }
+    function actualizarInfoFlip() {
+        if (!pageFlip) return;
+        document.getElementById('flip-page-info').textContent = 'Página ' + (pageFlip.getCurrentPageIndex() + 1) + ' de ' + imagenesInterior.length;
+    }
+    window.flipPrev = function() { if (pageFlip) { pageFlip.flipPrev(); setTimeout(actualizarInfoFlip, 750); } };
+    window.flipNext = function() { if (pageFlip) { pageFlip.flipNext(); setTimeout(actualizarInfoFlip, 750); } };
+    document.getElementById('flipbook-modal').addEventListener('click', function(e) { if (e.target === this) window.cerrarFlipbook(); });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') window.cerrarFlipbook();
+        if (e.key === 'ArrowRight') window.flipNext();
+        if (e.key === 'ArrowLeft') window.flipPrev();
+    });
+})();
 </script>
 {% endif %}
 {% endblock %}
