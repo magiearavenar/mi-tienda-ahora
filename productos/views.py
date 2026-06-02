@@ -77,6 +77,12 @@ def detalle_producto(request, producto_id):
             if precio_variante < precio_minimo:
                 precio_minimo = precio_variante
 
+    # Si hay opciones, el precio minimo es el menor precio de opcion
+    opciones = list(producto.opciones.all())
+    if opciones:
+        precio_minimo_opcion = min(float(o.precio) for o in opciones)
+        precio_minimo = precio_minimo_opcion
+
     # Serializar variantes para JS
     variantes_json = []
     for atributo in atributos:
@@ -93,7 +99,7 @@ def detalle_producto(request, producto_id):
 
     # Opciones de precio
     opciones_json = []
-    for op in producto.opciones.all():
+    for op in opciones:
         opciones_json.append({
             'id': op.id,
             'nombre': op.nombre,
