@@ -25,7 +25,10 @@
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Contraseña</label>
-                    <input type="password" name="password" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
+                    <div style="position:relative;">
+                        <input type="password" name="password" id="id_password" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;padding-right:2.8rem;" required>
+                        <span onclick="togglePass('id_password', this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#d2a8dd;font-size:1rem;">👁️</span>
+                    </div>
                 </div>
                 <button type="submit" class="btn w-100" style="background:var(--color-primario,#ffc1ea);color:#fff;border:none;border-radius:14px;padding:0.75rem;font-weight:600;font-size:0.95rem;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(255,193,234,0.4);transition:all 0.2s;">
                     Ingresar
@@ -41,4 +44,12 @@
         </div>
     </div>
 </div>
+
+<script>
+function togglePass(id, el) {
+    var input = document.getElementById(id);
+    if (input.type === 'password') { input.type = 'text'; el.textContent = '🙈'; }
+    else { input.type = 'password'; el.innerHTML = '👁️'; }
+}
+</script>
 {% endblock %}

@@ -33,14 +33,20 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Contraseña</label>
-                    <input type="password" name="password1" id="id_password1" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
+                    <div style="position:relative;">
+                        <input type="password" name="password1" id="id_password1" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;padding-right:2.8rem;" required>
+                        <span onclick="togglePass('id_password1', this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#d2a8dd;font-size:1rem;">👁️</span>
+                    </div>
                     <div id="password-strength" class="mt-1"></div>
                     <div style="color:#aaa;font-size:0.75rem;margin-top:4px;">Mínimo 10 caracteres.</div>
                     {% if form.password1.errors %}<div style="color:#c0567a;font-size:0.78rem;margin-top:4px;">{{ form.password1.errors }}</div>{% endif %}
                 </div>
                 <div class="mb-4">
                     <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Confirmar Contraseña</label>
-                    <input type="password" name="password2" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
+                    <div style="position:relative;">
+                        <input type="password" name="password2" id="id_password2" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;padding-right:2.8rem;" required>
+                        <span onclick="togglePass('id_password2', this)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);cursor:pointer;color:#d2a8dd;font-size:1rem;">👁️</span>
+                    </div>
                     {% if form.password2.errors %}<div style="color:#c0567a;font-size:0.78rem;margin-top:4px;">{{ form.password2.errors }}</div>{% endif %}
                 </div>
                 <button type="submit" class="btn w-100" style="background:var(--color-primario,#ffc1ea);color:#fff;border:none;border-radius:14px;padding:0.75rem;font-weight:600;font-size:0.95rem;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(255,193,234,0.4);">
@@ -73,5 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
         bar.innerHTML = score > 0 ? '<span style="font-size:0.78rem;color:' + colors[score] + ';font-weight:600;">' + labels[score] + '</span>' : '';
     });
 });
+
+function togglePass(id, el) {
+    var input = document.getElementById(id);
+    if (input.type === 'password') { input.type = 'text'; el.textContent = '🙈'; }
+    else { input.type = 'password'; el.innerHTML = '👁️'; }
+}
 </script>
 {% endblock %}
