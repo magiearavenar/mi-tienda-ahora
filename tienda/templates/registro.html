@@ -27,6 +27,11 @@
                     {% if form.username.errors %}<div style="color:#c0567a;font-size:0.78rem;margin-top:4px;">{{ form.username.errors }}</div>{% endif %}
                 </div>
                 <div class="mb-3">
+                    <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Email</label>
+                    <input type="email" name="email" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
+                    {% if form.email.errors %}<div style="color:#c0567a;font-size:0.78rem;margin-top:4px;">{{ form.email.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
                     <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Contraseña</label>
                     <input type="password" name="password1" id="id_password1" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
                     <div id="password-strength" class="mt-1"></div>

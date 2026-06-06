@@ -15,6 +15,7 @@ import os
 from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena
 from .services import FlowService, MercadoPagoService
 from .instagram_service import InstagramService
+from .forms import RegistroForm
 
 def home(request):
     productos = Producto.objects.filter(activo=True).order_by('-fecha_creacion')[:8]
@@ -142,16 +143,61 @@ def crear_resena(request, producto_id):
 
 def registro(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegistroForm(request.POST)
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
             messages.success(request, f'Cuenta creada para {username}')
             login(request, user)
+            # Generar cupón de bienvenida y enviar email
+            _enviar_bienvenida(user)
             return redirect('home')
     else:
-        form = UserCreationForm()
+        form = RegistroForm()
     return render(request, 'registro.html', {'form': form})
+
+
+def _enviar_bienvenida(user):
+    """Genera cupón único de 10% y envía email de bienvenida."""
+    try:
+        from django.utils import timezone
+        from django.template.loader import render_to_string
+        from django.core.mail import send_mail
+        import random, string
+
+        # Generar código único
+        codigo = 'MAGIE-' + ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+        # Crear descuento
+        Descuento.objects.create(
+            nombre=f'Bienvenida {user.username}',
+            codigo=codigo,
+            tipo='porcentaje',
+            valor=10,
+            aplica_a='todos',
+            activo=True,
+            fecha_inicio=timezone.now().date(),
+            fecha_fin=timezone.now().date() + timezone.timedelta(days=5),
+            usos_maximos=1,
+        )
+
+        # Enviar email si tiene correo
+        if user.email:
+            html = render_to_string('emails/bienvenida.html', {
+                'nombre_usuario': user.username,
+                'codigo_cupon': codigo,
+            })
+            send_mail(
+                subject='✨ ¡Bienvenida(o) a Mundo Magie! Tu regalo te espera',
+                message='',
+                from_email=None,
+                recipient_list=[user.email],
+                html_message=html,
+                fail_silently=True,
+            )
+    except Exception as e:
+        import logging
+        logging.error(f'Error enviando bienvenida: {e}')
 
 @login_required
 def perfil(request):
