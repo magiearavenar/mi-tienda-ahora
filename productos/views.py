@@ -197,7 +197,7 @@ def _enviar_bienvenida(user):
             )
     except Exception as e:
         import logging
-        logging.error(f'Error enviando bienvenida: {e}')
+        logging.error(f'Error enviando bienvenida: {e}', exc_info=True)
 
 @login_required
 def perfil(request):
