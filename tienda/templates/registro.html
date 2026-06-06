@@ -1,75 +1,72 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h3 class="card-title text-center mb-4">Crear Cuenta</h3>
-                
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-success">{{ message }}</div>
-                    {% endfor %}
-                {% endif %}
-                
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">Usuario</label>
-                        <input type="text" name="username" class="form-control" id="{{ form.username.id_for_label }}" required>
-                        {% if form.username.errors %}
-                            <div class="text-danger">{{ form.username.errors }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="mb-3">
-                        <label for="{{ form.password1.id_for_label }}" class="form-label">Contraseña</label>
-                        <input type="password" name="password1" class="form-control" id="{{ form.password1.id_for_label }}" required>
-                        <div id="password-strength" class="mt-1"></div>
-                        {% if form.password1.errors %}
-                            <div class="text-danger">{{ form.password1.errors }}</div>
-                        {% endif %}
-                        <div class="form-text">Mínimo 10 caracteres. No puede ser solo números ni una contraseña común.</div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="{{ form.password2.id_for_label }}" class="form-label">Confirmar Contraseña</label>
-                        <input type="password" name="password2" class="form-control" id="{{ form.password2.id_for_label }}" required>
-                        {% if form.password2.errors %}
-                            <div class="text-danger">{{ form.password2.errors }}</div>
-                        {% endif %}
-                    </div>
-                    
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary">Crear Cuenta</button>
-                    </div>
-                </form>
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-5 col-lg-4">
+        <div style="background:#fff;border-radius:24px;box-shadow:0 8px 32px rgba(255,193,234,0.18);padding:2.5rem 2rem;border:1.5px solid #fce4f5;">
 
-                <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const input = document.getElementById('{{ form.password1.id_for_label }}');
-                    const bar = document.getElementById('password-strength');
-                    if (!input) return;
-                    input.addEventListener('input', function () {
-                        const val = input.value;
-                        let score = 0;
-                        if (val.length >= 10) score++;
-                        if (/[A-Z]/.test(val)) score++;
-                        if (/[0-9]/.test(val)) score++;
-                        if (/[^A-Za-z0-9]/.test(val)) score++;
-                        const labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
-                        const colors = ['', 'danger', 'warning', 'info', 'success'];
-                        bar.innerHTML = score > 0
-                            ? `<span class="badge bg-${colors[score]}">Contraseña ${labels[score]}</span>`
-                            : '';
-                    });
-                });
-                </script>
-                
-                <div class="text-center mt-3">
-                    <p>¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión aquí</a></p>
+            <!-- Logo -->
+            <div class="text-center mb-4">
+                <img src="/static/images/logo.png" alt="Mundo Magie" style="max-width:160px;height:auto;" onerror="this.style.display='none'">
+                <p style="color:#d2a8dd;font-size:0.82rem;margin-top:0.5rem;letter-spacing:1px;">CREAR CUENTA ✨</p>
+            </div>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div style="background:#f0fff4;border:1px solid #b2dfdb;border-radius:10px;padding:0.75rem 1rem;margin-bottom:1rem;color:#2e7d5e;font-size:0.85rem;">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Usuario</label>
+                    <input type="text" name="username" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
+                    {% if form.username.errors %}<div style="color:#c0567a;font-size:0.78rem;margin-top:4px;">{{ form.username.errors }}</div>{% endif %}
                 </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Contraseña</label>
+                    <input type="password" name="password1" id="id_password1" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
+                    <div id="password-strength" class="mt-1"></div>
+                    <div style="color:#aaa;font-size:0.75rem;margin-top:4px;">Mínimo 10 caracteres.</div>
+                    {% if form.password1.errors %}<div style="color:#c0567a;font-size:0.78rem;margin-top:4px;">{{ form.password1.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-semibold" style="color:#555;font-size:0.85rem;">Confirmar Contraseña</label>
+                    <input type="password" name="password2" class="form-control" style="border-radius:12px;border:1.5px solid #f3c6ec;padding:0.65rem 1rem;font-size:0.9rem;" required>
+                    {% if form.password2.errors %}<div style="color:#c0567a;font-size:0.78rem;margin-top:4px;">{{ form.password2.errors }}</div>{% endif %}
+                </div>
+                <button type="submit" class="btn w-100" style="background:var(--color-primario,#ffc1ea);color:#fff;border:none;border-radius:14px;padding:0.75rem;font-weight:600;font-size:0.95rem;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(255,193,234,0.4);">
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <div class="text-center mt-4" style="font-size:0.85rem;color:#888;">
+                ¿Ya tienes cuenta?
+                <a href="{% url 'login' %}" style="color:var(--color-primario,#ffc1ea);font-weight:600;text-decoration:none;"> Inicia sesión aquí</a>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('id_password1');
+    var bar = document.getElementById('password-strength');
+    if (!input) return;
+    input.addEventListener('input', function() {
+        var val = input.value;
+        var score = 0;
+        if (val.length >= 10) score++;
+        if (/[A-Z]/.test(val)) score++;
+        if (/[0-9]/.test(val)) score++;
+        if (/[^A-Za-z0-9]/.test(val)) score++;
+        var labels = ['', 'Débil', 'Regular', 'Buena', 'Fuerte'];
+        var colors = ['', '#dc3545', '#ffc107', '#17a2b8', '#28a745'];
+        bar.innerHTML = score > 0 ? '<span style="font-size:0.78rem;color:' + colors[score] + ';font-weight:600;">' + labels[score] + '</span>' : '';
+    });
+});
+</script>
 {% endblock %}
