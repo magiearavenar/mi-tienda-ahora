@@ -230,7 +230,7 @@
 <!-- JS del producto — funciones en window para que onclick inline funcione -->
 <script>
 var PRODUCTO_ID = {{ producto.id }};
-var PRECIO_BASE = {{ producto.precio }};
+var PRECIO_BASE = {{ producto.precio|floatformat:"-2" }};
 var OPCIONES_DATA = {{ opciones_json|safe }};
 
 function getPrecioActual() {
