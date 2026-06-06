@@ -1,1 +1,1 @@
-web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn tienda.wsgi:application --bind 0.0.0.0:$PORT
+web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn tienda.wsgi:application --bind 0.0.0.0:$PORT --timeout 120 --workers 2

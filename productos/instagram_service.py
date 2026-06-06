@@ -14,7 +14,7 @@ class InstagramService:
             me = requests.get(
                 f'{self.base_url}/me',
                 params={'fields': 'user_id', 'access_token': self.access_token},
-                timeout=10
+                timeout=3
             ).json()
             user_id = me.get('user_id') or me.get('id')
             if not user_id:
@@ -28,7 +28,7 @@ class InstagramService:
                     'limit': limit,
                     'access_token': self.access_token
                 },
-                timeout=10
+                timeout=3
             )
             if resp.status_code == 200:
                 return self._format(resp.json().get('data', []))
