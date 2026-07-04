@@ -414,6 +414,9 @@ def mercadopago_webhook(request):
                         
                         pedido.estado = 'procesando'
                         pedido.save()
+
+                        # Enviar archivos digitales si corresponde
+                        _enviar_digitales(pedido, payment_info.get('payer', {}).get('email', ''))
                         
                     except Pedido.DoesNotExist:
                         pass
@@ -421,6 +424,59 @@ def mercadopago_webhook(request):
         return HttpResponse('OK')
     except Exception as e:
         return HttpResponse('ERROR', status=400)
+
+def _enviar_digitales(pedido, email_pago):
+    """Envía los archivos digitales del pedido al correo del cliente."""
+    try:
+        from django.core.mail import EmailMessage
+        import urllib.request
+
+        # Obtener email: del pedido, del usuario, o del pago
+        email = None
+        if pedido.usuario and pedido.usuario.email:
+            email = pedido.usuario.email
+        elif email_pago:
+            email = email_pago
+        
+        if not email:
+            return
+
+        # Buscar productos digitales en el pedido
+        digitales = []
+        for detalle in pedido.detalles.select_related('producto').all():
+            if detalle.producto.es_digital and detalle.producto.archivo_digital:
+                digitales.append(detalle.producto)
+
+        if not digitales:
+            return
+
+        msg = EmailMessage(
+            subject=f'Tu compra digital en Mundo Magie - Pedido #{pedido.id}',
+            body=f'Hola! Gracias por tu compra.\n\nAdjunto encontrarás tu(s) producto(s) digital(es):\n' +
+                 '\n'.join([f'- {p.nombre}' for p in digitales]) +
+                 '\n\nSaludos,\nMundo Magie',
+            from_email=None,
+            to=[email],
+        )
+
+        for producto in digitales:
+            archivo = producto.archivo_digital
+            try:
+                # Leer el archivo desde Cloudinary o local
+                with urllib.request.urlopen(archivo.url) as f:
+                    contenido = f.read()
+                nombre_archivo = archivo.name.split('/')[-1]
+                msg.attach(nombre_archivo, contenido)
+            except Exception as e:
+                import logging
+                logging.error(f'Error adjuntando archivo {archivo.name}: {e}')
+
+        msg.send(fail_silently=True)
+
+    except Exception as e:
+        import logging
+        logging.error(f'Error enviando digitales pedido {pedido.id}: {e}', exc_info=True)
+
 
 def pago_exitoso(request):
     return render(request, 'pago_exitoso.html')

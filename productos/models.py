@@ -77,6 +77,7 @@ class Producto(models.Model):
     sincronizar_google = models.BooleanField(default=True, help_text='¿Sincronizar con Google Shopping?')
     
     es_digital = models.BooleanField(default=False, help_text='¿Es un producto digital? Se enviará por correo electrónico.')
+    archivo_digital = models.FileField(upload_to='digitales/', blank=True, null=True, help_text='Archivo a enviar por correo al comprar (PDF, ZIP, etc.)')
     
     # Campos de personalización
     permite_personalizacion = models.BooleanField(default=False, help_text='¿Este producto permite personalización?')
