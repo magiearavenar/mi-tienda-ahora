@@ -29,7 +29,7 @@
                 <!-- 2. Envío -->
                 <div class="form-section">
                     <h4 class="section-title">2. Método de Envío</h4>
-                    <div class="shipping-options">
+                    <div class="shipping-options" id="opcionesEnvioFisico">
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="tipoEnvio" id="starken" value="starken" checked>
                             <label class="form-check-label" for="starken">
@@ -47,6 +47,17 @@
                             <label class="form-check-label" for="retiroTienda">
                                 <i class="fas fa-store me-2"></i>Retiro en tienda - Gratis
                             </label>
+                        </div>
+                    </div>
+                    <div id="opcionEnvioDigital" style="display:none;">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="tipoEnvio" id="correoDigital" value="digital" checked>
+                            <label class="form-check-label" for="correoDigital">
+                                <i class="fas fa-envelope me-2"></i>Enviar a correo electrónico - Gratis
+                            </label>
+                        </div>
+                        <div class="alert alert-info py-2 mt-2" style="font-size:0.9rem;">
+                            <i class="fas fa-info-circle me-1"></i> El producto digital será enviado al correo que ingresaste en el paso 1.
                         </div>
                     </div>
                 </div>
@@ -424,12 +435,13 @@ const comunasPorRegion = {
 
 document.addEventListener('DOMContentLoaded', function() {
     mostrarResumenPedido();
+    detectarCarritoDigital();
     
     // Toggle sección dirección
     document.querySelectorAll('input[name="tipoEnvio"]').forEach(radio => {
         radio.addEventListener('change', function() {
             document.getElementById('direccionSection').style.display = 
-                this.value === 'retiro' ? 'none' : 'block';
+                (this.value === 'retiro' || this.value === 'digital') ? 'none' : 'block';
             actualizarTotal();
         });
     });
@@ -703,6 +715,16 @@ function actualizarTotal() {
     const total = Math.max(0, subtotal - montoDescuento + costoEnvio);
     subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
     totalElement.textContent = `$${Math.round(total).toLocaleString()}`;
+}
+
+function detectarCarritoDigital() {
+    const todosDigitales = carrito.length > 0 && carrito.every(item => item.es_digital);
+    document.getElementById('opcionesEnvioFisico').style.display = todosDigitales ? 'none' : 'block';
+    document.getElementById('opcionEnvioDigital').style.display = todosDigitales ? 'block' : 'none';
+    document.getElementById('direccionSection').style.display = todosDigitales ? 'none' : 'block';
+    if (todosDigitales) {
+        document.getElementById('correoDigital').checked = true;
+    }
 }
 
 function getCookie(name) {

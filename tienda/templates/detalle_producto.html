@@ -230,6 +230,7 @@
 <!-- JS del producto — funciones en window para que onclick inline funcione -->
 <script>
 var PRODUCTO_ID = {{ producto.id }};
+var PRODUCTO_DIGITAL = {{ producto.es_digital|yesno:'true,false' }};
 var PRECIO_BASE = {{ producto.precio|floatformat:"-2" }};
 var OPCIONES_DATA = {{ opciones_json|safe }};
 
@@ -302,7 +303,7 @@ function agregarAlCarritoConOpcion() {
     }
     var personalizacionField = document.getElementById('personalizacion');
     var personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
-    agregarAlCarrito(PRODUCTO_ID, nombreProducto, precio, cantidad, personalizacion);
+    agregarAlCarrito(PRODUCTO_ID, nombreProducto, precio, cantidad, personalizacion, null, PRODUCTO_DIGITAL);
 }
 
 function goToSlide(slideIndex) {

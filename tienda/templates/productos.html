@@ -42,7 +42,7 @@
                     <h6 class="card-title">{{ producto.nombre }}</h6>
                 </a>
                 <p class="h5 text-primary mb-3">${{ producto.precio|floatformat:0 }}</p>
-                <button class="btn btn-primary btn-sm mt-auto" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})">
+                <button class="btn btn-primary btn-sm mt-auto" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }}, 1, '', null, {{ producto.es_digital|yesno:'true,false' }})">
                     Agregar al Carrito
                 </button>
             </div>

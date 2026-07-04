@@ -76,6 +76,8 @@ class Producto(models.Model):
     condicion = models.CharField(max_length=20, choices=[('new', 'Nuevo'), ('refurbished', 'Reacondicionado'), ('used', 'Usado')], default='new')
     sincronizar_google = models.BooleanField(default=True, help_text='¿Sincronizar con Google Shopping?')
     
+    es_digital = models.BooleanField(default=False, help_text='¿Es un producto digital? Se enviará por correo electrónico.')
+    
     # Campos de personalización
     permite_personalizacion = models.BooleanField(default=False, help_text='¿Este producto permite personalización?')
     texto_personalizacion = models.CharField(max_length=200, blank=True, help_text='Ej: ¿Quieres ponerle nombre personalizado?')

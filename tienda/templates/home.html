@@ -98,7 +98,7 @@
                                     <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, -1)">-</div>
                                     <span id="qty-{{ producto.id }}">1</span>
                                     <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, 1)">+</div>
-                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})" title="Agregar al carrito">
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }}, {{ producto.es_digital|yesno:'true,false' }})" title="Agregar al carrito">
                                         <i class="fas fa-shopping-cart"></i>
                                     </button>
                                 </div>
@@ -175,7 +175,7 @@
                                     <h6 class="product-name">{{ producto.nombre }}</h6>
                                     <div class="product-price-container">
                                         <p class="product-price">{% if producto.tiene_rango_precios %}<small style="font-weight:400;font-size:0.75rem;">Desde</small> {% endif %}${{ producto.precio_desde|floatformat:0 }}</p>
-                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }})" title="Agregar al carrito">
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }}, 1, '', null, {{ producto.es_digital|yesno:'true,false' }})" title="Agregar al carrito">
                                             <i class="fas fa-shopping-cart"></i>
                                         </button>
                                     </div>
