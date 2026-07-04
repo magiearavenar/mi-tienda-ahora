@@ -103,6 +103,7 @@ class MercadoPagoService:
                 },
 
                 "external_reference": f"ORD-{pedido.id}",
+                "notification_url": settings.SITE_URL + "/mercadopago/webhook/",
 
             }
             
