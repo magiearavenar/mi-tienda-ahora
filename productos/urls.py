@@ -53,6 +53,7 @@ urlpatterns = [
     path('obtener-imagenes/<int:producto_id>/', views.obtener_imagenes_producto, name='obtener_imagenes_producto'),
     path('variantes-datos/<int:producto_id>/', views.variantes_datos, name='variantes_datos'),
     path('calcular-envio/', views.calcular_envio, name='calcular_envio'),
+    path('verificar-digitales/', views.verificar_digitales, name='verificar_digitales'),
     path('api/instagram-posts/', instagram_posts_api, name='instagram_posts_api'),
     path('portafolio/', views.portafolio, name='portafolio'),
     path('configurador/', views.configurador, name='configurador'),

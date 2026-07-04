@@ -551,6 +551,13 @@ def debug_config(request):
     }
     return JsonResponse(config)
 
+@require_POST
+def verificar_digitales(request):
+    data = json.loads(request.body)
+    ids = data.get('ids', [])
+    digitales = list(Producto.objects.filter(id__in=ids, es_digital=True).values_list('id', flat=True))
+    return JsonResponse({'digitales': digitales})
+
 def obtener_imagen_producto(request, producto_id):
     try:
         producto = Producto.objects.get(id=producto_id)

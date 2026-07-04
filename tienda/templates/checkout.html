@@ -433,7 +433,7 @@ const comunasPorRegion = {
 
 document.addEventListener('DOMContentLoaded', function() {
     mostrarResumenPedido();
-    detectarCarritoDigital();
+    verificarProductosDigitales();
     
     // Toggle sección dirección
     document.querySelectorAll('input[name="tipoEnvio"]').forEach(radio => {
@@ -713,6 +713,24 @@ function actualizarTotal() {
     const total = Math.max(0, subtotal - montoDescuento + costoEnvio);
     subtotalElement.textContent = `$${subtotal.toLocaleString()}`;
     totalElement.textContent = `$${Math.round(total).toLocaleString()}`;
+}
+
+function verificarProductosDigitales() {
+    if (carrito.length === 0) return;
+    const ids = carrito.map(item => item.id);
+    fetch('/verificar-digitales/', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken')},
+        body: JSON.stringify({ids: ids})
+    })
+    .then(r => r.json())
+    .then(data => {
+        const todosDigitales = ids.every(id => data.digitales.includes(id));
+        document.getElementById('opcionesEnvioFisico').style.display = todosDigitales ? 'none' : 'block';
+        document.getElementById('opcionEnvioDigital').style.display = todosDigitales ? 'block' : 'none';
+        document.getElementById('direccionSection').style.display = todosDigitales ? 'none' : 'block';
+        if (todosDigitales) document.getElementById('correoDigital').checked = true;
+    });
 }
 
 function detectarCarritoDigital() {
