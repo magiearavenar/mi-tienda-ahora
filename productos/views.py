@@ -24,11 +24,9 @@ def home(request):
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     banners = BannerFidelizacion.objects.filter(activo=True)
 
-    # Instagram
-    instagram_config = InstagramConfig.objects.filter(activo=True, mostrar_en_home=True).first()
+    # Instagram desactivado temporalmente
+    instagram_config = None
     instagram_posts = []
-    if instagram_config:
-        instagram_posts = InstagramService().get_user_media(instagram_config.cantidad_posts)
 
     secciones_categorias = SeccionCategoria.objects.filter(activo=True)
     secciones_con_productos = []
