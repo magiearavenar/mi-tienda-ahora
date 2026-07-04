@@ -544,7 +544,7 @@ function procesarPedido() {
     
     const tipoEnvio = document.querySelector('input[name="tipoEnvio"]:checked').value;
     
-    if (tipoEnvio !== 'retiro') {
+    if (tipoEnvio !== 'retiro' && tipoEnvio !== 'digital') {
         const nombre = document.getElementById('nombre').value;
         const apellido = document.getElementById('apellido').value;
         const rut = document.getElementById('rut').value;
