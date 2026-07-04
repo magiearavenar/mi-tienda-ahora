@@ -106,7 +106,12 @@ class MercadoPagoService:
 
             }
             
+            import logging
+            logging.info(f"MP preference_data: {preference_data}")
+            
             preference_response = self.sdk.preference().create(preference_data)
+            
+            logging.info(f"MP response: {preference_response}")
             
             if preference_response["status"] == 201:
                 preference = preference_response["response"]
