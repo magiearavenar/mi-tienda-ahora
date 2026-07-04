@@ -316,7 +316,7 @@ FLOW_SECRET_KEY = os.environ.get('FLOW_SECRET_KEY', '')
 FLOW_SANDBOX = os.environ.get('FLOW_SANDBOX', 'True').lower() == 'true'
 
 MERCADOPAGO_ACCESS_TOKEN = os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')
-MERCADOPAGO_SANDBOX = os.environ.get('MERCADOPAGO_SANDBOX', 'True').lower() == 'true'
+MERCADOPAGO_SANDBOX = os.environ.get('MERCADOPAGO_SANDBOX', 'False').lower() == 'true'
 
 SITE_URL = os.environ.get('SITE_URL', 'http://127.0.0.1:8000')
 
