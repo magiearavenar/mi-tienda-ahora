@@ -10,9 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='producto',
-            name='es_digital',
-            field=models.BooleanField(default=False, help_text='¿Es un producto digital? Se enviará por correo electrónico.'),
+        migrations.RunSQL(
+            sql="ALTER TABLE productos_producto ADD COLUMN IF NOT EXISTS es_digital boolean NOT NULL DEFAULT false;",
+            reverse_sql="ALTER TABLE productos_producto DROP COLUMN IF EXISTS es_digital;",
         ),
     ]
