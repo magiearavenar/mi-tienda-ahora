@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style="max-width:800px;margin:2rem auto;padding:0 1rem;">
+    <a href="{% url 'perfil' %}" style="color:var(--color-primario);">← Volver a mis compras</a>
+
+    <div class="card mt-3">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Pedido #{{ pedido.id }}</h5>
+            <span class="badge bg-{% if pedido.estado == 'entregado' %}success{% elif pedido.estado == 'enviado' %}info{% elif pedido.estado == 'procesando' %}warning{% else %}secondary{% endif %}">
+                {{ pedido.get_estado_display }}
+            </span>
+        </div>
+        <div class="card-body">
+            <p class="text-muted">Fecha: {{ pedido.fecha|date:"d/m/Y H:i" }}</p>
+
+            <h6 class="mt-3">Productos</h6>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for detalle in pedido.detalles.all %}
+                    <tr>
+                        <td>
+                            {{ detalle.producto.nombre }}
+                            {% if detalle.producto.es_digital %}
+                                <span class="badge bg-info ms-1">Digital</span>
+                                {% for token in detalle.producto.tokens.all %}
+                                    {% if token.pedido == pedido and token.esta_vigente %}
+                                    <br><a href="{% url 'descargar_digital' token.token %}" class="btn btn-sm btn-outline-primary mt-1">
+                                        <i class="fas fa-download"></i> Descargar
+                                    </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if detalle.personalizacion %}
+                                <br><small class="text-muted">{{ detalle.personalizacion }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ detalle.cantidad }}</td>
+                        <td>${{ detalle.precio|floatformat:0 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2"><strong>Total</strong></td>
+                        <td><strong>${{ pedido.total|floatformat:0 }}</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

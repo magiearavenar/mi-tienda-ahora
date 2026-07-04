@@ -378,53 +378,56 @@ def flow_confirmar(request):
     return HttpResponse('ERROR', status=400)
 
 @csrf_exempt
-@require_POST
 def mercadopago_webhook(request):
     try:
+        if request.method == 'GET':
+            return HttpResponse('OK')
         data = json.loads(request.body)
-        
-        if data.get('type') == 'payment':
-            payment_id = data['data']['id']
-            
-            mp_service = MercadoPagoService()
-            payment_info = mp_service.verificar_pago(payment_id)
-            
-            if payment_info and payment_info.get('status') == 'approved':
-                external_reference = payment_info.get('external_reference')
-                if external_reference:
-                    pedido_id = external_reference.replace('ORD-', '')
-                    try:
-                        pedido = Pedido.objects.get(id=pedido_id)
-                        pago, created = Pago.objects.get_or_create(
-                            pedido=pedido,
-                            defaults={
-                                'metodo': 'mercadopago',
-                                'monto': pedido.total,
-                                'estado': 'pagado',
-                                'fecha_pago': timezone.now(),
-                                'id_transaccion': str(payment_id),
-                                'datos_respuesta': payment_info
-                            }
-                        )
-                        
-                        if not created:
-                            pago.estado = 'pagado'
-                            pago.fecha_pago = timezone.now()
-                            pago.datos_respuesta = payment_info
-                            pago.save()
-                        
-                        pedido.estado = 'procesando'
-                        pedido.save()
-
-                        # Enviar archivos digitales si corresponde
-                        _enviar_digitales(pedido, payment_info.get('payer', {}).get('email', ''))
-                        
-                    except Pedido.DoesNotExist:
-                        pass
-        
+        import threading
+        threading.Thread(target=_procesar_webhook_mp, args=(data,), daemon=True).start()
         return HttpResponse('OK')
+    except Exception:
+        return HttpResponse('OK')
+
+def _procesar_webhook_mp(data):
+    try:
+        if data.get('type') != 'payment':
+            return
+        payment_id = data['data']['id']
+        mp_service = MercadoPagoService()
+        payment_info = mp_service.verificar_pago(payment_id)
+        if not payment_info or payment_info.get('status') != 'approved':
+            return
+        external_reference = payment_info.get('external_reference', '')
+        if not external_reference:
+            return
+        pedido_id = external_reference.replace('ORD-', '')
+        try:
+            pedido = Pedido.objects.get(id=pedido_id)
+            pago, created = Pago.objects.get_or_create(
+                pedido=pedido,
+                defaults={
+                    'metodo': 'mercadopago',
+                    'monto': pedido.total,
+                    'estado': 'pagado',
+                    'fecha_pago': timezone.now(),
+                    'id_transaccion': str(payment_id),
+                    'datos_respuesta': payment_info
+                }
+            )
+            if not created:
+                pago.estado = 'pagado'
+                pago.fecha_pago = timezone.now()
+                pago.datos_respuesta = payment_info
+                pago.save()
+            pedido.estado = 'procesando'
+            pedido.save()
+            _enviar_digitales(pedido, payment_info.get('payer', {}).get('email', ''))
+        except Pedido.DoesNotExist:
+            pass
     except Exception as e:
-        return HttpResponse('ERROR', status=400)
+        import logging
+        logging.error(f'Error procesando webhook MP: {e}', exc_info=True)
 
 def _enviar_digitales(pedido, email_pago):
     """Genera tokens de descarga y envía email con links al cliente."""
