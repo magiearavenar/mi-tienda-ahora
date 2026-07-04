@@ -551,6 +551,7 @@ def debug_config(request):
     }
     return JsonResponse(config)
 
+@csrf_exempt
 @require_POST
 def verificar_digitales(request):
     data = json.loads(request.body)
