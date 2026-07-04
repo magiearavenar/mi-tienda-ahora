@@ -625,7 +625,7 @@ def debug_config(request):
     config = {
         'FLOW_API_KEY': bool(os.environ.get('FLOW_API_KEY', '')),
         'FLOW_SECRET_KEY': bool(os.environ.get('FLOW_SECRET_KEY', '')),
-        'MERCADOPAGO_ACCESS_TOKEN': bool(os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')),
+        'MERCADOPAGO_ACCESS_TOKEN_END': os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')[-4:],
         'MERCADOPAGO_SANDBOX': os.environ.get('MERCADOPAGO_SANDBOX', 'Not set'),
         'SITE_URL': os.environ.get('SITE_URL', 'Not set'),
         'DEBUG': os.environ.get('DEBUG', 'Not set'),
