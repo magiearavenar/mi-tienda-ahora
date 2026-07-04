@@ -267,6 +267,7 @@ def checkout(request):
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     return render(request, 'checkout.html', {'config': config})
 
+@csrf_exempt
 @require_POST
 def procesar_pago(request):
     try:
