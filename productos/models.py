@@ -554,6 +554,25 @@ class Resena(models.Model):
         verbose_name_plural = "Reseñas"
 
 
+class TokenDescarga(models.Model):
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE)
+    pedido = models.ForeignKey('Pedido', on_delete=models.CASCADE)
+    token = models.CharField(max_length=64, unique=True)
+    fecha_expiracion = models.DateTimeField()
+    usado = models.BooleanField(default=False)
+
+    def esta_vigente(self):
+        from django.utils import timezone
+        return not self.usado and timezone.now() < self.fecha_expiracion
+
+    def __str__(self):
+        return f'Token {self.token[:8]}... - {self.producto.nombre}'
+
+    class Meta:
+        verbose_name = 'Token de Descarga'
+        verbose_name_plural = 'Tokens de Descarga'
+
+
 class InstagramConfig(models.Model):
     usuario = models.CharField(max_length=100, help_text='Usuario de Instagram (sin @)')
     titulo = models.CharField(max_length=100, default='Síguenos en Instagram')

@@ -12,7 +12,7 @@ from django.db import models
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena, TokenDescarga
 from .services import FlowService, MercadoPagoService
 from .instagram_service import InstagramService
 from .forms import RegistroForm
@@ -427,52 +427,62 @@ def mercadopago_webhook(request):
         return HttpResponse('ERROR', status=400)
 
 def _enviar_digitales(pedido, email_pago):
-    """Envía los archivos digitales del pedido al correo del cliente."""
+    """Genera tokens de descarga y envía email con links al cliente."""
     try:
-        from django.core.mail import EmailMessage
-        import urllib.request
+        from django.core.mail import send_mail
+        from django.template.loader import render_to_string
+        from django.utils import timezone
+        from datetime import timedelta
+        import secrets
+        from .models import TokenDescarga
 
-        # Obtener email: del pedido, del usuario, o del pago
         email = None
         if pedido.usuario and pedido.usuario.email:
             email = pedido.usuario.email
         elif email_pago:
             email = email_pago
-        
+
         if not email:
             return
 
-        # Buscar productos digitales en el pedido
-        digitales = []
-        for detalle in pedido.detalles.select_related('producto').all():
-            if detalle.producto.es_digital and detalle.producto.archivo_digital:
-                digitales.append(detalle.producto)
+        digitales = [
+            detalle.producto
+            for detalle in pedido.detalles.select_related('producto').all()
+            if detalle.producto.es_digital and detalle.producto.archivo_digital
+        ]
 
         if not digitales:
             return
 
-        msg = EmailMessage(
-            subject=f'Tu compra digital en Mundo Magie - Pedido #{pedido.id}',
-            body=f'Hola! Gracias por tu compra.\n\nAdjunto encontrarás tu(s) producto(s) digital(es):\n' +
-                 '\n'.join([f'- {p.nombre}' for p in digitales]) +
-                 '\n\nSaludos,\nMundo Magie',
-            from_email=None,
-            to=[email],
-        )
-
+        # Generar tokens con expiración de 5 días
+        items = []
         for producto in digitales:
-            archivo = producto.archivo_digital
-            try:
-                # Leer el archivo desde Cloudinary o local
-                with urllib.request.urlopen(archivo.url) as f:
-                    contenido = f.read()
-                nombre_archivo = archivo.name.split('/')[-1]
-                msg.attach(nombre_archivo, contenido)
-            except Exception as e:
-                import logging
-                logging.error(f'Error adjuntando archivo {archivo.name}: {e}')
+            token = secrets.token_urlsafe(32)
+            TokenDescarga.objects.create(
+                producto=producto,
+                pedido=pedido,
+                token=token,
+                fecha_expiracion=timezone.now() + timedelta(days=5)
+            )
+            items.append({
+                'nombre': producto.nombre,
+                'url': f'https://www.mundomagie.cl/descargar/{token}/'
+            })
 
-        msg.send(fail_silently=True)
+        nombre_usuario = pedido.usuario.username if pedido.usuario else email.split('@')[0]
+        html = render_to_string('emails/descarga_digital.html', {
+            'nombre_usuario': nombre_usuario,
+            'productos': items,
+        })
+
+        send_mail(
+            subject=f'✨ Tu descarga digital - Mundo Magie (Pedido #{pedido.id})',
+            message='',
+            from_email=None,
+            recipient_list=[email],
+            html_message=html,
+            fail_silently=True,
+        )
 
     except Exception as e:
         import logging
@@ -481,6 +491,21 @@ def _enviar_digitales(pedido, email_pago):
 
 def pago_exitoso(request):
     return render(request, 'pago_exitoso.html')
+
+
+def descargar_digital(request, token):
+    td = get_object_or_404(TokenDescarga, token=token)
+    if not td.esta_vigente():
+        return render(request, 'descarga_expirada.html')
+    import urllib.request as urlreq
+    from django.http import HttpResponse
+    archivo = td.producto.archivo_digital
+    with urlreq.urlopen(archivo.url) as f:
+        contenido = f.read()
+    nombre = archivo.name.split('/')[-1]
+    response = HttpResponse(contenido, content_type='application/octet-stream')
+    response['Content-Disposition'] = f'attachment; filename="{nombre}"'
+    return response
 
 def pago_fallido(request):
     return render(request, 'pago_fallido.html')
