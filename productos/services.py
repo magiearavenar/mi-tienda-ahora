@@ -89,7 +89,7 @@ class MercadoPagoService:
                     {
                         "title": f"Pedido #{pedido.id} - Mundo Magie",
                         "quantity": 1,
-                        "unit_price": float(pedido.total),
+                        "unit_price": int(pedido.total),
                         "currency_id": "CLP"
                     }
                 ],
