@@ -3,7 +3,13 @@ from django.utils.text import slugify
 import unicodedata
 
 
-def generar_slugs(apps, schema_editor):
+def agregar_columna_y_slugs(apps, schema_editor):
+    # Agregar columna si no existe
+    schema_editor.execute("""
+        ALTER TABLE productos_producto
+        ADD COLUMN IF NOT EXISTS slug varchar(250) NOT NULL DEFAULT '';
+    """)
+    # Generar slugs
     Producto = apps.get_model('productos', 'Producto')
     for p in Producto.objects.all():
         if not p.slug:
@@ -14,6 +20,22 @@ def generar_slugs(apps, schema_editor):
                 n += 1
             p.slug = slug
             p.save(update_fields=['slug'])
+    # Agregar unique constraint si no existe
+    schema_editor.execute("""
+        DO $$ BEGIN
+            IF NOT EXISTS (
+                SELECT 1 FROM pg_constraint
+                WHERE conname = 'productos_producto_slug_key'
+            ) THEN
+                ALTER TABLE productos_producto ADD CONSTRAINT productos_producto_slug_key UNIQUE (slug);
+            END IF;
+        END $$;
+    """)
+    # Agregar índice LIKE si no existe
+    schema_editor.execute("""
+        CREATE INDEX IF NOT EXISTS productos_producto_slug_8e5f75e2_like
+        ON productos_producto (slug varchar_pattern_ops);
+    """)
 
 
 class Migration(migrations.Migration):
@@ -23,12 +45,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='producto',
-            name='slug',
-            field=models.SlugField(blank=True, max_length=250, default=''),
-        ),
-        migrations.RunPython(generar_slugs, migrations.RunPython.noop),
+        migrations.RunPython(agregar_columna_y_slugs, migrations.RunPython.noop),
         migrations.AlterField(
             model_name='producto',
             name='slug',
