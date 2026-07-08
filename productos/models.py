@@ -179,6 +179,7 @@ class DetallePedido(models.Model):
     cantidad = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     personalizacion = models.TextField(blank=True, help_text='Texto de personalización del cliente')
+    imagen_personalizacion = models.ImageField(upload_to='personalizaciones/', blank=True, null=True, help_text='Imagen subida por el cliente')
     
     def __str__(self):
         return f"{self.producto.nombre} x{self.cantidad}"

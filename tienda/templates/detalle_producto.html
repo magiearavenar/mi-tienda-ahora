@@ -143,6 +143,22 @@
                 <textarea id="personalizacion" class="form-control" rows="3" placeholder="{{ producto.placeholder_personalizacion|default:'Ingresa tu texto personalizado aquí...' }}"></textarea>
                 <small class="form-text text-muted">Este campo es opcional</small>
             </div>
+            <div class="mb-4">
+                <label class="form-label">Subir foto de referencia <small class="text-muted">(opcional)</small></label>
+                <div id="zona-foto" style="border:2px dashed #ccc;border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s;">
+                    <input type="file" id="foto-personalizacion" accept="image/*" style="display:none;">
+                    <div id="foto-preview-container" style="display:none;">
+                        <img id="foto-preview" style="max-height:150px;border-radius:8px;margin-bottom:0.5rem;">
+                        <br>
+                        <button type="button" onclick="quitarFoto()" class="btn btn-sm btn-outline-danger mt-1">Quitar foto</button>
+                    </div>
+                    <div id="foto-placeholder">
+                        <i class="fas fa-camera fa-2x text-muted mb-2"></i>
+                        <p class="text-muted mb-0" style="font-size:0.9rem;">Haz clic para subir tu foto</p>
+                        <small class="text-muted">JPG, PNG — máx. 5MB</small>
+                    </div>
+                </div>
+            </div>
             {% endif %}
 
             <div class="mb-4">
@@ -233,6 +249,34 @@ var PRODUCTO_ID = {{ producto.id }};
 var PRODUCTO_DIGITAL = {{ producto.es_digital|yesno:'true,false' }};
 var PRECIO_BASE = {{ producto.precio|floatformat:"-2" }};
 var OPCIONES_DATA = {{ opciones_json|safe }};
+var fotoPersonalizacion = null;
+
+{% if producto.permite_personalizacion %}
+document.getElementById('zona-foto').addEventListener('click', function(e) {
+    if (e.target.tagName !== 'BUTTON') document.getElementById('foto-personalizacion').click();
+});
+document.getElementById('foto-personalizacion').addEventListener('change', function() {
+    var file = this.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { alert('La foto no puede superar 5MB'); return; }
+    fotoPersonalizacion = file;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('foto-preview').src = e.target.result;
+        document.getElementById('foto-preview-container').style.display = 'block';
+        document.getElementById('foto-placeholder').style.display = 'none';
+        document.getElementById('zona-foto').style.borderColor = '#28a745';
+    };
+    reader.readAsDataURL(file);
+});
+function quitarFoto() {
+    fotoPersonalizacion = null;
+    document.getElementById('foto-personalizacion').value = '';
+    document.getElementById('foto-preview-container').style.display = 'none';
+    document.getElementById('foto-placeholder').style.display = 'block';
+    document.getElementById('zona-foto').style.borderColor = '#ccc';
+}
+{% endif %}
 
 function getPrecioActual() {
     var selectOpcion = document.getElementById('opcion');
@@ -303,7 +347,15 @@ function agregarAlCarritoConOpcion() {
     }
     var personalizacionField = document.getElementById('personalizacion');
     var personalizacion = personalizacionField ? personalizacionField.value.trim() : '';
-    agregarAlCarrito(PRODUCTO_ID, nombreProducto, precio, cantidad, personalizacion, null, PRODUCTO_DIGITAL);
+    if (fotoPersonalizacion) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            agregarAlCarrito(PRODUCTO_ID, nombreProducto, precio, cantidad, personalizacion, null, PRODUCTO_DIGITAL, e.target.result, fotoPersonalizacion.name);
+        };
+        reader.readAsDataURL(fotoPersonalizacion);
+    } else {
+        agregarAlCarrito(PRODUCTO_ID, nombreProducto, precio, cantidad, personalizacion, null, PRODUCTO_DIGITAL);
+    }
 }
 
 function goToSlide(slideIndex) {

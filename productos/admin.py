@@ -475,7 +475,17 @@ class SeccionCategoriaAdmin(admin.ModelAdmin):
 class DetallePedidoInline(admin.TabularInline):
     model = DetallePedido
     extra = 0
-    readonly_fields = ['producto', 'cantidad', 'precio', 'personalizacion']
+    readonly_fields = ['producto', 'cantidad', 'precio', 'personalizacion', 'ver_imagen']
+
+    def ver_imagen(self, obj):
+        if obj.imagen_personalizacion:
+            return format_html(
+                '<a href="{}" target="_blank"><img src="{}" style="height:80px;border-radius:6px;"></a>',
+                obj.imagen_personalizacion.url,
+                obj.imagen_personalizacion.url
+            )
+        return '-'
+    ver_imagen.short_description = 'Foto cliente'
 
 @admin.register(Pedido)
 class PedidoAdmin(admin.ModelAdmin):

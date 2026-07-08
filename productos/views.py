@@ -300,13 +300,25 @@ def procesar_pago(request):
         for item in carrito:
             try:
                 producto = Producto.objects.get(id=item['id'])
-                DetallePedido.objects.create(
+                detalle = DetallePedido.objects.create(
                     pedido=pedido,
                     producto=producto,
                     cantidad=int(item['cantidad']),
                     precio=float(item['precio']),
                     personalizacion=item.get('personalizacion', '')
                 )
+                # Guardar imagen de personalización si existe
+                foto_b64 = item.get('foto_personalizacion')
+                foto_nombre = item.get('foto_nombre', 'foto.jpg')
+                if foto_b64 and ',' in foto_b64:
+                    import base64
+                    from django.core.files.base import ContentFile
+                    header, data = foto_b64.split(',', 1)
+                    detalle.imagen_personalizacion.save(
+                        f'pedido_{pedido.id}_{foto_nombre}',
+                        ContentFile(base64.b64decode(data)),
+                        save=True
+                    )
                 # Descontar stock general
                 producto.stock = max(0, producto.stock - int(item['cantidad']))
                 producto.save(update_fields=['stock'])
