@@ -4,11 +4,64 @@ from django.db import models
 from django.core.files.base import ContentFile
 from django.shortcuts import render
 from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from PIL import Image
 import io
 from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento, ImagenInterior, Resena
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
+
+
+class QuillWidget(forms.Textarea):
+    def render(self, name, value, attrs=None, renderer=None):
+        textarea = super().render(name, value, attrs, renderer)
+        uid = attrs.get('id', name)
+        html = f"""
+        {textarea}
+        <div id="quill_{uid}" style="min-height:200px;border:1px solid #ccc;border-radius:4px;background:#fff;font-size:14px;"></div>
+        <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+        <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+        <script>
+        (function(){{
+            var textarea = document.getElementById('{uid}');
+            textarea.style.display = 'none';
+            var quill = new Quill('#quill_{uid}', {{
+                theme: 'snow',
+                modules: {{
+                    toolbar: [
+                        ['bold','italic','underline','strike'],
+                        [{{'list':'ordered'}},{{'list':'bullet'}}],
+                        [{{'size':['small',false,'large','huge']}}],
+                        ['link'],
+                        ['clean']
+                    ]
+                }}
+            }});
+            if (textarea.value) {{
+                quill.root.innerHTML = textarea.value;
+            }}
+            quill.on('text-change', function() {{
+                textarea.value = quill.root.innerHTML;
+            }});
+            var form = textarea.closest('form');
+            if (form) {{
+                form.addEventListener('submit', function() {{
+                    textarea.value = quill.root.innerHTML;
+                }});
+            }}
+        }})();
+        </script>
+        """
+        return mark_safe(html)
+
+
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = '__all__'
+        widgets = {
+            'descripcion': QuillWidget(attrs={'rows': 4}),
+        }
 
 
 def comprimir_imagen(imagen, max_kb=4000, max_px=1920):
@@ -123,6 +176,7 @@ class OpcionProductoInline(admin.TabularInline):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
+    form = ProductoForm
     list_display = ['nombre', 'mostrar_categoria', 'mostrar_tags', 'precio', 'stock', 'activo', 'fecha_creacion']
     list_filter = ['categoria', 'activo', 'permite_personalizacion', 'fecha_creacion', 'tags_adicionales']
     search_fields = ['nombre', 'descripcion']
