@@ -81,7 +81,7 @@
                     <div class="product-card-carousel">
                         <div class="product-image-carousel">
                             {% if producto.imagen_principal %}
-                            <a href="{% url 'detalle_producto' producto.id %}">
+                            <a href="{% url 'detalle_producto' producto.slug %}">
                                 <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy" width="280" height="280">
                             </a>
                             {% else %}
@@ -164,7 +164,7 @@
                             <div class="product-card-carousel">
                                 <div class="product-image-carousel">
                                     {% if producto.imagen_principal %}
-                                    <a href="{% url 'detalle_producto' producto.id %}">
+                                    <a href="{% url 'detalle_producto' producto.slug %}">
                                         <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy">
                                     </a>
                                     {% else %}

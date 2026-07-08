@@ -58,8 +58,8 @@ def productos_por_categoria(request, categoria_id):
         'config': config,
         'banners': banners
     })
-def detalle_producto(request, producto_id):
-    producto = get_object_or_404(Producto, id=producto_id, activo=True)
+def detalle_producto(request, slug):
+    producto = get_object_or_404(Producto, slug=slug, activo=True)
     categorias = Categoria.objects.filter(visible_navegacion=True)
     config = ConfiguracionSitio.objects.filter(activo=True).first()
     atributos = producto.atributos.prefetch_related('valores').all()
@@ -124,8 +124,8 @@ def carrito(request):
 
 
 @require_POST
-def crear_resena(request, producto_id):
-    producto = get_object_or_404(Producto, id=producto_id, activo=True)
+def crear_resena(request, slug):
+    producto = get_object_or_404(Producto, slug=slug, activo=True)
     nombre = request.POST.get('nombre', '').strip()
     puntuacion = int(request.POST.get('puntuacion', 5))
     comentario = request.POST.get('comentario', '').strip()
@@ -137,7 +137,7 @@ def crear_resena(request, producto_id):
         messages.success(request, 'Tu reseña fue enviada y será publicada tras revisión.')
     else:
         messages.error(request, 'Por favor completa todos los campos.')
-    return redirect('detalle_producto', producto_id=producto_id)
+    return redirect('detalle_producto', slug=producto.slug)
 
 def registro(request):
     if request.method == 'POST':

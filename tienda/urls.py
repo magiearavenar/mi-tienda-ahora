@@ -55,7 +55,7 @@ def sitemap_xml(request):
     for producto in Producto.objects.filter(activo=True):
         urls.append(f'''
     <url>
-        <loc>{base_url}/producto/{producto.id}/</loc>
+        <loc>{base_url}/producto/{producto.slug}/</loc>
         <lastmod>{producto.fecha_creacion.strftime('%Y-%m-%d')}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.7</priority>

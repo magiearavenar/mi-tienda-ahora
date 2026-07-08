@@ -30,7 +30,7 @@ def google_feed_xml(request):
       <g:id>{p.id}</g:id>
       <g:title><![CDATA[{p.nombre}]]></g:title>
       <g:description><![CDATA[{p.descripcion[:5000]}]]></g:description>
-      <g:link>{base_url}/producto/{p.id}/</g:link>
+      <g:link>{base_url}/producto/{p.slug}/</g:link>
       <g:image_link>{imagen_url}</g:image_link>
       <g:availability>{disponibilidad}</g:availability>
       <g:price>{p.precio} CLP</g:price>

@@ -28,7 +28,7 @@
         <div class="card product-card h-100">
             <div class="product-image">
                 {% if producto.imagen_principal %}
-                <a href="{% url 'detalle_producto' producto.id %}">
+                <a href="{% url 'detalle_producto' producto.slug %}">
                     <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy" style="cursor: pointer;">
                 </a>
                 {% else %}
@@ -38,7 +38,7 @@
                 {% endif %}
             </div>
             <div class="card-body d-flex flex-column">
-                <a href="{% url 'detalle_producto' producto.id %}" class="text-decoration-none text-dark">
+                <a href="{% url 'detalle_producto' producto.slug %}" class="text-decoration-none text-dark">
                     <h6 class="card-title">{{ producto.nombre }}</h6>
                 </a>
                 <p class="h5 text-primary mb-3">${{ producto.precio|floatformat:0 }}</p>

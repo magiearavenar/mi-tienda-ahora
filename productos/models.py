@@ -38,6 +38,7 @@ class Categoria(models.Model):
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=200)
+    slug = models.SlugField(max_length=250, unique=True, blank=True)
     descripcion = models.TextField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     categoria = models.ManyToManyField(Categoria, blank=True, verbose_name='Categorías')
@@ -51,24 +52,24 @@ class Producto(models.Model):
     # Campos Google Shopping
     GOOGLE_CATEGORIES = [
         ('', '-- Seleccionar --'),
-        ('Arts & Entertainment > Party & Celebration > Party Supplies', 'Artículos de Fiesta'),
-        ('Arts & Entertainment > Party & Celebration > Party Favors', 'Sorpresas / Cotillón'),
-        ('Arts & Entertainment > Party & Celebration > Gift Wrapping', 'Envoltorios de Regalo'),
-        ('Arts & Entertainment > Party & Celebration > Party Decorations', 'Decoración de Fiestas'),
-        ('Arts & Entertainment > Party & Celebration > Banners', 'Banners y Guirnaldas'),
-        ('Arts & Entertainment > Party & Celebration > Invitations', 'Invitaciones'),
-        ('Arts & Entertainment > Party & Celebration > Party Hats', 'Gorros de Fiesta'),
-        ('Home & Garden > Decor', 'Decoración del Hogar'),
-        ('Home & Garden > Decor > Candles', 'Velas Decorativas'),
-        ('Food, Beverages & Tobacco > Food Items > Candy & Chocolate', 'Dulces y Chocolates'),
-        ('Toys & Games', 'Juguetes'),
-        ('Toys & Games > Puzzles', 'Puzzles'),
-        ('Toys & Games > Stuffed Animals', 'Peluches'),
-        ('Baby & Toddler > Baby Shower', 'Baby Shower'),
-        ('Office Supplies > Paper Products > Stationery', 'Papelería'),
-        ('Office Supplies > Paper Products > Gift Cards', 'Tarjetas de Regalo'),
-        ('Apparel & Accessories > Costumes & Accessories', 'Disfraces y Accesorios'),
-        ('Arts & Entertainment > Crafts > Craft Supplies', 'Manualidades'),
+        ('5709', 'Artículos de Fiesta'),
+        ('96', 'Sorpresas / Cotillón'),
+        ('5710', 'Envoltorios de Regalo'),
+        ('5711', 'Decoración de Fiestas'),
+        ('5712', 'Banners y Guirnaldas'),
+        ('5713', 'Invitaciones'),
+        ('5714', 'Gorros de Fiesta'),
+        ('536', 'Decoración del Hogar'),
+        ('592', 'Velas Decorativas'),
+        ('1876', 'Dulces y Chocolates'),
+        ('1253', 'Juguetes'),
+        ('3867', 'Puzzles'),
+        ('4352', 'Peluches'),
+        ('5593', 'Baby Shower'),
+        ('923', 'Papelería'),
+        ('5874', 'Tarjetas de Regalo'),
+        ('5192', 'Disfraces y Accesorios'),
+        ('505370', 'Manualidades'),
     ]
     marca = models.CharField(max_length=100, default='Mundo Magie', help_text='Marca del producto')
     mpn = models.CharField(max_length=100, blank=True, help_text='Número de parte del fabricante (único por producto)')
@@ -86,8 +87,21 @@ class Producto(models.Model):
     
     def __str__(self):
         return self.nombre
-    
-    def imagen_principal(self):
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            import unicodedata
+            base = slugify(unicodedata.normalize('NFKD', self.nombre))
+            slug = base
+            n = 1
+            while Producto.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f'{base}-{n}'
+                n += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
+
+    def _imagen_principal(self):
         img = self.imagenes.filter(es_principal=True).first()
         if not img:
             img = self.imagenes.first()
@@ -96,7 +110,7 @@ class Producto(models.Model):
         if self.imagen:
             return self.imagen
         return None
-    imagen_principal = property(imagen_principal)
+    imagen_principal = property(_imagen_principal)
     
     def todas_las_imagenes(self):
         """Retorna todas las imágenes del producto para mostrar en el catálogo"""
