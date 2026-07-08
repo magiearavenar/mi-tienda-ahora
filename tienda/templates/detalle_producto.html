@@ -101,11 +101,11 @@
                         {% for valor in atributo.valores.all %}
                         {% if valor.activo %}
                         <option value="{{ valor.id }}"
-                                data-precio-extra="{{ valor.precio_extra }}"
+                                data-precio-extra="{{ valor.precio }}"
                                 data-stock="{{ valor.stock }}"
                                 {% if valor.imagen_producto %}data-imagen="{{ valor.imagen_producto.imagen.url }}"{% endif %}
                                 {% if valor.stock == 0 %}disabled{% endif %}>
-                            {{ valor.valor }}{% if valor.precio_extra > 0 %} (+${{ valor.precio_extra|floatformat:0 }}){% endif %}{% if valor.precio_extra < 0 %} (-${{ valor.precio_extra|floatformat:0 }}){% endif %}{% if valor.stock == 0 %} — Sin stock{% endif %}
+                            {{ valor.valor }}{% if valor.precio > 0 %} (${{ valor.precio|floatformat:0 }}){% endif %}{% if valor.stock == 0 %} — Sin stock{% endif %}
                         </option>
                         {% endif %}
                         {% endfor %}

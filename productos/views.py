@@ -72,7 +72,7 @@ def detalle_producto(request, slug):
     for atributo in atributos:
         for v in atributo.valores.filter(activo=True):
             tiene_variantes = True
-            precio_variante = float(producto.precio) + float(v.precio_extra)
+            precio_variante = float(v.precio) if float(v.precio) > 0 else float(producto.precio)
             if precio_variante < precio_minimo:
                 precio_minimo = precio_variante
 
@@ -90,7 +90,7 @@ def detalle_producto(request, slug):
             valores.append({
                 'id': v.id,
                 'valor': v.valor,
-                'precio_extra': float(v.precio_extra),
+                'precio_extra': 0,
                 'stock': v.stock,
                 'imagen': v.imagen_producto.imagen.url if v.imagen_producto and v.imagen_producto.imagen else None,
             })
