@@ -84,6 +84,9 @@ class Producto(models.Model):
     permite_personalizacion = models.BooleanField(default=False, help_text='¿Este producto permite personalización?')
     texto_personalizacion = models.CharField(max_length=200, blank=True, help_text='Ej: ¿Quieres ponerle nombre personalizado?')
     placeholder_personalizacion = models.CharField(max_length=100, blank=True, help_text='Texto de ejemplo para el campo')
+    permite_foto = models.BooleanField(default=False, help_text='¿El cliente puede subir una foto para este producto?')
+    texto_foto = models.CharField(max_length=200, blank=True, default='Sube tu foto de referencia', help_text='Título del campo de foto')
+    placeholder_foto = models.CharField(max_length=200, blank=True, default='Ej: foto de tu mascota, logo, diseño...', help_text='Descripción o instrucción para el cliente')
     
     def __str__(self):
         return self.nombre

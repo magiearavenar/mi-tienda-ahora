@@ -143,8 +143,11 @@
                 <textarea id="personalizacion" class="form-control" rows="3" placeholder="{{ producto.placeholder_personalizacion|default:'Ingresa tu texto personalizado aquí...' }}"></textarea>
                 <small class="form-text text-muted">Este campo es opcional</small>
             </div>
+            {% endif %}
+            {% if producto.permite_foto %}
             <div class="mb-4">
-                <label class="form-label">Subir foto de referencia <small class="text-muted">(opcional)</small></label>
+                <label class="form-label">{{ producto.texto_foto|default:'Sube tu foto de referencia' }} <small class="text-muted">(opcional)</small></label>
+                {% if producto.placeholder_foto %}<small class="d-block text-muted mb-2">{{ producto.placeholder_foto }}</small>{% endif %}
                 <div id="zona-foto" style="border:2px dashed #ccc;border-radius:10px;padding:1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s;">
                     <input type="file" id="foto-personalizacion" accept="image/*" style="display:none;">
                     <div id="foto-preview-container" style="display:none;">
@@ -251,7 +254,7 @@ var PRECIO_BASE = {{ producto.precio|floatformat:"-2" }};
 var OPCIONES_DATA = {{ opciones_json|safe }};
 var fotoPersonalizacion = null;
 
-{% if producto.permite_personalizacion %}
+{% if producto.permite_foto %}
 document.getElementById('zona-foto').addEventListener('click', function(e) {
     if (e.target.tagName !== 'BUTTON') document.getElementById('foto-personalizacion').click();
 });
