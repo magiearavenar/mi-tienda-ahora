@@ -18,7 +18,15 @@ class QuillWidget(forms.Textarea):
         uid = attrs.get('id', name)
         html = f"""
         {textarea}
-        <div id="quill_{uid}" style="min-height:200px;border:1px solid #ccc;border-radius:4px;background:#fff;font-size:14px;"></div>
+        <div id="quill_wrap_{uid}" style="position:relative;">
+            <div id="quill_{uid}" style="height:200px;border:1px solid #ccc;border-radius:4px 4px 0 0;background:#fff;font-size:14px;overflow-y:auto;"></div>
+            <div id="quill_resize_{uid}"
+                style="height:8px;background:#e9ecef;border:1px solid #ccc;border-top:none;border-radius:0 0 4px 4px;
+                       cursor:ns-resize;display:flex;align-items:center;justify-content:center;user-select:none;"
+                title="Arrastra para expandir">
+                <span style="color:#aaa;font-size:10px;letter-spacing:2px;">&#9776;</span>
+            </div>
+        </div>
         <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
         <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
         <script>
@@ -49,6 +57,25 @@ class QuillWidget(forms.Textarea):
                     textarea.value = quill.root.innerHTML;
                 }});
             }}
+            // Resize handle
+            var handle = document.getElementById('quill_resize_{uid}');
+            var editorEl = document.getElementById('quill_{uid}');
+            var startY, startH;
+            handle.addEventListener('mousedown', function(e) {{
+                startY = e.clientY;
+                startH = editorEl.offsetHeight;
+                e.preventDefault();
+                function onMove(e) {{
+                    var newH = Math.max(100, startH + (e.clientY - startY));
+                    editorEl.style.height = newH + 'px';
+                }}
+                function onUp() {{
+                    document.removeEventListener('mousemove', onMove);
+                    document.removeEventListener('mouseup', onUp);
+                }}
+                document.addEventListener('mousemove', onMove);
+                document.addEventListener('mouseup', onUp);
+            }});
         }})();
         </script>
         """
@@ -187,7 +214,10 @@ class ProductoAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Información Básica', {
-            'fields': ('nombre', 'precio', 'stock', 'activo', 'descripcion', 'imagen', 'imagen_url', 'categoria', 'tags_adicionales', 'es_digital', 'archivo_digital')
+            'fields': ('nombre', 'precio', 'stock', 'activo', 'imagen', 'imagen_url', 'categoria', 'tags_adicionales', 'es_digital', 'archivo_digital')
+        }),
+        ('Descripción', {
+            'fields': ('descripcion',),
         }),
         ('Personalización', {
             'fields': ('permite_personalizacion', 'texto_personalizacion', 'placeholder_personalizacion', 'permite_foto', 'texto_foto', 'placeholder_foto'),
