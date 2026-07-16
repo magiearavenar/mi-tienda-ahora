@@ -1,15 +1,45 @@
 from django.contrib import admin
+from django.contrib.admin import AdminSite
 from django import forms
 from django.db import models
 from django.core.files.base import ContentFile
 from django.shortcuts import render
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
+from django.utils import timezone
+from django.contrib.auth.models import User
+from django.contrib.admin.models import LogEntry
 from PIL import Image
 import io
 from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento, ImagenInterior, Resena
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
+
+
+class MundoMagieAdminSite(AdminSite):
+    def index(self, request, extra_context=None):
+        ahora = timezone.now()
+        inicio_mes = ahora.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        ventas_mes = Pedido.objects.filter(
+            fecha__gte=inicio_mes
+        ).aggregate(total=models.Sum('total'))['total'] or 0
+
+        extra_context = extra_context or {}
+        extra_context['kpi'] = {
+            'productos': Producto.objects.filter(activo=True).count(),
+            'pedidos_pendientes': Pedido.objects.filter(estado='pendiente').count(),
+            'ventas_mes': ventas_mes,
+            'clientes': User.objects.filter(is_staff=False).count(),
+            'resenas_pendientes': Resena.objects.filter(aprobada=False).count(),
+        }
+        extra_context['admin_log'] = LogEntry.objects.select_related(
+            'content_type', 'user'
+        ).order_by('-action_time')[:12]
+        return super().index(request, extra_context)
+
+
+# Reemplazar el site por defecto
+admin.site.__class__ = MundoMagieAdminSite
 
 
 class QuillWidget(forms.Textarea):

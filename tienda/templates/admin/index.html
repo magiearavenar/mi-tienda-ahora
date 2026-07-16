@@ -1,0 +1,194 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block title %}Dashboard | Mundo Magie{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="mm-dashboard">
+
+  <!-- ENCABEZADO -->
+  <div class="mm-header">
+    <div class="mm-header-left">
+      <h1 class="mm-greeting">Hola, {{ request.user.first_name|default:request.user.username }} 👋</h1>
+      <p class="mm-subgreeting">Bienvenida nuevamente a Mundo Magie</p>
+    </div>
+    <div class="mm-header-right">
+      <span class="mm-date" id="mm-fecha"></span>
+      <div class="mm-quick-links">
+        <a href="/" target="_blank" class="mm-ql-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          Ver tienda
+        </a>
+        <a href="{% url 'admin:productos_configuracionsitio_changelist' %}" class="mm-ql-btn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Configuración
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="mm-kpis">
+    <a href="{% url 'admin:productos_producto_changelist' %}" class="mm-kpi">
+      <div class="mm-kpi-icon mm-kpi-purple">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V7"/></svg>
+      </div>
+      <div class="mm-kpi-body">
+        <span class="mm-kpi-num">{{ kpi.productos }}</span>
+        <span class="mm-kpi-label">Productos activos</span>
+      </div>
+    </a>
+    <a href="{% url 'admin:productos_pedido_changelist' %}?estado__exact=pendiente" class="mm-kpi">
+      <div class="mm-kpi-icon mm-kpi-pink">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+      </div>
+      <div class="mm-kpi-body">
+        <span class="mm-kpi-num">{{ kpi.pedidos_pendientes }}</span>
+        <span class="mm-kpi-label">Pedidos pendientes</span>
+      </div>
+    </a>
+    <a href="{% url 'admin:productos_pedido_changelist' %}" class="mm-kpi">
+      <div class="mm-kpi-icon mm-kpi-blue">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      </div>
+      <div class="mm-kpi-body">
+        <span class="mm-kpi-num">${{ kpi.ventas_mes|floatformat:0 }}</span>
+        <span class="mm-kpi-label">Ventas este mes</span>
+      </div>
+    </a>
+    <a href="{% url 'admin:auth_user_changelist' %}" class="mm-kpi">
+      <div class="mm-kpi-icon mm-kpi-green">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </div>
+      <div class="mm-kpi-body">
+        <span class="mm-kpi-num">{{ kpi.clientes }}</span>
+        <span class="mm-kpi-label">Clientes registrados</span>
+      </div>
+    </a>
+  </div>
+
+  <!-- ACCIONES RÁPIDAS -->
+  <div class="mm-section-title">Acciones rápidas</div>
+  <div class="mm-actions">
+    <a href="{% url 'admin:productos_producto_add' %}" class="mm-action">
+      <span class="mm-action-icon">＋</span>
+      <span>Nuevo producto</span>
+    </a>
+    <a href="{% url 'admin:productos_categoria_add' %}" class="mm-action">
+      <span class="mm-action-icon">＋</span>
+      <span>Nueva categoría</span>
+    </a>
+    <a href="{% url 'admin:productos_slide_add' %}" class="mm-action">
+      <span class="mm-action-icon">＋</span>
+      <span>Nuevo banner</span>
+    </a>
+    <a href="{% url 'admin:productos_descuento_add' %}" class="mm-action">
+      <span class="mm-action-icon">＋</span>
+      <span>Crear descuento</span>
+    </a>
+    <a href="{% url 'admin:productos_pedido_add' %}" class="mm-action">
+      <span class="mm-action-icon">＋</span>
+      <span>Crear pedido</span>
+    </a>
+  </div>
+
+  <!-- MÓDULOS -->
+  <div class="mm-section-title">Administración</div>
+  <div class="mm-modules">
+
+    <div class="mm-module">
+      <div class="mm-module-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 10V7"/></svg>
+        Catálogo
+      </div>
+      <a href="{% url 'admin:productos_producto_changelist' %}">Productos <span class="mm-badge">{{ kpi.productos }}</span></a>
+      <a href="{% url 'admin:productos_categoria_changelist' %}">Categorías</a>
+      <a href="{% url 'admin:productos_slide_changelist' %}">Slides</a>
+      <a href="{% url 'admin:productos_seccioncategoria_changelist' %}">Secciones</a>
+      <a href="{% url 'admin:productos_bannerfidelizacion_changelist' %}">Banners</a>
+    </div>
+
+    <div class="mm-module">
+      <div class="mm-module-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        Ventas
+      </div>
+      <a href="{% url 'admin:productos_pedido_changelist' %}">Pedidos <span class="mm-badge mm-badge-pink">{{ kpi.pedidos_pendientes }} pend.</span></a>
+      <a href="{% url 'admin:productos_pago_changelist' %}">Pagos</a>
+      <a href="{% url 'admin:productos_descuento_changelist' %}">Descuentos</a>
+    </div>
+
+    <div class="mm-module">
+      <div class="mm-module-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+        Marketing
+      </div>
+      <a href="{% url 'admin:productos_instagramconfig_changelist' %}">Instagram</a>
+      <a href="{% url 'admin:productos_redsocial_changelist' %}">Redes Sociales</a>
+      <a href="{% url 'admin:productos_tag_changelist' %}">Etiquetas</a>
+    </div>
+
+    <div class="mm-module">
+      <div class="mm-module-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        Contenido
+      </div>
+      <a href="{% url 'admin:productos_sobremi_changelist' %}">Sobre Nosotros</a>
+      <a href="{% url 'admin:productos_contacto_changelist' %}">Contacto</a>
+      <a href="{% url 'admin:productos_informacion_changelist' %}">Información</a>
+      <a href="{% url 'admin:productos_resena_changelist' %}">Reseñas <span class="mm-badge">{{ kpi.resenas_pendientes }}</span></a>
+      <a href="{% url 'admin:productos_proyectoportafolio_changelist' %}">Portafolio</a>
+    </div>
+
+    <div class="mm-module">
+      <div class="mm-module-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        Configuración
+      </div>
+      <a href="{% url 'admin:productos_configuracionsitio_changelist' %}">Configuración del sitio</a>
+      <a href="{% url 'admin:productos_footerconfig_changelist' %}">Footer</a>
+    </div>
+
+    <div class="mm-module">
+      <div class="mm-module-header">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        Usuarios
+      </div>
+      <a href="{% url 'admin:auth_user_changelist' %}">Usuarios <span class="mm-badge">{{ kpi.clientes }}</span></a>
+      <a href="{% url 'admin:auth_group_changelist' %}">Grupos / Roles</a>
+    </div>
+
+  </div>
+
+  <!-- ACTIVIDAD RECIENTE -->
+  <div class="mm-section-title">Actividad reciente</div>
+  <div class="mm-timeline">
+    {% for entry in admin_log %}
+    <div class="mm-timeline-item">
+      <div class="mm-timeline-dot"></div>
+      <div class="mm-timeline-body">
+        <span class="mm-timeline-action">
+          {% if entry.is_addition %}➕{% elif entry.is_change %}✏️{% else %}🗑️{% endif %}
+          {{ entry.object_repr }}
+        </span>
+        <span class="mm-timeline-meta">{{ entry.content_type.name }} · {{ entry.action_time|timesince }} atrás</span>
+      </div>
+    </div>
+    {% empty %}
+    <p style="color:#aaa;font-size:0.85rem;">Sin actividad reciente.</p>
+    {% endfor %}
+  </div>
+
+</div>
+
+<script>
+  const d = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('mm-fecha').textContent = d.toLocaleDateString('es-CL', opts);
+</script>
+{% endblock %}
