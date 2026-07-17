@@ -711,6 +711,31 @@ def variantes_datos(request, producto_id):
     except Producto.DoesNotExist:
         return JsonResponse({})
 
+@login_required
+def admin_busqueda_global(request):
+    """API de búsqueda global para el panel admin."""
+    if not request.user.is_staff:
+        return JsonResponse([], safe=False, status=403)
+    q = request.GET.get('q', '').strip()
+    if len(q) < 2:
+        return JsonResponse([], safe=False)
+    from django.contrib.auth.models import User as AuthUser
+    resultados = []
+    # Productos
+    for p in Producto.objects.filter(nombre__icontains=q)[:5]:
+        resultados.append({'tipo': 'Producto', 'label': p.nombre, 'url': f'/admin/productos/producto/{p.id}/change/'})
+    # Categorías
+    for c in Categoria.objects.filter(nombre__icontains=q)[:3]:
+        resultados.append({'tipo': 'Categoría', 'label': c.nombre, 'url': f'/admin/productos/categoria/{c.id}/change/'})
+    # Pedidos
+    for ped in Pedido.objects.filter(id__icontains=q)[:3]:
+        resultados.append({'tipo': 'Pedido', 'label': f'Pedido #{ped.id} — {ped.estado}', 'url': f'/admin/productos/pedido/{ped.id}/change/'})
+    # Usuarios
+    for u in AuthUser.objects.filter(username__icontains=q)[:3]:
+        resultados.append({'tipo': 'Usuario', 'label': u.username, 'url': f'/admin/auth/user/{u.id}/change/'})
+    return JsonResponse(resultados, safe=False)
+
+
 @csrf_exempt
 @require_POST
 def calcular_envio(request):

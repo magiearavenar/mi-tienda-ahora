@@ -1,14 +1,185 @@
 {% extends "admin/base.html" %}
 {% load static %}
 
-{% block title %}{{ title }} | {{ site_title|default:'Mi Tienda Admin' }}{% endblock %}
+{% block title %}{{ title }} | Mundo Magie{% endblock %}
 
 {% block extrahead %}
 {{ block.super }}
 <link rel="shortcut icon" type="image/x-icon" href="{% static 'images/conf-ico.ico' %}">
 <link rel="icon" type="image/x-icon" href="{% static 'images/conf-ico.ico' %}">
+<style>
+/* ── BUSCADOR GLOBAL ── */
+.mm-search-wrap {
+    position: relative;
+    margin: 0 16px;
+}
+.mm-search-input {
+    width: 260px;
+    padding: 6px 14px 6px 36px;
+    border: 1px solid #f3d9fa;
+    border-radius: 20px;
+    background: #fff0f9;
+    font-size: 0.82rem;
+    color: #555;
+    outline: none;
+    transition: all 0.2s;
+}
+.mm-search-input:focus {
+    border-color: #d2a8dd;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(210,168,221,0.15);
+    width: 320px;
+}
+.mm-search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d2a8dd;
+    pointer-events: none;
+}
+.mm-search-results {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 360px;
+    background: #fff;
+    border: 1px solid #f3d9fa;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(160,122,176,0.15);
+    z-index: 9999;
+    overflow: hidden;
+}
+.mm-search-results.open { display: block; }
+.mm-sr-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    text-decoration: none !important;
+    color: #444 !important;
+    border-bottom: 1px solid #fdf4ff;
+    transition: background 0.15s;
+    font-size: 0.83rem;
+}
+.mm-sr-item:last-child { border-bottom: none; }
+.mm-sr-item:hover { background: #fff0f9; color: #a07ab0 !important; }
+.mm-sr-badge {
+    font-size: 0.68rem;
+    padding: 1px 7px;
+    border-radius: 10px;
+    background: #f3e8ff;
+    color: #a07ab0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+.mm-sr-empty {
+    padding: 14px;
+    text-align: center;
+    color: #bbb;
+    font-size: 0.82rem;
+}
+.mm-sr-loading {
+    padding: 14px;
+    text-align: center;
+    color: #d2a8dd;
+    font-size: 0.82rem;
+}
+</style>
 {% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:'Panel de Administración - Mi Tienda' }}</a></h1>
+<h1 id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:'Mundo Magie' }}</a></h1>
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+(function() {
+    // Inyectar buscador en la navbar de Jazzmin
+    document.addEventListener('DOMContentLoaded', function () {
+        // Buscar el ul de la navbar izquierda
+        var navbar = document.querySelector('#jazzy-navbar .container-fluid');
+        if (!navbar) return;
+
+        var wrap = document.createElement('div');
+        wrap.className = 'mm-search-wrap';
+        wrap.innerHTML = `
+            <svg class="mm-search-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+            </svg>
+            <input type="text" class="mm-search-input" placeholder="Buscar productos, pedidos, usuarios..." id="mm-global-search" autocomplete="off">
+            <div class="mm-search-results" id="mm-search-results"></div>
+        `;
+
+        // Insertar después del primer ul (botón hamburguesa + links)
+        var firstUl = navbar.querySelector('ul.navbar-nav');
+        if (firstUl && firstUl.nextSibling) {
+            navbar.insertBefore(wrap, firstUl.nextSibling);
+        } else {
+            navbar.appendChild(wrap);
+        }
+
+        var input = document.getElementById('mm-global-search');
+        var results = document.getElementById('mm-search-results');
+        var timer = null;
+
+        input.addEventListener('input', function () {
+            clearTimeout(timer);
+            var q = input.value.trim();
+            if (q.length < 2) {
+                results.classList.remove('open');
+                return;
+            }
+            results.innerHTML = '<div class="mm-sr-loading">Buscando...</div>';
+            results.classList.add('open');
+            timer = setTimeout(function () {
+                fetch('/admin/busqueda-global/?q=' + encodeURIComponent(q))
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (!data.length) {
+                            results.innerHTML = '<div class="mm-sr-empty">Sin resultados para "' + q + '"</div>';
+                            return;
+                        }
+                        results.innerHTML = data.map(function(item) {
+                            return '<a href="' + item.url + '" class="mm-sr-item">' +
+                                '<span class="mm-sr-badge">' + item.tipo + '</span>' +
+                                '<span>' + item.label + '</span>' +
+                            '</a>';
+                        }).join('');
+                    })
+                    .catch(function() {
+                        results.innerHTML = '<div class="mm-sr-empty">Error al buscar</div>';
+                    });
+            }, 300);
+        });
+
+        // Cerrar al hacer clic fuera
+        document.addEventListener('click', function (e) {
+            if (!wrap.contains(e.target)) {
+                results.classList.remove('open');
+            }
+        });
+
+        // Navegar con teclado
+        input.addEventListener('keydown', function(e) {
+            var items = results.querySelectorAll('.mm-sr-item');
+            var active = results.querySelector('.mm-sr-item:focus');
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (!active && items.length) items[0].focus();
+                else if (active && active.nextElementSibling) active.nextElementSibling.focus();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (active && active.previousElementSibling) active.previousElementSibling.focus();
+                else input.focus();
+            } else if (e.key === 'Escape') {
+                results.classList.remove('open');
+                input.blur();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}
