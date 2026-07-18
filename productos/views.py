@@ -58,6 +58,11 @@ def productos_por_categoria(request, categoria_id):
         'config': config,
         'banners': banners
     })
+def redirigir_producto_por_id(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    return redirect('detalle_producto', slug=producto.slug, permanent=True)
+
+
 def detalle_producto(request, slug):
     producto = get_object_or_404(Producto, slug=slug, activo=True)
     categorias = Categoria.objects.filter(visible_navegacion=True)

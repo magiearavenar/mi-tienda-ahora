@@ -7,6 +7,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('categoria/<int:categoria_id>/', views.productos_por_categoria, name='productos_categoria'),
     path('producto/<slug:slug>/', views.detalle_producto, name='detalle_producto'),
+    path('producto/<int:pk>/', views.redirigir_producto_por_id, name='redirigir_producto_id'),
     path('producto/<slug:slug>/resena/', views.crear_resena, name='crear_resena'),
     path('carrito/', views.carrito, name='carrito'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
