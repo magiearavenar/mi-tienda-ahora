@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}MUNDO MAGIE - Productos únicos y mágicos{% endblock %}</title>
-    <meta name="description" content="{% block description %}Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor para hacer de cada momento algo mágico.{% endblock %}">
+    <title>{% block title %}{{ config.seo_titulo|default:'MUNDO MAGIE - Productos únicos y mágicos' }}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{{ config.seo_descripcion|default:'Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor para hacer de cada momento algo mágico.' }}{% endblock %}">
     <meta name="keywords" content="{% block keywords %}mundo magie, productos únicos, artículos especiales, tienda online, regalos{% endblock %}">
     <meta name="author" content="Mundo Magie">
     <meta name="robots" content="index, follow">
@@ -12,15 +12,15 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:title" content="{% block og_title %}Mundo Magie - Productos únicos y mágicos{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ config.seo_titulo|default:'Mundo Magie - Productos únicos y mágicos' }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ config.seo_descripcion|default:'Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor.' }}{% endblock %}">
     <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}/static/images/logo.png">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ request.build_absolute_uri }}">
-    <meta property="twitter:title" content="{% block twitter_title %}Mundo Magie - Productos únicos y mágicos{% endblock %}">
-    <meta property="twitter:description" content="{% block twitter_description %}Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor.{% endblock %}">
+    <meta property="twitter:title" content="{% block twitter_title %}{{ config.seo_titulo|default:'Mundo Magie - Productos únicos y mágicos' }}{% endblock %}">
+    <meta property="twitter:description" content="{% block twitter_description %}{{ config.seo_descripcion|default:'Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor.' }}{% endblock %}">
     <meta property="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}/static/images/logo.png">
     
     <link rel="canonical" href="{{ request.build_absolute_uri }}">
@@ -51,6 +51,7 @@
     <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
     <style>
         :root {
+            --moneda-simbolo: '{{ config.moneda_simbolo|default:"$" }}';
             --color-primario: {{ config.color_primario|default:'#ffc1ea' }};
             --color-secundario: {{ config.color_secundario|default:'#d2a8dd' }};
             --color-fondo: {{ config.color_fondo|default:'#fff' }};

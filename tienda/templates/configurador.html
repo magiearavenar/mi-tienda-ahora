@@ -244,6 +244,9 @@
             <div class="panel-tab" onclick="switchTab('whatsapp', this)">
                 <i class="fab fa-whatsapp"></i>WhatsApp
             </div>
+            <div class="panel-tab" onclick="switchTab('seo', this)">
+                <i class="fas fa-search"></i>SEO
+            </div>
         </div>
 
         <!-- COLORES -->
@@ -401,6 +404,30 @@
             </div>
         </div>
 
+        <!-- SEO -->
+        <div class="panel-section" id="tab-seo">
+            <div class="field-group">
+                <span class="field-label">Título del sitio</span>
+                <input type="text" class="field-input" id="seo_titulo"
+                    value="{{ config.seo_titulo|default:'Mundo Magie - Productos únicos y mágicos' }}"
+                    maxlength="70" oninput="previewChange(); actualizarContador('seo_titulo', 60, 'cnt_titulo')">
+                <small style="color:#aaa;font-size:0.72rem;margin-top:4px;display:block">Aparece en Google. Ideal: menos de 60 caracteres. <span id="cnt_titulo"></span></small>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Descripción meta (SEO)</span>
+                <textarea class="field-input" id="seo_descripcion" maxlength="160"
+                    oninput="previewChange(); actualizarContador('seo_descripcion', 155, 'cnt_desc')">{{ config.seo_descripcion|default:'' }}</textarea>
+                <small style="color:#aaa;font-size:0.72rem;margin-top:4px;display:block">Descripción en resultados de Google. Ideal: menos de 155 caracteres. <span id="cnt_desc"></span></small>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Símbolo de moneda</span>
+                <input type="text" class="field-input" id="moneda_simbolo"
+                    value="{{ config.moneda_simbolo|default:'$' }}"
+                    maxlength="5" style="width:80px" oninput="previewChange()">
+                <small style="color:#aaa;font-size:0.72rem;margin-top:4px;display:block">Ej: $, CLP, USD, €</small>
+            </div>
+        </div>
+
     </div><!-- fin panel -->
     <div class="preview">
         <div class="preview-toolbar">
@@ -422,6 +449,14 @@
     const csrfToken = '{{ csrf_token }}';
     let tabActual = 'colores';
     let previewTimer = null;
+
+    function actualizarContador(inputId, limite, spanId) {
+        const val = document.getElementById(inputId).value.length;
+        const span = document.getElementById(spanId);
+        if (!span) return;
+        span.textContent = val + '/' + limite;
+        span.style.color = val > limite ? '#e74c3c' : '#aaa';
+    }
 
     function switchTab(tab, el) {
         document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
@@ -493,6 +528,13 @@
                 seccion: 'whatsapp',
                 whatsapp: document.getElementById('whatsapp_numero').value.replace(/[^0-9]/g, ''),
                 whatsapp_mensaje: document.getElementById('whatsapp_mensaje').value,
+            };
+        } else if (tabActual === 'seo') {
+            return {
+                seccion: 'seo',
+                seo_titulo: document.getElementById('seo_titulo').value,
+                seo_descripcion: document.getElementById('seo_descripcion').value,
+                moneda_simbolo: document.getElementById('moneda_simbolo').value,
             };
         }
     }

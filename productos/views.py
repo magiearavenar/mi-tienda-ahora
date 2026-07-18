@@ -635,6 +635,13 @@ def configurador_guardar(request):
                 obj.whatsapp_mensaje = data['whatsapp_mensaje']
             obj.save()
 
+        elif seccion == 'seo':
+            config, _ = ConfiguracionSitio.objects.get_or_create(activo=True)
+            for campo in ['seo_titulo', 'seo_descripcion', 'moneda_simbolo']:
+                if campo in data:
+                    setattr(config, campo, data[campo])
+            config.save()
+
         return JsonResponse({'ok': True})
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=500)

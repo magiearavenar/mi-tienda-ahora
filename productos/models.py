@@ -245,7 +245,12 @@ class Slide(models.Model):
 class ConfiguracionSitio(models.Model):
     mensaje_envio = models.CharField(max_length=200, default='Envíos a domicilio en 3 días hábiles')
     activo = models.BooleanField(default=True)
-    
+
+    # SEO
+    seo_titulo = models.CharField(max_length=70, blank=True, default='Mundo Magie - Productos únicos y mágicos', help_text='Título que aparece en Google (máx 60 caracteres)')
+    seo_descripcion = models.CharField(max_length=160, blank=True, default='Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor para hacer de cada momento algo mágico.', help_text='Descripción para Google (máx 155 caracteres)')
+    moneda_simbolo = models.CharField(max_length=5, blank=True, default='$', help_text='Símbolo de moneda. Ej: $, CLP, USD')
+
     # Colores del sitio
     color_primario = models.CharField(max_length=7, default='#495057', help_text='Color principal (botones, enlaces)')
     color_secundario = models.CharField(max_length=7, default='#6c757d', help_text='Color secundario (texto, bordes)')
