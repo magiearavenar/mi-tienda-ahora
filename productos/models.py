@@ -327,6 +327,8 @@ class SobreMi(models.Model):
 class Contacto(models.Model):
     titulo = models.CharField(max_length=100, default='Contacto')
     telefono = models.CharField(max_length=20, blank=True)
+    whatsapp = models.CharField(max_length=20, blank=True, help_text='Número con código de país, sin + ni espacios. Ej: 56912345678')
+    whatsapp_mensaje = models.CharField(max_length=200, blank=True, default='Hola! Me interesa un producto 😊', help_text='Mensaje predeterminado al abrir WhatsApp')
     email = models.EmailField(blank=True)
     direccion = models.TextField(blank=True)
     horarios = models.TextField(blank=True, help_text='Horarios de atención')

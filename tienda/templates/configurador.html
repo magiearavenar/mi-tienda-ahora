@@ -241,6 +241,9 @@
             <div class="panel-tab" onclick="switchTab('contacto', this)">
                 <i class="fas fa-envelope"></i>Contacto
             </div>
+            <div class="panel-tab" onclick="switchTab('whatsapp', this)">
+                <i class="fab fa-whatsapp"></i>WhatsApp
+            </div>
         </div>
 
         <!-- COLORES -->
@@ -379,9 +382,26 @@
                 <textarea class="field-input" id="contacto_horarios" oninput="previewChange()">{{ contacto.horarios|default:'' }}</textarea>
             </div>
         </div>
-    </div>
+        <!-- WHATSAPP -->
+        <div class="panel-section" id="tab-whatsapp">
+            <div class="field-group">
+                <span class="field-label">Número de WhatsApp</span>
+                <input type="text" class="field-input" id="whatsapp_numero"
+                    placeholder="Ej: 56912345678"
+                    value="{{ contacto.whatsapp|default:'' }}" oninput="previewChange()">
+                <small style="color:#aaa;font-size:0.72rem;margin-top:4px;display:block">Con código de país, sin + ni espacios. Ej: 56912345678</small>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Mensaje predeterminado</span>
+                <textarea class="field-input" id="whatsapp_mensaje" oninput="previewChange()">{{ contacto.whatsapp_mensaje|default:'Hola! Me interesa un producto 😊' }}</textarea>
+                <small style="color:#aaa;font-size:0.72rem;margin-top:4px;display:block">Texto que aparece al abrir el chat</small>
+            </div>
+            <div style="background:#f0fff4;border:1px solid #b7ebc8;border-radius:8px;padding:12px;font-size:0.78rem;color:#2d6a4f;margin-top:8px">
+                <strong>✓ Al guardar:</strong> aparece el botón flotante verde en toda la tienda y el ícono en el header y footer.
+            </div>
+        </div>
 
-    <!-- PREVIEW IFRAME -->
+    </div><!-- fin panel -->
     <div class="preview">
         <div class="preview-toolbar">
             <div class="preview-dots">
@@ -467,6 +487,12 @@
                 email: document.getElementById('contacto_email').value,
                 direccion: document.getElementById('contacto_direccion').value,
                 horarios: document.getElementById('contacto_horarios').value,
+            };
+        } else if (tabActual === 'whatsapp') {
+            return {
+                seccion: 'whatsapp',
+                whatsapp: document.getElementById('whatsapp_numero').value.replace(/[^0-9]/g, ''),
+                whatsapp_mensaje: document.getElementById('whatsapp_mensaje').value,
             };
         }
     }

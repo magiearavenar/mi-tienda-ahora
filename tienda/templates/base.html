@@ -243,9 +243,11 @@
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <a href="https://wa.link/ggf77d" target="_blank" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="WhatsApp">
+                    {% if contacto.whatsapp %}
+                    <a href="https://wa.me/{{ contacto.whatsapp }}?text={{ contacto.whatsapp_mensaje|urlencode }}" target="_blank" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="WhatsApp">
                         <i class="fab fa-whatsapp"></i>
                     </a>
+                    {% endif %}
                     {% if redes_sociales %}
                     {% for red in redes_sociales %}
                     <a href="{{ red.url }}" target="_blank" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="{{ red.nombre }}">
@@ -371,9 +373,11 @@
                         <button class="btn btn-primary" type="button">Suscribir</button>
                     </div>
                     <div>
-                        <a href="https://wa.link/ggf77d" target="_blank" class="me-2 social-link">
+                        {% if contacto.whatsapp %}
+                        <a href="https://wa.me/{{ contacto.whatsapp }}?text={{ contacto.whatsapp_mensaje|urlencode }}" target="_blank" class="me-2 social-link">
                             <i class="fab fa-whatsapp"></i>
                         </a>
+                        {% endif %}
                         {% if redes_sociales %}
                         {% for red in redes_sociales %}
                         <a href="{{ red.url }}" target="_blank" class="me-2 social-link">
@@ -398,9 +402,11 @@
     </footer>
 
     <!-- WhatsApp Button -->
-    <a href="https://wa.link/ggf77d" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
+    {% if contacto.whatsapp %}
+    <a href="https://wa.me/{{ contacto.whatsapp }}?text={{ contacto.whatsapp_mensaje|urlencode }}" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
         <i class="fab fa-whatsapp"></i>
     </a>
+    {% endif %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

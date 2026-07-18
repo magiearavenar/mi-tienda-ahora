@@ -627,6 +627,14 @@ def configurador_guardar(request):
                     setattr(obj, campo, data[campo])
             obj.save()
 
+        elif seccion == 'whatsapp':
+            obj, _ = Contacto.objects.get_or_create(activo=True)
+            if 'whatsapp' in data:
+                obj.whatsapp = data['whatsapp']
+            if 'whatsapp_mensaje' in data:
+                obj.whatsapp_mensaje = data['whatsapp_mensaje']
+            obj.save()
+
         return JsonResponse({'ok': True})
     except Exception as e:
         return JsonResponse({'ok': False, 'error': str(e)}, status=500)
