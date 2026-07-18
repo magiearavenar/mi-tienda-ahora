@@ -45,9 +45,9 @@ def build_product_data(producto, base_url):
         'attributes': {
             'title': producto.nombre,
             'description': producto.descripcion[:5000],
-            'link': f'{base_url}/producto/{producto.id}/',
+            'link': f'{base_url}/producto/{producto.slug}/',
             'imageLink': imagen_url,
-            'availability': 'in_stock' if producto.stock > 0 else 'out_of_stock',
+            'availability': 'in_stock' if (producto.stock > 0 or producto.es_digital) else 'out_of_stock',
             'price': {
                 'amountMicros': str(int(producto.precio * 1_000_000)),
                 'currencyCode': 'CLP'
