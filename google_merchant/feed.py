@@ -17,6 +17,8 @@ def limpiar_texto(texto):
 def google_feed_xml(request):
     """Feed XML compatible con Google Merchant Center."""
     base_url = settings.SITE_URL.rstrip('/')
+    if not base_url.startswith('http'):
+        base_url = f'https://{base_url}'
     productos = Producto.objects.filter(activo=True, sincronizar_google=True)
 
     items = []

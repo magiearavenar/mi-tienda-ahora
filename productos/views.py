@@ -297,6 +297,7 @@ def procesar_pago(request):
         total = sum(float(item['precio']) * int(item['cantidad']) for item in carrito)
         pedido = Pedido.objects.create(
             usuario=request.user if request.user.is_authenticated else None,
+            email_cliente=email,
             total=total,
             estado='pendiente'
         )
@@ -510,7 +511,14 @@ def _enviar_digitales(pedido, email_pago):
 
 
 def pago_exitoso(request):
-    return render(request, 'pago_exitoso.html')
+    pedido = None
+    external_ref = request.GET.get('external_reference', '')
+    if external_ref.startswith('ORD-'):
+        try:
+            pedido = Pedido.objects.get(id=external_ref.replace('ORD-', ''))
+        except Pedido.DoesNotExist:
+            pass
+    return render(request, 'pago_exitoso.html', {'pedido': pedido})
 
 
 def descargar_digital(request, token):

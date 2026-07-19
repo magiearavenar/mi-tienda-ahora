@@ -20,3 +20,22 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+{% if pedido %}
+<script src="https://apis.google.com/js/platform.js?onload=renderOptIn" async defer></script>
+<script>
+  window.renderOptIn = function() {
+    window.gapi.load('surveyoptin', function() {
+      window.gapi.surveyoptin.render({
+        "merchant_id": 647635808,
+        "order_id": "{{ pedido.id }}",
+        "email": "{{ pedido.email_cliente|default:pedido.usuario.email|default:'' }}",
+        "delivery_country": "CL",
+        "estimated_delivery_date": "{{ pedido.fecha_creacion|date:'Y-m-d' }}"
+      });
+    });
+  }
+</script>
+{% endif %}
+{% endblock %}
