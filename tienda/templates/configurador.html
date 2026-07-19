@@ -7,6 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/nano.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #f5f5f5; height: 100vh; overflow: hidden; }
@@ -130,30 +131,36 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
-        .color-preview {
+        .color-swatch {
             width: 36px;
             height: 36px;
             border-radius: 8px;
             border: 1px solid #e0e0e0;
-            cursor: pointer;
             flex-shrink: 0;
-            position: relative;
-            overflow: hidden;
-        }
-        .color-preview input[type="color"] {
-            position: absolute;
-            top: 0; left: 0;
-            width: 200%;
-            height: 200%;
-            border: none;
             cursor: pointer;
-            opacity: 0;
         }
         .color-info { flex: 1; }
-        .color-name { font-size: 0.75rem; font-weight: 600; color: #444; }
-        .color-hex { font-size: 0.7rem; color: #999; font-family: monospace; }
+        .color-name { font-size: 0.75rem; font-weight: 600; color: #444; margin-bottom: 3px; }
+        .color-hex-input {
+            width: 100%;
+            font-size: 0.72rem;
+            font-family: monospace;
+            border: 1px solid #e8e8e8;
+            border-radius: 5px;
+            padding: 3px 7px;
+            color: #666;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .color-hex-input:focus { border-color: #ffc1ea; }
+        /* Pickr overrides */
+        .pickr { display: inline-block; }
+        .pickr .pcr-button { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #e0e0e0; }
+        .pcr-app { font-family: 'Inter', sans-serif !important; }
+        .pcr-app .pcr-interaction input { font-family: monospace !important; font-size: 0.8rem !important; }
+        .pcr-app .pcr-swatches button { border-radius: 6px !important; width: 22px !important; height: 22px !important; }
 
         .section-title {
             font-size: 0.7rem;
@@ -262,57 +269,45 @@
 
             {% with colores=config %}
             <div class="color-row">
-                <div class="color-preview" style="background: {{ config.color_primario|default:'#ffc1ea' }}">
-                    <input type="color" id="color_primario" value="{{ config.color_primario|default:'#ffc1ea' }}" oninput="updateColor(this, 'color_primario')">
-                </div>
+                <div class="pickr" id="pickr_color_primario"></div>
                 <div class="color-info">
                     <div class="color-name">Color primario</div>
-                    <div class="color-hex" id="hex_color_primario">{{ config.color_primario|default:'#ffc1ea' }}</div>
+                    <input class="color-hex-input" id="hex_color_primario" value="{{ config.color_primario|default:'#ffc1ea' }}" maxlength="7" oninput="hexInputChange(this, 'color_primario')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ config.color_secundario|default:'#d2a8dd' }}" id="prev_color_secundario">
-                    <input type="color" id="color_secundario" value="{{ config.color_secundario|default:'#d2a8dd' }}" oninput="updateColor(this, 'color_secundario')">
-                </div>
+                <div class="pickr" id="pickr_color_secundario"></div>
                 <div class="color-info">
                     <div class="color-name">Color secundario</div>
-                    <div class="color-hex" id="hex_color_secundario">{{ config.color_secundario|default:'#d2a8dd' }}</div>
+                    <input class="color-hex-input" id="hex_color_secundario" value="{{ config.color_secundario|default:'#d2a8dd' }}" maxlength="7" oninput="hexInputChange(this, 'color_secundario')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ config.color_fondo|default:'#ffffff' }}" id="prev_color_fondo">
-                    <input type="color" id="color_fondo" value="{{ config.color_fondo|default:'#ffffff' }}" oninput="updateColor(this, 'color_fondo')">
-                </div>
+                <div class="pickr" id="pickr_color_fondo"></div>
                 <div class="color-info">
                     <div class="color-name">Fondo del sitio</div>
-                    <div class="color-hex" id="hex_color_fondo">{{ config.color_fondo|default:'#ffffff' }}</div>
+                    <input class="color-hex-input" id="hex_color_fondo" value="{{ config.color_fondo|default:'#ffffff' }}" maxlength="7" oninput="hexInputChange(this, 'color_fondo')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ config.color_banner|default:'#95d4e8' }}" id="prev_color_banner">
-                    <input type="color" id="color_banner" value="{{ config.color_banner|default:'#95d4e8' }}" oninput="updateColor(this, 'color_banner')">
-                </div>
+                <div class="pickr" id="pickr_color_banner"></div>
                 <div class="color-info">
                     <div class="color-name">Banner de envío</div>
-                    <div class="color-hex" id="hex_color_banner">{{ config.color_banner|default:'#95d4e8' }}</div>
+                    <input class="color-hex-input" id="hex_color_banner" value="{{ config.color_banner|default:'#95d4e8' }}" maxlength="7" oninput="hexInputChange(this, 'color_banner')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ config.color_hover|default:'#f4d875' }}" id="prev_color_hover">
-                    <input type="color" id="color_hover" value="{{ config.color_hover|default:'#f4d875' }}" oninput="updateColor(this, 'color_hover')">
-                </div>
+                <div class="pickr" id="pickr_color_hover"></div>
                 <div class="color-info">
                     <div class="color-name">Hover navegación</div>
-                    <div class="color-hex" id="hex_color_hover">{{ config.color_hover|default:'#f4d875' }}</div>
+                    <input class="color-hex-input" id="hex_color_hover" value="{{ config.color_hover|default:'#f4d875' }}" maxlength="7" oninput="hexInputChange(this, 'color_hover')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ config.color_nav|default:'#ffffff' }}" id="prev_color_nav">
-                    <input type="color" id="color_nav" value="{{ config.color_nav|default:'#ffffff' }}" oninput="updateColor(this, 'color_nav')">
-                </div>
+                <div class="pickr" id="pickr_color_nav"></div>
                 <div class="color-info">
                     <div class="color-name">Fondo del menú</div>
-                    <div class="color-hex" id="hex_color_nav">{{ config.color_nav|default:'#ffffff' }}</div>
+                    <input class="color-hex-input" id="hex_color_nav" value="{{ config.color_nav|default:'#ffffff' }}" maxlength="7" oninput="hexInputChange(this, 'color_nav')">
                 </div>
             </div>
             {% endwith %}
@@ -322,39 +317,31 @@
         <div class="panel-section" id="tab-footer">
             <div class="section-title">Colores del footer</div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ footer.color_fondo|default:'#f8f4ff' }}">
-                    <input type="color" id="footer_color_fondo" value="{{ footer.color_fondo|default:'#f8f4ff' }}" oninput="updateColor(this, 'footer_color_fondo')">
-                </div>
+                <div class="pickr" id="pickr_footer_color_fondo"></div>
                 <div class="color-info">
                     <div class="color-name">Fondo</div>
-                    <div class="color-hex" id="hex_footer_color_fondo">{{ footer.color_fondo|default:'#f8f4ff' }}</div>
+                    <input class="color-hex-input" id="hex_footer_color_fondo" value="{{ footer.color_fondo|default:'#f8f4ff' }}" maxlength="7" oninput="hexInputChange(this, 'footer_color_fondo')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ footer.color_texto|default:'#4a4a4a' }}">
-                    <input type="color" id="footer_color_texto" value="{{ footer.color_texto|default:'#4a4a4a' }}" oninput="updateColor(this, 'footer_color_texto')">
-                </div>
+                <div class="pickr" id="pickr_footer_color_texto"></div>
                 <div class="color-info">
                     <div class="color-name">Texto</div>
-                    <div class="color-hex" id="hex_footer_color_texto">{{ footer.color_texto|default:'#4a4a4a' }}</div>
+                    <input class="color-hex-input" id="hex_footer_color_texto" value="{{ footer.color_texto|default:'#4a4a4a' }}" maxlength="7" oninput="hexInputChange(this, 'footer_color_texto')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ footer.color_enlaces|default:'#d7b9ff' }}">
-                    <input type="color" id="footer_color_enlaces" value="{{ footer.color_enlaces|default:'#d7b9ff' }}" oninput="updateColor(this, 'footer_color_enlaces')">
-                </div>
+                <div class="pickr" id="pickr_footer_color_enlaces"></div>
                 <div class="color-info">
                     <div class="color-name">Enlaces</div>
-                    <div class="color-hex" id="hex_footer_color_enlaces">{{ footer.color_enlaces|default:'#d7b9ff' }}</div>
+                    <input class="color-hex-input" id="hex_footer_color_enlaces" value="{{ footer.color_enlaces|default:'#d7b9ff' }}" maxlength="7" oninput="hexInputChange(this, 'footer_color_enlaces')">
                 </div>
             </div>
             <div class="color-row">
-                <div class="color-preview" style="background: {{ footer.color_redes|default:'#ffc1e3' }}">
-                    <input type="color" id="footer_color_redes" value="{{ footer.color_redes|default:'#ffc1e3' }}" oninput="updateColor(this, 'footer_color_redes')">
-                </div>
+                <div class="pickr" id="pickr_footer_color_redes"></div>
                 <div class="color-info">
                     <div class="color-name">Redes sociales</div>
-                    <div class="color-hex" id="hex_footer_color_redes">{{ footer.color_redes|default:'#ffc1e3' }}</div>
+                    <input class="color-hex-input" id="hex_footer_color_redes" value="{{ footer.color_redes|default:'#ffc1e3' }}" maxlength="7" oninput="hexInputChange(this, 'footer_color_redes')">
                 </div>
             </div>
         </div>
@@ -454,10 +441,58 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
     const csrfToken = '{{ csrf_token }}';
     let tabActual = 'colores';
-    let previewTimer = null;
+    const pickrs = {};
+
+    const SWATCHES = [
+        '#ffc1ea','#d2a8dd','#d7b9ff','#f4d875','#95d4e8',
+        '#ffc1e3','#b7ebc8','#ffb3b3','#a8d8ea','#f8f4ff',
+        '#ffffff','#f5f5f5','#e0e0e0','#4a4a4a','#1a1a1a'
+    ];
+
+    function crearPickr(elId, campoId, colorInicial) {
+        const p = Pickr.create({
+            el: '#' + elId,
+            theme: 'nano',
+            default: colorInicial,
+            defaultRepresentation: 'HEX',
+            components: {
+                preview: true, opacity: false, hue: true,
+                interaction: { hex: true, input: true, save: true }
+            },
+            swatches: SWATCHES,
+        });
+        p.on('change', (color) => {
+            const hex = color.toHEXA().toString().slice(0, 7);
+            document.getElementById('hex_' + campoId).value = hex;
+            previewChange();
+        });
+        p.on('save', (color) => {
+            if (color) {
+                const hex = color.toHEXA().toString().slice(0, 7);
+                document.getElementById('hex_' + campoId).value = hex;
+            }
+            p.hide();
+            previewChange();
+        });
+        pickrs[campoId] = p;
+    }
+
+    function hexInputChange(input, campoId) {
+        const val = input.value.trim();
+        if (/^#[0-9a-fA-F]{6}$/.test(val) && pickrs[campoId]) {
+            pickrs[campoId].setColor(val);
+        }
+        previewChange();
+    }
+
+    function getColor(campoId) {
+        const hex = document.getElementById('hex_' + campoId);
+        return hex ? hex.value : '#ffffff';
+    }
 
     function actualizarContador(inputId, limite, spanId) {
         const val = document.getElementById(inputId).value.length;
@@ -473,16 +508,6 @@
         el.classList.add('active');
         document.getElementById('tab-' + tab).classList.add('active');
         tabActual = tab;
-    }
-
-    function updateColor(input, campo) {
-        const color = input.value;
-        // Actualizar preview del cuadro
-        input.parentElement.style.background = color;
-        // Actualizar hex label
-        const hexEl = document.getElementById('hex_' + campo);
-        if (hexEl) hexEl.textContent = color;
-        previewChange();
     }
 
     function previewChange() {
@@ -504,20 +529,20 @@
             return {
                 seccion: 'colores',
                 mensaje_envio: document.getElementById('mensaje_envio').value,
-                color_primario: document.getElementById('color_primario').value,
-                color_secundario: document.getElementById('color_secundario').value,
-                color_fondo: document.getElementById('color_fondo').value,
-                color_banner: document.getElementById('color_banner').value,
-                color_hover: document.getElementById('color_hover').value,
-                color_nav: document.getElementById('color_nav').value,
+                color_primario: getColor('color_primario'),
+                color_secundario: getColor('color_secundario'),
+                color_fondo: getColor('color_fondo'),
+                color_banner: getColor('color_banner'),
+                color_hover: getColor('color_hover'),
+                color_nav: getColor('color_nav'),
             };
         } else if (tabActual === 'footer') {
             return {
                 seccion: 'footer',
-                color_fondo: document.getElementById('footer_color_fondo').value,
-                color_texto: document.getElementById('footer_color_texto').value,
-                color_enlaces: document.getElementById('footer_color_enlaces').value,
-                color_redes: document.getElementById('footer_color_redes').value,
+                color_fondo: getColor('footer_color_fondo'),
+                color_texto: getColor('footer_color_texto'),
+                color_enlaces: getColor('footer_color_enlaces'),
+                color_redes: getColor('footer_color_redes'),
             };
         } else if (tabActual === 'sobre_mi') {
             return {
@@ -554,10 +579,7 @@
         try {
             const res = await fetch('/configurador/guardar/', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken,
-                },
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken },
                 body: JSON.stringify(getDatos()),
             });
             const data = await res.json();
@@ -571,6 +593,20 @@
             setStatus('', 'Error de conexión');
         }
     }
+
+    // Inicializar todos los Pickr al cargar
+    document.addEventListener('DOMContentLoaded', () => {
+        crearPickr('pickr_color_primario',       'color_primario',       '{{ config.color_primario|default:"#ffc1ea" }}');
+        crearPickr('pickr_color_secundario',     'color_secundario',     '{{ config.color_secundario|default:"#d2a8dd" }}');
+        crearPickr('pickr_color_fondo',          'color_fondo',          '{{ config.color_fondo|default:"#ffffff" }}');
+        crearPickr('pickr_color_banner',         'color_banner',         '{{ config.color_banner|default:"#95d4e8" }}');
+        crearPickr('pickr_color_hover',          'color_hover',          '{{ config.color_hover|default:"#f4d875" }}');
+        crearPickr('pickr_color_nav',            'color_nav',            '{{ config.color_nav|default:"#ffffff" }}');
+        crearPickr('pickr_footer_color_fondo',   'footer_color_fondo',   '{{ footer.color_fondo|default:"#f8f4ff" }}');
+        crearPickr('pickr_footer_color_texto',   'footer_color_texto',   '{{ footer.color_texto|default:"#4a4a4a" }}');
+        crearPickr('pickr_footer_color_enlaces', 'footer_color_enlaces', '{{ footer.color_enlaces|default:"#d7b9ff" }}');
+        crearPickr('pickr_footer_color_redes',   'footer_color_redes',   '{{ footer.color_redes|default:"#ffc1e3" }}');
+    });
 </script>
 </body>
 </html>
