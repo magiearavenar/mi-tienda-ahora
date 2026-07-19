@@ -306,6 +306,15 @@
                     <div class="color-hex" id="hex_color_hover">{{ config.color_hover|default:'#f4d875' }}</div>
                 </div>
             </div>
+            <div class="color-row">
+                <div class="color-preview" style="background: {{ config.color_nav|default:'#ffffff' }}" id="prev_color_nav">
+                    <input type="color" id="color_nav" value="{{ config.color_nav|default:'#ffffff' }}" oninput="updateColor(this, 'color_nav')">
+                </div>
+                <div class="color-info">
+                    <div class="color-name">Fondo del menú</div>
+                    <div class="color-hex" id="hex_color_nav">{{ config.color_nav|default:'#ffffff' }}</div>
+                </div>
+            </div>
             {% endwith %}
         </div>
 
@@ -500,6 +509,7 @@
                 color_fondo: document.getElementById('color_fondo').value,
                 color_banner: document.getElementById('color_banner').value,
                 color_hover: document.getElementById('color_hover').value,
+                color_nav: document.getElementById('color_nav').value,
             };
         } else if (tabActual === 'footer') {
             return {

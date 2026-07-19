@@ -259,6 +259,7 @@ class ConfiguracionSitio(models.Model):
     color_banner = models.CharField(max_length=7, default='#28a745', help_text='Color del banner de envío')
     color_cards = models.CharField(max_length=7, default='#ffffff', help_text='Color de fondo de las cards')
     color_hover = models.CharField(max_length=7, default='#F4C2C2', help_text='Color de hover en navegación')
+    color_nav = models.CharField(max_length=7, default='#ffffff', help_text='Color de fondo del menú de navegación')
     
     def __str__(self):
         return "Configuración del Sitio"

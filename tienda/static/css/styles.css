@@ -49,7 +49,7 @@ div {
 }
 
 .nav-categories {
-    background: var(--color-cards);
+    background: var(--color-nav, #ffffff);
     border-bottom: 1px solid #dee2e6;
     padding: 0.5rem 0;
 }

@@ -613,7 +613,7 @@ def configurador_guardar(request):
 
         if seccion == 'colores':
             config, _ = ConfiguracionSitio.objects.get_or_create(activo=True)
-            for campo in ['color_primario', 'color_secundario', 'color_fondo', 'color_banner', 'color_cards', 'color_hover']:
+            for campo in ['color_primario', 'color_secundario', 'color_fondo', 'color_banner', 'color_cards', 'color_hover', 'color_nav']:
                 if campo in data:
                     setattr(config, campo, data[campo])
             if 'mensaje_envio' in data:
