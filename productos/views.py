@@ -712,6 +712,8 @@ def debug_config(request):
         return HttpResponseForbidden()
     import os
     config = {
+        'CLOUDINARY_CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME', 'NO CONFIGURADO'),
+        'CLOUDINARY_API_KEY_END': os.environ.get('CLOUDINARY_API_KEY', '')[-4:],
         'FLOW_API_KEY': bool(os.environ.get('FLOW_API_KEY', '')),
         'FLOW_SECRET_KEY': bool(os.environ.get('FLOW_SECRET_KEY', '')),
         'MERCADOPAGO_ACCESS_TOKEN_END': os.environ.get('MERCADOPAGO_ACCESS_TOKEN', '')[-4:],
