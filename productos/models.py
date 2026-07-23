@@ -36,6 +36,15 @@ class Categoria(models.Model):
         verbose_name_plural = 'Categorías'
         ordering = ['nombre']
 
+def _get_digital_storage():
+    import os
+    if os.environ.get('CLOUDINARY_CLOUD_NAME'):
+        from productos.storage import DigitalFileStorage
+        return DigitalFileStorage()
+    from django.core.files.storage import default_storage
+    return default_storage
+
+
 class Producto(models.Model):
     nombre = models.CharField(max_length=200)
     slug = models.SlugField(max_length=250, unique=True, blank=True)
@@ -81,7 +90,8 @@ class Producto(models.Model):
     archivo_digital = models.FileField(
         upload_to='digitales/',
         blank=True, null=True,
-        help_text='Archivo a enviar por correo al comprar (PDF, ZIP, etc.)'
+        help_text='Archivo a enviar por correo al comprar (PDF, ZIP, etc.)',
+        storage=_get_digital_storage,
     )
     
     # Campos de personalización

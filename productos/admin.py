@@ -120,14 +120,6 @@ class ProductoForm(forms.ModelForm):
             'descripcion': QuillWidget(attrs={'rows': 4}),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Forzar RawMediaCloudinaryStorage para archivo_digital
-        import os
-        if os.environ.get('CLOUDINARY_CLOUD_NAME'):
-            from productos.storage import DigitalFileStorage
-            self.fields['archivo_digital'].storage = DigitalFileStorage()
-
     def clean_archivo_digital(self):
         archivo = self.cleaned_data.get('archivo_digital')
         if not archivo or not hasattr(archivo, 'read'):
@@ -135,7 +127,6 @@ class ProductoForm(forms.ModelForm):
         nombre = getattr(archivo, 'name', '')
         if not nombre.lower().endswith('.pdf'):
             return archivo
-        # Comprimir PDF si supera 9MB
         import io
         contenido = archivo.read()
         if len(contenido) <= 9 * 1024 * 1024:
@@ -152,7 +143,7 @@ class ProductoForm(forms.ModelForm):
             tam_nuevo = salida.getbuffer().nbytes
             if tam_nuevo < len(contenido):
                 return InMemoryUploadedFile(
-                    salida, 'archivo_digital', nombre,
+                    salida, None, nombre,
                     'application/pdf', tam_nuevo, None
                 )
         except Exception:
