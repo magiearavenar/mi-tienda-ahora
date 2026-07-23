@@ -1,6 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+
+def _get_digital_storage():
+    """Retorna RawMediaCloudinaryStorage en producción, default en desarrollo."""
+    import os
+    if os.environ.get('CLOUDINARY_CLOUD_NAME'):
+        from productos.storage import DigitalFileStorage
+        return DigitalFileStorage()
+    return None
+
 class Tag(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     color = models.CharField(max_length=7, default='#6c757d', help_text='Color del tag en formato hex')
@@ -78,7 +87,12 @@ class Producto(models.Model):
     sincronizar_google = models.BooleanField(default=True, help_text='¿Sincronizar con Google Shopping?')
     
     es_digital = models.BooleanField(default=False, help_text='¿Es un producto digital? Se enviará por correo electrónico.')
-    archivo_digital = models.FileField(upload_to='digitales/', blank=True, null=True, help_text='Archivo a enviar por correo al comprar (PDF, ZIP, etc.)')
+    archivo_digital = models.FileField(
+        upload_to='digitales/',
+        blank=True, null=True,
+        storage=_get_digital_storage(),
+        help_text='Archivo a enviar por correo al comprar (PDF, ZIP, etc.)'
+    )
     
     # Campos de personalización
     permite_personalizacion = models.BooleanField(default=False, help_text='¿Este producto permite personalización?')
@@ -587,6 +601,8 @@ class TokenDescarga(models.Model):
     token = models.CharField(max_length=64, unique=True)
     fecha_expiracion = models.DateTimeField()
     usado = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    email_destino = models.EmailField(blank=True, default='')
 
     def esta_vigente(self):
         from django.utils import timezone
@@ -598,6 +614,14 @@ class TokenDescarga(models.Model):
     class Meta:
         verbose_name = 'Token de Descarga'
         verbose_name_plural = 'Tokens de Descarga'
+        # Un token activo por producto+pedido (evita duplicados)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['producto', 'pedido'],
+                condition=models.Q(usado=False),
+                name='unique_token_activo_por_producto_pedido'
+            )
+        ]
 
 
 class InstagramConfig(models.Model):

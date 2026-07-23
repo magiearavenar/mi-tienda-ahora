@@ -13,6 +13,18 @@
                 </a>
             </div>
         </div>
+
+        {% if tokens_digitales %}
+        <div class="card mt-3">
+            <div class="card-body text-center">
+                <i class="fas fa-download fa-2x mb-2" style="color:#c97bb2;"></i>
+                <h6>Tienes {{ tokens_digitales|length }} descarga{{ tokens_digitales|length|pluralize }} digital{{ tokens_digitales|length|pluralize }}</h6>
+                <a href="{% url 'mis_compras_digitales' %}" class="btn btn-sm btn-primary mt-1">
+                    <i class="fas fa-download"></i> Mis Compras Digitales
+                </a>
+            </div>
+        </div>
+        {% endif %}
     </div>
     
     <div class="col-md-8">

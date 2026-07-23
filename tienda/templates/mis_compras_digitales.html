@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+
+            <div class="d-flex align-items-center mb-4">
+                <a href="{% url 'perfil' %}" class="btn btn-sm btn-outline-secondary mr-3">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <h3 class="mb-0"><i class="fas fa-download mr-2" style="color:#c97bb2;"></i> Mis Compras Digitales</h3>
+            </div>
+
+            {% if tokens %}
+                {% for token in tokens %}
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-1 text-center">
+                                <i class="fas fa-file-download fa-2x" style="color:#c97bb2;"></i>
+                            </div>
+                            <div class="col-md-5">
+                                <strong>{{ token.producto.nombre }}</strong><br>
+                                <small class="text-muted">
+                                    Pedido #{{ token.pedido.id }} &middot;
+                                    {{ token.fecha_creacion|date:"d/m/Y" }}
+                                </small>
+                            </div>
+                            <div class="col-md-3">
+                                {% if token.esta_vigente %}
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-check-circle"></i> Disponible
+                                    </span><br>
+                                    <small class="text-muted">Expira: {{ token.fecha_expiracion|date:"d/m/Y" }}</small>
+                                {% else %}
+                                    <span class="badge badge-secondary">
+                                        <i class="fas fa-clock"></i> Expirado
+                                    </span>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-3 text-right">
+                                {% if token.esta_vigente %}
+                                    <a href="{% url 'descargar_digital' token.token %}"
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fas fa-download"></i> Descargar
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">
+                                        Contáctanos para reactivar
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No tienes compras digitales aún</h5>
+                    <a href="{% url 'home' %}" class="btn btn-primary mt-3">Ver productos</a>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

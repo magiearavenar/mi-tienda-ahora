@@ -14,6 +14,7 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('registro/', views.registro, name='registro'),
     path('perfil/', views.perfil, name='perfil'),
+    path('mis-compras-digitales/', views.mis_compras_digitales, name='mis_compras_digitales'),
     path('cambiar-contrasena/', auth_views.PasswordChangeView.as_view(
         template_name='cambiar_contrasena.html',
         success_url='/cambiar-contrasena/exito/'
@@ -43,7 +44,6 @@ urlpatterns = [
     
     # Pagos
     path('procesar-pago/', views.procesar_pago, name='procesar_pago'),
-    path('flow/confirmar/', views.flow_confirmar, name='flow_confirmar'),
     path('mercadopago/webhook/', views.mercadopago_webhook, name='mercadopago_webhook'),
     path('pago/exitoso/', views.pago_exitoso, name='pago_exitoso'),
     path('descargar/<str:token>/', views.descargar_digital, name='descargar_digital'),

@@ -13,7 +13,7 @@ import json
 import requests
 import os
 from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena, TokenDescarga
-from .services import FlowService, MercadoPagoService
+from .services import MercadoPagoService
 from .instagram_service import InstagramService
 from .forms import RegistroForm
 
@@ -204,8 +204,23 @@ def _enviar_bienvenida(user):
 
 @login_required
 def perfil(request):
-    pedidos = Pedido.objects.filter(usuario=request.user)
-    return render(request, 'perfil.html', {'pedidos': pedidos})
+    pedidos = Pedido.objects.filter(usuario=request.user).prefetch_related('detalles__producto')
+    # Tokens de descarga activos del usuario
+    tokens_digitales = TokenDescarga.objects.filter(
+        pedido__usuario=request.user
+    ).select_related('producto', 'pedido').order_by('-fecha_creacion')
+    return render(request, 'perfil.html', {
+        'pedidos': pedidos,
+        'tokens_digitales': tokens_digitales,
+    })
+
+
+@login_required
+def mis_compras_digitales(request):
+    tokens = TokenDescarga.objects.filter(
+        pedido__usuario=request.user
+    ).select_related('producto', 'pedido').order_by('-fecha_creacion')
+    return render(request, 'mis_compras_digitales.html', {'tokens': tokens})
 
 @login_required
 def detalle_pedido(request, pedido_id):
@@ -340,16 +355,9 @@ def procesar_pago(request):
             except Producto.DoesNotExist:
                 return JsonResponse({'error': f'Producto {item["id"]} no encontrado'}, status=400)
         
-        # Procesar pago según método
+        # Procesar pago
         try:
-            if metodo_pago == 'flow':
-                flow_service = FlowService()
-                url_pago = flow_service.crear_pago(pedido, email)
-                if url_pago:
-                    return JsonResponse({'url': url_pago})
-                else:
-                    return JsonResponse({'error': 'Error al crear pago con Flow'}, status=500)
-            elif metodo_pago == 'mercadopago':
+            if metodo_pago == 'mercadopago':
                 mp_service = MercadoPagoService()
                 url_pago = mp_service.crear_pago(pedido, email)
                 if url_pago:
@@ -359,41 +367,12 @@ def procesar_pago(request):
             else:
                 return JsonResponse({'error': 'Método de pago no válido'}, status=400)
         except Exception as payment_error:
-            # Si Flow falla, sugerir MercadoPago
-            if metodo_pago == 'flow':
-                return JsonResponse({'error': 'Flow temporalmente no disponible. Por favor usa MercadoPago.'}, status=500)
             return JsonResponse({'error': f'Error en pasarela: {str(payment_error)}'}, status=500)
         
     except json.JSONDecodeError:
         return JsonResponse({'error': 'JSON inválido'}, status=400)
     except Exception as e:
         return JsonResponse({'error': f'Error interno: {str(e)}'}, status=500)
-
-@csrf_exempt
-@require_POST
-def flow_confirmar(request):
-    token = request.POST.get('token')
-    
-    if token:
-        flow_service = FlowService()
-        resultado = flow_service.verificar_pago(token)
-        
-        if resultado and resultado.get('status') == 2:  # Pagado
-            try:
-                pago = Pago.objects.get(token_pago=token)
-                pago.estado = 'pagado'
-                pago.fecha_pago = timezone.now()
-                pago.datos_respuesta = resultado
-                pago.save()
-                
-                pago.pedido.estado = 'procesando'
-                pago.pedido.save()
-                
-                return HttpResponse('OK')
-            except Pago.DoesNotExist:
-                pass
-    
-    return HttpResponse('ERROR', status=400)
 
 @csrf_exempt
 def mercadopago_webhook(request):
@@ -408,6 +387,8 @@ def mercadopago_webhook(request):
         return HttpResponse('OK')
 
 def _procesar_webhook_mp(data):
+    import logging
+    logger = logging.getLogger(__name__)
     try:
         if data.get('type') != 'payment':
             return
@@ -433,81 +414,110 @@ def _procesar_webhook_mp(data):
                     'datos_respuesta': payment_info
                 }
             )
-            if not created:
+            if not created and pago.estado != 'pagado':
                 pago.estado = 'pagado'
                 pago.fecha_pago = timezone.now()
                 pago.datos_respuesta = payment_info
                 pago.save()
-            pedido.estado = 'procesando'
-            pedido.save()
-            _enviar_digitales(pedido, payment_info.get('payer', {}).get('email', ''))
+            if pedido.estado != 'procesando':
+                pedido.estado = 'procesando'
+                pedido.save()
+            logger.info(f'[MP] Pago confirmado pedido #{pedido.id}')
+            # Usar email_cliente del pedido como fuente principal
+            email_comprador = (
+                pedido.email_cliente
+                or payment_info.get('payer', {}).get('email', '')
+            )
+            _enviar_digitales(pedido, email_comprador)
         except Pedido.DoesNotExist:
-            pass
+            logger.error(f'[MP] Pedido no encontrado: {pedido_id}')
     except Exception as e:
-        import logging
-        logging.error(f'Error procesando webhook MP: {e}', exc_info=True)
+        logger.error(f'[MP] Error procesando webhook: {e}', exc_info=True)
 
 def _enviar_digitales(pedido, email_pago):
     """Genera tokens de descarga y envía email con links al cliente."""
-    try:
-        from django.core.mail import send_mail
-        from django.template.loader import render_to_string
-        from django.utils import timezone
-        from datetime import timedelta
-        import secrets
-        from .models import TokenDescarga
+    import logging
+    import secrets
+    from django.core.mail import EmailMultiAlternatives
+    from django.template.loader import render_to_string
+    from datetime import timedelta
+    from .models import TokenDescarga
 
-        email = None
-        if pedido.usuario and pedido.usuario.email:
-            email = pedido.usuario.email
-        elif email_pago:
-            email = email_pago
+    logger = logging.getLogger(__name__)
+    logger.info(f'[DIGITAL] Inicio procesamiento pedido #{pedido.id}')
 
-        if not email:
-            return
+    email = pedido.email_cliente or email_pago
+    if pedido.usuario and pedido.usuario.email:
+        email = pedido.usuario.email
 
-        digitales = [
-            detalle.producto
-            for detalle in pedido.detalles.select_related('producto').all()
-            if detalle.producto.es_digital and detalle.producto.archivo_digital
-        ]
+    logger.info(f'[DIGITAL] Email destino: {email}')
 
-        if not digitales:
-            return
+    if not email:
+        logger.warning(f'[DIGITAL] Sin email para pedido #{pedido.id}')
+        return
 
-        # Generar tokens con expiración de 5 días
-        items = []
-        for producto in digitales:
+    digitales = [
+        detalle.producto
+        for detalle in pedido.detalles.select_related('producto').all()
+        if detalle.producto.es_digital and detalle.producto.archivo_digital
+    ]
+
+    if not digitales:
+        logger.info(f'[DIGITAL] Sin productos digitales en pedido #{pedido.id}')
+        return
+
+    items = []
+    for producto in digitales:
+        logger.info(f'[DIGITAL] Procesando producto: {producto.nombre}')
+
+        # Idempotente: reutilizar token activo existente o crear uno nuevo
+        token_obj = TokenDescarga.objects.filter(
+            producto=producto,
+            pedido=pedido,
+            usado=False
+        ).first()
+
+        if not token_obj:
             token = secrets.token_urlsafe(32)
-            TokenDescarga.objects.create(
+            token_obj = TokenDescarga.objects.create(
                 producto=producto,
                 pedido=pedido,
                 token=token,
-                fecha_expiracion=timezone.now() + timedelta(days=5)
+                fecha_expiracion=timezone.now() + timedelta(days=5),
+                email_destino=email,
             )
-            items.append({
-                'nombre': producto.nombre,
-                'url': f'https://www.mundomagie.cl/descargar/{token}/'
-            })
+            logger.info(f'[DIGITAL] Token creado: {token_obj.token[:8]}...')
+        else:
+            logger.info(f'[DIGITAL] Token existente reutilizado: {token_obj.token[:8]}...')
 
-        nombre_usuario = pedido.usuario.username if pedido.usuario else email.split('@')[0]
+        site_url = os.environ.get('SITE_URL', 'https://www.mundomagie.cl')
+        items.append({
+            'nombre': producto.nombre,
+            'url': f'{site_url}/descargar/{token_obj.token}/'
+        })
+
+    nombre_usuario = (
+        pedido.usuario.get_full_name() or pedido.usuario.username
+        if pedido.usuario else email.split('@')[0]
+    )
+
+    try:
         html = render_to_string('emails/descarga_digital.html', {
             'nombre_usuario': nombre_usuario,
             'productos': items,
+            'pedido': pedido,
         })
-
-        send_mail(
+        msg = EmailMultiAlternatives(
             subject=f'✨ Tu descarga digital - Mundo Magie (Pedido #{pedido.id})',
-            message='',
+            body=f'Hola {nombre_usuario}, tu descarga está lista en: {items[0]["url"]}',
             from_email=None,
-            recipient_list=[email],
-            html_message=html,
-            fail_silently=True,
+            to=[email],
         )
-
+        msg.attach_alternative(html, 'text/html')
+        msg.send(fail_silently=False)
+        logger.info(f'[DIGITAL] Email enviado correctamente a {email}')
     except Exception as e:
-        import logging
-        logging.error(f'Error enviando digitales pedido {pedido.id}: {e}', exc_info=True)
+        logger.error(f'[DIGITAL] Error enviando email pedido #{pedido.id}: {e}', exc_info=True)
 
 
 def pago_exitoso(request):
@@ -522,18 +532,46 @@ def pago_exitoso(request):
 
 
 def descargar_digital(request, token):
+    import logging
+    import mimetypes
+    logger = logging.getLogger(__name__)
+
     td = get_object_or_404(TokenDescarga, token=token)
+
     if not td.esta_vigente():
-        return render(request, 'descarga_expirada.html')
-    import urllib.request as urlreq
-    from django.http import HttpResponse
+        logger.warning(f'[DESCARGA] Token expirado o usado: {token[:8]}...')
+        return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
+
     archivo = td.producto.archivo_digital
-    with urlreq.urlopen(archivo.url) as f:
-        contenido = f.read()
-    nombre = archivo.name.split('/')[-1]
-    response = HttpResponse(contenido, content_type='application/octet-stream')
-    response['Content-Disposition'] = f'attachment; filename="{nombre}"'
-    return response
+    if not archivo:
+        logger.error(f'[DESCARGA] Archivo no existe para producto {td.producto.id}')
+        return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
+
+    try:
+        url_archivo = archivo.url
+        logger.info(f'[DESCARGA] Sirviendo archivo desde: {url_archivo[:50]}...')
+
+        # Redirigir a Cloudinary con redirect seguro (no expone URL permanente)
+        # El token ya valida el acceso; la URL de Cloudinary es temporal por naturaleza
+        import requests as req_lib
+        resp = req_lib.get(url_archivo, timeout=30, stream=True)
+        resp.raise_for_status()
+
+        nombre_archivo = archivo.name.split('/')[-1]
+        content_type, _ = mimetypes.guess_type(nombre_archivo)
+        content_type = content_type or 'application/octet-stream'
+
+        response = HttpResponse(content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+        for chunk in resp.iter_content(chunk_size=8192):
+            response.write(chunk)
+
+        logger.info(f'[DESCARGA] Archivo entregado: {nombre_archivo}')
+        return response
+
+    except Exception as e:
+        logger.error(f'[DESCARGA] Error descargando archivo: {e}', exc_info=True)
+        return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
 
 def pago_fallido(request):
     return render(request, 'pago_fallido.html')
