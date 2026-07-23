@@ -548,7 +548,10 @@ def descargar_digital(request, token):
 
     try:
         url_archivo = archivo.url
-        logger.info(f'[DESCARGA] Sirviendo archivo desde: {url_archivo[:50]}...')
+        # Cloudinary sube PDFs/ZIPs como /image/upload/ pero deben servirse como /raw/upload/
+        url_archivo = url_archivo.replace('/image/upload/', '/raw/upload/')
+        url_archivo = url_archivo.replace('/video/upload/', '/raw/upload/')
+        logger.info(f'[DESCARGA] Sirviendo archivo desde: {url_archivo[:80]}...')
 
         # Redirigir a Cloudinary con redirect seguro (no expone URL permanente)
         # El token ya valida el acceso; la URL de Cloudinary es temporal por naturaleza
