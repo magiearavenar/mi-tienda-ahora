@@ -537,6 +537,7 @@ def pago_exitoso(request):
 def descargar_digital(request, token):
     import logging
     import mimetypes
+    import re
     import cloudinary
     import cloudinary.utils
     logger = logging.getLogger(__name__)
@@ -553,27 +554,11 @@ def descargar_digital(request, token):
         return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
 
     try:
-        nombre_archivo = archivo.name.split('/')[-1]
         url_base = archivo.url
-        logger.info(f'[DESCARGA] archivo.name={archivo.name} url={url_base}')
-
-        # Extraer public_id desde la URL completa de Cloudinary
-        # Formato: /raw/upload/v123/digitales/archivo.pdf  o  /raw/upload/digitales/archivo.pdf
-        import re
-        match = re.search(r'/raw/upload/(?:s--[^/]+--/)?(?:v\d+/)?(.+)$', url_base)
-        public_id = match.group(1) if match else archivo.name
-        logger.info(f'[DESCARGA] public_id={public_id}')
-
-        url_firmada = cloudinary.utils.cloudinary_url(
-            public_id,
-            resource_type='raw',
-            type='upload',
-            sign_url=True,
-            expires_at=int(timezone.now().timestamp()) + 300,
-        )[0]
-        logger.info(f'[DESCARGA] URL firmada: {url_firmada}')
-
-        return redirect(url_firmada)
+        # Asegurar que sea /raw/upload/ (no image ni authenticated)
+        url_directa = re.sub(r'/(?:image|video|raw)/(?:upload|authenticated)/', '/raw/upload/', url_base)
+        logger.info(f'[DESCARGA] Redirigiendo a: {url_directa}')
+        return redirect(url_directa)
 
     except Exception as e:
         logger.error(f'[DESCARGA] Error: {e}', exc_info=True)
