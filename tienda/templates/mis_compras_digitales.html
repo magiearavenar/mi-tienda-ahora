@@ -46,9 +46,12 @@
                                         <i class="fas fa-download"></i> Descargar
                                     </a>
                                 {% else %}
-                                    <span class="text-muted small">
-                                        Contáctanos para reactivar
-                                    </span>
+                                    <form method="post" action="{% url 'regenerar_token' token.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-redo"></i> Nuevo link
+                                        </button>
+                                    </form>
                                 {% endif %}
                             </div>
                         </div>

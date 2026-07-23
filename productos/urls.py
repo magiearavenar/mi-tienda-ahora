@@ -47,6 +47,7 @@ urlpatterns = [
     path('mercadopago/webhook/', views.mercadopago_webhook, name='mercadopago_webhook'),
     path('pago/exitoso/', views.pago_exitoso, name='pago_exitoso'),
     path('descargar/<str:token>/', views.descargar_digital, name='descargar_digital'),
+    path('regenerar-token/<int:token_id>/', views.regenerar_token, name='regenerar_token'),
     path('pago/fallido/', views.pago_fallido, name='pago_fallido'),
     path('pago/pendiente/', views.pago_pendiente, name='pago_pendiente'),
     path('validar-cupon/', views.validar_cupon, name='validar_cupon'),

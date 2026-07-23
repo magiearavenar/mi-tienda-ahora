@@ -581,6 +581,20 @@ def descargar_digital(request, token):
         logger.error(f'[DESCARGA] Error: {e}', exc_info=True)
         return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
 
+@login_required
+@require_POST
+def regenerar_token(request, token_id):
+    import secrets
+    from datetime import timedelta
+    td = get_object_or_404(TokenDescarga, id=token_id, pedido__usuario=request.user)
+    td.token = secrets.token_urlsafe(32)
+    td.usado = False
+    td.fecha_expiracion = timezone.now() + timedelta(days=5)
+    td.save()
+    messages.success(request, 'Nuevo link de descarga generado.')
+    return redirect('mis_compras_digitales')
+
+
 def pago_fallido(request):
     return render(request, 'pago_fallido.html')
 
