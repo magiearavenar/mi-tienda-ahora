@@ -1,15 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-
-def _get_digital_storage():
-    """Retorna RawMediaCloudinaryStorage en producción, default en desarrollo."""
-    import os
-    if os.environ.get('CLOUDINARY_CLOUD_NAME'):
-        from productos.storage import DigitalFileStorage
-        return DigitalFileStorage()
-    return None
-
 class Tag(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     color = models.CharField(max_length=7, default='#6c757d', help_text='Color del tag en formato hex')
@@ -90,7 +81,6 @@ class Producto(models.Model):
     archivo_digital = models.FileField(
         upload_to='digitales/',
         blank=True, null=True,
-        storage=_get_digital_storage(),
         help_text='Archivo a enviar por correo al comprar (PDF, ZIP, etc.)'
     )
     
@@ -601,7 +591,7 @@ class TokenDescarga(models.Model):
     token = models.CharField(max_length=64, unique=True)
     fecha_expiracion = models.DateTimeField()
     usado = models.BooleanField(default=False)
-    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True, null=True)
     email_destino = models.EmailField(blank=True, default='')
 
     def esta_vigente(self):
