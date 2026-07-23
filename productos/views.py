@@ -432,6 +432,7 @@ def _procesar_webhook_mp(data):
                 or payment_info.get('payer', {}).get('email', '')
             )
             _enviar_digitales(pedido, email_comprador)
+        except Pedido.DoesNotExist:
             logger.error(f'[MP] Pedido no encontrado: {pedido_id}')
     except Exception as e:
         logger.error(f'[MP] Error procesando webhook: {e}', exc_info=True)
