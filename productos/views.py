@@ -555,7 +555,7 @@ def descargar_digital(request, token):
         url_archivo = url_archivo.replace('/image/upload/', '/raw/upload/')
         url_archivo = url_archivo.replace('/video/upload/', '/raw/upload/')
         url_archivo = url_archivo.replace('/raw/authenticated/', '/raw/upload/')
-        logger.info(f'[DESCARGA] Sirviendo archivo desde: {url_archivo[:80]}...')
+        logger.info(f'[DESCARGA] URL completa: {url_archivo}')
 
         import requests as req_lib
         resp = req_lib.get(url_archivo, timeout=30, stream=True)
