@@ -504,13 +504,16 @@ def _enviar_digitales(pedido, email_pago):
             'pedido': pedido,
         })
 
-        resend.api_key = os.environ.get('RESEND_API_KEY', '')
-        resend.Emails.send({
-            'from': os.environ.get('RESEND_FROM_EMAIL', 'Mundo Magie <noreply@mundomagie.cl>'),
+        api_key = os.environ.get('RESEND_API_KEY', '')
+        logger.info(f'[DIGITAL] RESEND_API_KEY presente: {bool(api_key)} longitud: {len(api_key)}')
+        resend.api_key = api_key
+        resultado = resend.Emails.send({
+            'from': os.environ.get('RESEND_FROM_EMAIL', 'Mundo Magie <contacto@mundomagie.cl>'),
             'to': [email],
             'subject': f'Tu descarga digital - Mundo Magie (Pedido #{pedido.id})',
             'html': html,
         })
+        logger.info(f'[DIGITAL] Resend resultado: {resultado}')
         logger.info(f'[DIGITAL] Email enviado correctamente a {email}')
     except Exception as e:
         logger.error(f'[DIGITAL] Error enviando email pedido #{pedido.id}: {e}', exc_info=True)
