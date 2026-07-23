@@ -120,6 +120,14 @@ class ProductoForm(forms.ModelForm):
             'descripcion': QuillWidget(attrs={'rows': 4}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Forzar RawMediaCloudinaryStorage para archivo_digital
+        import os
+        if os.environ.get('CLOUDINARY_CLOUD_NAME'):
+            from productos.storage import DigitalFileStorage
+            self.fields['archivo_digital'].storage = DigitalFileStorage()
+
 
 def comprimir_imagen(imagen, max_kb=4000, max_px=1920):
     """Comprime una imagen a menos de max_kb KB y max_px px de ancho."""

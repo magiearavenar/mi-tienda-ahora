@@ -284,7 +284,6 @@ if os.environ.get('CLOUDINARY_CLOUD_NAME'):
         'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
         'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
         'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
-        'MAGIC_FILE_PATH': 'digitales/',  # carpeta de archivos digitales
     }
     
     # File upload settings
