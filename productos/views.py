@@ -380,8 +380,7 @@ def mercadopago_webhook(request):
         if request.method == 'GET':
             return HttpResponse('OK')
         data = json.loads(request.body)
-        import threading
-        threading.Thread(target=_procesar_webhook_mp, args=(data,), daemon=True).start()
+        _procesar_webhook_mp(data)
         return HttpResponse('OK')
     except Exception:
         return HttpResponse('OK')
