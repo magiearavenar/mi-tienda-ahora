@@ -539,7 +539,7 @@ def descargar_digital(request, token):
     import mimetypes
     import re
     import cloudinary
-    import cloudinary.utils
+    import cloudinary.uploader
     logger = logging.getLogger(__name__)
 
     td = get_object_or_404(TokenDescarga, token=token)
@@ -554,11 +554,28 @@ def descargar_digital(request, token):
         return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
 
     try:
-        url_base = archivo.url
-        # Asegurar que sea /raw/upload/ (no image ni authenticated)
-        url_directa = re.sub(r'/(?:image|video|raw)/(?:upload|authenticated)/', '/raw/upload/', url_base)
-        logger.info(f'[DESCARGA] Redirigiendo a: {url_directa}')
-        return redirect(url_directa)
+        nombre_archivo = archivo.name.split('/')[-1]
+        # Usar API de Cloudinary para obtener URL temporal autenticada
+        resultado = cloudinary.uploader.explicit(
+            archivo.name,
+            type='upload',
+            resource_type='raw',
+        )
+        url_directa = resultado.get('secure_url', '')
+        logger.info(f'[DESCARGA] URL desde API: {url_directa}')
+
+        import requests as req_lib
+        resp = req_lib.get(url_directa, timeout=60, stream=True)
+        resp.raise_for_status()
+
+        content_type, _ = mimetypes.guess_type(nombre_archivo)
+        content_type = content_type or 'application/octet-stream'
+        response = HttpResponse(content_type=content_type)
+        response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
+        for chunk in resp.iter_content(chunk_size=8192):
+            response.write(chunk)
+        logger.info(f'[DESCARGA] Entregado: {nombre_archivo}')
+        return response
 
     except Exception as e:
         logger.error(f'[DESCARGA] Error: {e}', exc_info=True)
