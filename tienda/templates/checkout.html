@@ -132,14 +132,24 @@
                 <!-- 4. Confirmaciones -->
                 <div class="form-section">
                     <h4 class="section-title">4. Confirmaciones</h4>
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="confirmarTiempo" required>
-                        <label class="form-check-label" for="confirmarTiempo">
-                            Confirmo que el pedido será preparado y despachado en 3-5 días hábiles
-                        </label>
+                    <div id="confirmacionesFisicas">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmarTiempo">
+                            <label class="form-check-label" for="confirmarTiempo">
+                                Confirmo que el pedido será preparado y despachado en 3-5 días hábiles
+                            </label>
+                        </div>
+                    </div>
+                    <div id="confirmacionDigital" style="display:none;">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="confirmarDescarga">
+                            <label class="form-check-label" for="confirmarDescarga">
+                                Entiendo que recibiré el archivo digital en mi correo electrónico tras confirmar el pago
+                            </label>
+                        </div>
                     </div>
                     <div class="form-check mb-3">
-                        <input class="form-check-input" type="checkbox" id="aceptarCondiciones" required>
+                        <input class="form-check-input" type="checkbox" id="aceptarCondiciones">
                         <label class="form-check-label" for="aceptarCondiciones">
                             Acepto las condiciones de envío y términos de servicio
                         </label>
@@ -520,20 +530,28 @@ function aplicarDescuento() {
 }
 
 function procesarPedido() {
-    // Validar campos obligatorios
     const email = document.getElementById('email').value;
     const telefono = document.getElementById('telefono').value;
-    
+
     if (!email || !telefono) {
         alert('Por favor completa todos los campos obligatorios');
         return;
     }
-    
-    // Validar términos y condiciones
-    if (!document.getElementById('confirmarTiempo').checked || 
-        !document.getElementById('aceptarCondiciones').checked) {
-        alert('Debes aceptar las confirmaciones obligatorias');
-        return;
+
+    const esDigital = window._todosDigitales || false;
+
+    if (esDigital) {
+        if (!document.getElementById('confirmarDescarga').checked ||
+            !document.getElementById('aceptarCondiciones').checked) {
+            alert('Debes aceptar las confirmaciones obligatorias');
+            return;
+        }
+    } else {
+        if (!document.getElementById('confirmarTiempo').checked ||
+            !document.getElementById('aceptarCondiciones').checked) {
+            alert('Debes aceptar las confirmaciones obligatorias');
+            return;
+        }
     }
     
     const tipoEnvio = document.querySelector('input[name="tipoEnvio"]:checked').value;
@@ -720,9 +738,12 @@ function verificarProductosDigitales() {
     .then(r => r.json())
     .then(data => {
         const todosDigitales = ids.every(id => data.digitales.includes(id));
+        window._todosDigitales = todosDigitales;
         document.getElementById('opcionesEnvioFisico').style.display = todosDigitales ? 'none' : 'block';
         document.getElementById('opcionEnvioDigital').style.display = todosDigitales ? 'block' : 'none';
         document.getElementById('direccionSection').style.display = todosDigitales ? 'none' : 'block';
+        document.getElementById('confirmacionesFisicas').style.display = todosDigitales ? 'none' : 'block';
+        document.getElementById('confirmacionDigital').style.display = todosDigitales ? 'block' : 'none';
         if (todosDigitales) document.getElementById('correoDigital').checked = true;
     });
 }
