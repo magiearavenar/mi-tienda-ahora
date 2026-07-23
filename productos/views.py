@@ -555,23 +555,19 @@ def descargar_digital(request, token):
     try:
         nombre_archivo = archivo.name.split('/')[-1]
         url_base = archivo.url
+        logger.info(f'[DESCARGA] archivo.name={archivo.name} url={url_base}')
 
-        # Extraer public_id real desde la URL de Cloudinary
-        # URL formato: https://res.cloudinary.com/cloud/raw/upload/v123/digitales/archivo.pdf
+        # Extraer public_id desde la URL completa de Cloudinary
+        # Formato: /raw/upload/v123/digitales/archivo.pdf  o  /raw/upload/digitales/archivo.pdf
         import re
-        match = re.search(r'/raw/(?:upload|authenticated)/(?:v\d+/)?(.+)$', url_base)
+        match = re.search(r'/raw/upload/(?:s--[^/]+--/)?(?:v\d+/)?(.+)$', url_base)
         public_id = match.group(1) if match else archivo.name
-        # Quitar extension para Cloudinary (lo maneja internamente)
-        logger.info(f'[DESCARGA] public_id extraido: {public_id}')
-
-        # Detectar tipo real del archivo en Cloudinary
-        tipo = 'authenticated' if '/authenticated/' in url_base else 'upload'
-        logger.info(f'[DESCARGA] tipo Cloudinary: {tipo}')
+        logger.info(f'[DESCARGA] public_id={public_id}')
 
         url_firmada = cloudinary.utils.cloudinary_url(
             public_id,
             resource_type='raw',
-            type=tipo,
+            type='upload',
             sign_url=True,
             expires_at=int(timezone.now().timestamp()) + 300,
         )[0]
