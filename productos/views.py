@@ -537,6 +537,8 @@ def pago_exitoso(request):
 def descargar_digital(request, token):
     import logging
     import mimetypes
+    import cloudinary
+    import cloudinary.utils
     logger = logging.getLogger(__name__)
 
     td = get_object_or_404(TokenDescarga, token=token)
@@ -551,30 +553,24 @@ def descargar_digital(request, token):
         return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
 
     try:
-        url_archivo = archivo.url
-        url_archivo = url_archivo.replace('/image/upload/', '/raw/upload/')
-        url_archivo = url_archivo.replace('/video/upload/', '/raw/upload/')
-        url_archivo = url_archivo.replace('/raw/authenticated/', '/raw/upload/')
-        logger.info(f'[DESCARGA] URL completa: {url_archivo}')
-
-        import requests as req_lib
-        resp = req_lib.get(url_archivo, timeout=30, stream=True)
-        resp.raise_for_status()
-
         nombre_archivo = archivo.name.split('/')[-1]
-        content_type, _ = mimetypes.guess_type(nombre_archivo)
-        content_type = content_type or 'application/octet-stream'
+        logger.info(f'[DESCARGA] archivo.name={archivo.name}')
+        logger.info(f'[DESCARGA] archivo.url={archivo.url}')
 
-        response = HttpResponse(content_type=content_type)
-        response['Content-Disposition'] = f'attachment; filename="{nombre_archivo}"'
-        for chunk in resp.iter_content(chunk_size=8192):
-            response.write(chunk)
+        # Generar URL firmada para tipo upload (public) con expiracion 5 min
+        url_firmada = cloudinary.utils.cloudinary_url(
+            archivo.name,
+            resource_type='raw',
+            type='upload',
+            sign_url=True,
+            expires_at=int(timezone.now().timestamp()) + 300,
+        )[0]
+        logger.info(f'[DESCARGA] URL firmada: {url_firmada}')
 
-        logger.info(f'[DESCARGA] Archivo entregado: {nombre_archivo}')
-        return response
+        return redirect(url_firmada)
 
     except Exception as e:
-        logger.error(f'[DESCARGA] Error descargando archivo: {e}', exc_info=True)
+        logger.error(f'[DESCARGA] Error: {e}', exc_info=True)
         return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
 
 def pago_fallido(request):
