@@ -150,9 +150,13 @@ def registro(request):
         if form.is_valid():
             user = form.save()
             username = form.cleaned_data.get('username')
+            email = form.cleaned_data.get('email', '')
+            # Asociar pedidos de invitado con el mismo email
+            if email:
+                Pedido.objects.filter(usuario=None, email_cliente=email).update(usuario=user)
+                TokenDescarga.objects.filter(pedido__usuario=user, email_destino=email).update(email_destino=email)
             messages.success(request, f'Cuenta creada para {username}')
             login(request, user)
-            # Generar cupón de bienvenida y enviar email
             _enviar_bienvenida(user)
             return redirect('home')
     else:
