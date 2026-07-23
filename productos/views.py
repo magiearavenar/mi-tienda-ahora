@@ -720,6 +720,18 @@ def debug_config(request):
         'DEBUG': os.environ.get('DEBUG', 'Not set'),
         'RAILWAY_ENVIRONMENT': os.environ.get('RAILWAY_ENVIRONMENT', 'Not set')
     }
+    # Mostrar tokens activos
+    tokens = list(TokenDescarga.objects.order_by('-fecha_creacion')[:5].values(
+        'token', 'usado', 'fecha_expiracion', 'producto__nombre', 'pedido__id'
+    ))
+    config['tokens_recientes'] = [{
+        'token': t['token'][:12] + '...',
+        'usado': t['usado'],
+        'expiracion': str(t['fecha_expiracion']),
+        'producto': t['producto__nombre'],
+        'pedido': t['pedido__id'],
+        'url': f"/descargar/{t['token']}/"
+    } for t in tokens]
     return JsonResponse(config)
 
 @csrf_exempt
