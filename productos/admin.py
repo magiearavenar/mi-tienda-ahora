@@ -120,36 +120,7 @@ class ProductoForm(forms.ModelForm):
             'descripcion': QuillWidget(attrs={'rows': 4}),
         }
 
-    def clean_archivo_digital(self):
-        archivo = self.cleaned_data.get('archivo_digital')
-        if not archivo or not hasattr(archivo, 'read'):
-            return archivo
-        nombre = getattr(archivo, 'name', '')
-        if not nombre.lower().endswith('.pdf'):
-            return archivo
-        import io
-        contenido = archivo.read()
-        if len(contenido) <= 9 * 1024 * 1024:
-            archivo.seek(0)
-            return archivo
-        try:
-            import pikepdf
-            from django.core.files.uploadedfile import InMemoryUploadedFile
-            entrada = io.BytesIO(contenido)
-            salida = io.BytesIO()
-            with pikepdf.open(entrada) as pdf:
-                pdf.save(salida, compress_streams=True, object_stream_mode=pikepdf.ObjectStreamMode.generate)
-            salida.seek(0)
-            tam_nuevo = salida.getbuffer().nbytes
-            if tam_nuevo < len(contenido):
-                return InMemoryUploadedFile(
-                    salida, None, nombre,
-                    'application/pdf', tam_nuevo, None
-                )
-        except Exception:
-            pass
-        archivo.seek(0)
-        return archivo
+    pass
 
 
 def comprimir_imagen(imagen, max_kb=4000, max_px=1920):
@@ -313,6 +284,27 @@ class ProductoAdmin(admin.ModelAdmin):
     mostrar_tags.allow_tags = True
 
     def save_model(self, request, obj, form, change):
+        # Comprimir PDF digital si supera 9MB antes de subir a Cloudinary
+        archivo = request.FILES.get('archivo_digital')
+        if archivo and archivo.name.lower().endswith('.pdf') and archivo.size > 9 * 1024 * 1024:
+            try:
+                import pikepdf
+                from django.core.files.uploadedfile import InMemoryUploadedFile
+                contenido = archivo.read()
+                entrada = io.BytesIO(contenido)
+                salida = io.BytesIO()
+                with pikepdf.open(entrada) as pdf:
+                    pdf.save(salida, compress_streams=True, object_stream_mode=pikepdf.ObjectStreamMode.generate)
+                salida.seek(0)
+                tam_nuevo = salida.getbuffer().nbytes
+                if tam_nuevo < len(contenido):
+                    comprimido = InMemoryUploadedFile(
+                        salida, None, archivo.name,
+                        'application/pdf', tam_nuevo, None
+                    )
+                    obj.archivo_digital = comprimido
+            except Exception:
+                pass
         super().save_model(request, obj, form, change)
         imagenes = request.FILES.getlist('imagenes_bulk')
         if not imagenes:
