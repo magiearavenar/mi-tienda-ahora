@@ -128,6 +128,38 @@ class ProductoForm(forms.ModelForm):
             from productos.storage import DigitalFileStorage
             self.fields['archivo_digital'].storage = DigitalFileStorage()
 
+    def clean_archivo_digital(self):
+        archivo = self.cleaned_data.get('archivo_digital')
+        if not archivo or not hasattr(archivo, 'read'):
+            return archivo
+        nombre = getattr(archivo, 'name', '')
+        if not nombre.lower().endswith('.pdf'):
+            return archivo
+        # Comprimir PDF si supera 9MB
+        import io
+        contenido = archivo.read()
+        if len(contenido) <= 9 * 1024 * 1024:
+            archivo.seek(0)
+            return archivo
+        try:
+            import pikepdf
+            from django.core.files.uploadedfile import InMemoryUploadedFile
+            entrada = io.BytesIO(contenido)
+            salida = io.BytesIO()
+            with pikepdf.open(entrada) as pdf:
+                pdf.save(salida, compress_streams=True, object_stream_mode=pikepdf.ObjectStreamMode.generate)
+            salida.seek(0)
+            tam_nuevo = salida.getbuffer().nbytes
+            if tam_nuevo < len(contenido):
+                return InMemoryUploadedFile(
+                    salida, 'archivo_digital', nombre,
+                    'application/pdf', tam_nuevo, None
+                )
+        except Exception:
+            pass
+        archivo.seek(0)
+        return archivo
+
 
 def comprimir_imagen(imagen, max_kb=4000, max_px=1920):
     """Comprime una imagen a menos de max_kb KB y max_px px de ancho."""

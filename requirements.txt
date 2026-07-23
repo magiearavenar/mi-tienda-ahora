@@ -13,3 +13,4 @@ mercadopago==2.2.1
 gunicorn==21.2.0
 google-auth==2.29.0
 resend==2.34.0
+pikepdf==10.10.0

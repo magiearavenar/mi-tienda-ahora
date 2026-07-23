@@ -287,8 +287,8 @@ if os.environ.get('CLOUDINARY_CLOUD_NAME'):
     }
     
     # File upload settings
-    FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
-    DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+    FILE_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
+    DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
     
 else:
     # Local media files (desarrollo)
