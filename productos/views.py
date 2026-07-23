@@ -432,7 +432,6 @@ def _procesar_webhook_mp(data):
                 or payment_info.get('payer', {}).get('email', '')
             )
             _enviar_digitales(pedido, email_comprador)
-        except Pedido.DoesNotExist:
             logger.error(f'[MP] Pedido no encontrado: {pedido_id}')
     except Exception as e:
         logger.error(f'[MP] Error procesando webhook: {e}', exc_info=True)
@@ -519,6 +518,12 @@ def _enviar_digitales(pedido, email_pago):
         })
         logger.info(f'[DIGITAL] Resend resultado: {resultado}')
         logger.info(f'[DIGITAL] Email enviado correctamente a {email}')
+        # Marcar pedido como entregado si todos los productos son digitales
+        todos_digitales = not pedido.detalles.filter(producto__es_digital=False).exists()
+        if todos_digitales:
+            pedido.estado = 'entregado'
+            pedido.save(update_fields=['estado'])
+            logger.info(f'[DIGITAL] Pedido #{pedido.id} marcado como entregado')
     except Exception as e:
         logger.error(f'[DIGITAL] Error enviando email pedido #{pedido.id}: {e}', exc_info=True)
 
