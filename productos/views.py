@@ -551,19 +551,27 @@ def descargar_digital(request, token):
         return render(request, 'descarga_expirada.html', {'pedido': td.pedido})
 
     try:
-        url_archivo = archivo.url
-        # Cloudinary sube PDFs/ZIPs como /image/upload/ pero deben servirse como /raw/upload/
-        url_archivo = url_archivo.replace('/image/upload/', '/raw/upload/')
-        url_archivo = url_archivo.replace('/video/upload/', '/raw/upload/')
-        logger.info(f'[DESCARGA] Sirviendo archivo desde: {url_archivo[:80]}...')
+        import cloudinary
+        import cloudinary.utils
 
-        # Redirigir a Cloudinary con redirect seguro (no expone URL permanente)
-        # El token ya valida el acceso; la URL de Cloudinary es temporal por naturaleza
+        # Obtener el public_id del archivo (sin extensión para Cloudinary)
+        nombre_archivo = archivo.name.split('/')[-1]
+        public_id = archivo.name  # ej: digitales/archivo.pdf
+
+        # Generar URL firmada con expiración de 60 segundos
+        url_firmada, _ = cloudinary.utils.cloudinary_url(
+            public_id,
+            resource_type='raw',
+            type='authenticated',
+            sign_url=True,
+            expires_at=int(timezone.now().timestamp()) + 60,
+        )
+        logger.info(f'[DESCARGA] URL firmada generada para: {public_id}')
+
         import requests as req_lib
-        resp = req_lib.get(url_archivo, timeout=30, stream=True)
+        resp = req_lib.get(url_firmada, timeout=30, stream=True)
         resp.raise_for_status()
 
-        nombre_archivo = archivo.name.split('/')[-1]
         content_type, _ = mimetypes.guess_type(nombre_archivo)
         content_type = content_type or 'application/octet-stream'
 
