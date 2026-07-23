@@ -112,6 +112,11 @@ class QuillWidget(forms.Textarea):
         return mark_safe(html)
 
 
+def validar_tamano_imagen(imagen):
+    if imagen and hasattr(imagen, 'size') and imagen.size > 10 * 1024 * 1024:
+        raise forms.ValidationError('La imagen no puede superar 10 MB. Por favor comprime la imagen antes de subirla.')
+
+
 class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
@@ -120,7 +125,10 @@ class ProductoForm(forms.ModelForm):
             'descripcion': QuillWidget(attrs={'rows': 4}),
         }
 
-    pass
+    def clean_imagen(self):
+        imagen = self.cleaned_data.get('imagen')
+        validar_tamano_imagen(imagen)
+        return imagen
 
 
 def comprimir_imagen(imagen, max_kb=4000, max_px=1920):
@@ -284,12 +292,20 @@ class ProductoAdmin(admin.ModelAdmin):
     mostrar_tags.allow_tags = True
 
     def save_model(self, request, obj, form, change):
+        # Comprimir imagen principal si supera 9MB antes de subir a Cloudinary
+        imagen = request.FILES.get('imagen')
+        if imagen and imagen.size > 9 * 1024 * 1024:
+            try:
+                obj.imagen = comprimir_imagen(imagen)
+            except Exception:
+                pass
         # Comprimir PDF digital si supera 9MB antes de subir a Cloudinary
         archivo = request.FILES.get('archivo_digital')
         if archivo and archivo.name.lower().endswith('.pdf') and archivo.size > 9 * 1024 * 1024:
             try:
                 import pikepdf
                 from django.core.files.uploadedfile import InMemoryUploadedFile
+                from django.contrib import messages
                 contenido = archivo.read()
                 entrada = io.BytesIO(contenido)
                 salida = io.BytesIO()
@@ -297,12 +313,19 @@ class ProductoAdmin(admin.ModelAdmin):
                     pdf.save(salida, compress_streams=True, object_stream_mode=pikepdf.ObjectStreamMode.generate)
                 salida.seek(0)
                 tam_nuevo = salida.getbuffer().nbytes
-                if tam_nuevo < len(contenido):
-                    comprimido = InMemoryUploadedFile(
+                if tam_nuevo <= 10 * 1024 * 1024:
+                    obj.archivo_digital = InMemoryUploadedFile(
                         salida, None, archivo.name,
                         'application/pdf', tam_nuevo, None
                     )
-                    obj.archivo_digital = comprimido
+                else:
+                    messages.error(
+                        request,
+                        f'El PDF pesa {archivo.size // (1024*1024)} MB y tras comprimir quedó en '
+                        f'{tam_nuevo // (1024*1024)} MB. Cloudinary acepta máximo 10 MB. '
+                        f'Por favor reduce el tamaño del PDF antes de subirlo.'
+                    )
+                    obj.archivo_digital = obj.__class__.objects.filter(pk=obj.pk).values_list('archivo_digital', flat=True).first()
             except Exception:
                 pass
         super().save_model(request, obj, form, change)
@@ -329,6 +352,23 @@ class ProductoAdmin(admin.ModelAdmin):
                 orden=ultimo_orden + i + 1,
                 es_principal=(i == 0 and not obj.imagenes.filter(es_principal=True).exists())
             )
+
+    def save_formset(self, request, form, formset, change):
+        if formset.model == ImagenProducto:
+            instances = formset.save(commit=False)
+            for obj in instances:
+                if obj.imagen and hasattr(obj.imagen, 'file') and not isinstance(obj.imagen.file, bytes):
+                    try:
+                        f = obj.imagen.file
+                        if hasattr(f, 'size') and f.size > 9 * 1024 * 1024:
+                            f.seek(0)
+                            obj.imagen = comprimir_imagen(f)
+                    except Exception:
+                        pass
+                obj.save()
+            formset.save_m2m()
+        else:
+            formset.save()
 
     def save_related(self, request, form, formsets, change):
         super().save_related(request, form, formsets, change)

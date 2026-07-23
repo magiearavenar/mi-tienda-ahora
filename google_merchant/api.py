@@ -13,13 +13,17 @@ SCOPES = ['https://www.googleapis.com/auth/content']
 
 def get_session():
     """Obtiene sesión autenticada con credenciales de servicio."""
-    credentials_path = getattr(settings, 'GOOGLE_MERCHANT_CREDENTIALS', None)
-    if not credentials_path:
+    credentials_value = getattr(settings, 'GOOGLE_MERCHANT_CREDENTIALS', None)
+    if not credentials_value:
         raise ValueError('GOOGLE_MERCHANT_CREDENTIALS no configurado en settings.py')
 
-    credentials = service_account.Credentials.from_service_account_file(
-        credentials_path, scopes=SCOPES
-    )
+    # Soporta tanto JSON directo como ruta de archivo
+    try:
+        info = json.loads(credentials_value)
+        credentials = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+    except (json.JSONDecodeError, ValueError):
+        credentials = service_account.Credentials.from_service_account_file(credentials_value, scopes=SCOPES)
+
     return AuthorizedSession(credentials)
 
 
