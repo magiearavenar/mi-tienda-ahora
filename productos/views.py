@@ -383,9 +383,26 @@ def mercadopago_webhook(request):
     try:
         if request.method == 'GET':
             return HttpResponse('OK')
+        if request.method != 'POST':
+            return HttpResponse('OK')
+        # Validar firma de MercadoPago si hay secret configurado
+        mp_secret = os.environ.get('MERCADOPAGO_WEBHOOK_SECRET', '')
+        if mp_secret:
+            import hmac as hmac_lib
+            import hashlib
+            x_signature = request.headers.get('x-signature', '')
+            x_request_id = request.headers.get('x-request-id', '')
+            data_id = request.GET.get('data.id', '') or request.GET.get('id', '')
+            parts = dict(p.split('=', 1) for p in x_signature.split(',') if '=' in p)
+            ts = parts.get('ts', '')
+            v1 = parts.get('v1', '')
+            manifest = f'id:{data_id};request-id:{x_request_id};ts:{ts};'
+            expected = hmac_lib.new(mp_secret.encode(), manifest.encode(), hashlib.sha256).hexdigest()
+            if not hmac_lib.compare_digest(expected, v1):
+                import logging
+                logging.getLogger(__name__).warning('[MP] Firma de webhook invalida')
+                return HttpResponse('OK')
         data = json.loads(request.body)
-        # Responder inmediatamente a MP para evitar timeout
-        # Procesar en thread separado con manejo correcto
         import threading
         t = threading.Thread(target=_procesar_webhook_mp, args=(data,), daemon=False)
         t.start()
@@ -572,11 +589,13 @@ def descargar_digital(request, token):
             resource_type='raw',
         )
         url_directa = resultado.get('secure_url', '')
-        logger.info(f'[DESCARGA] URL desde API: {url_directa}')
 
         import requests as req_lib
         resp = req_lib.get(url_directa, timeout=60, stream=True)
         resp.raise_for_status()
+
+        td.usado = True
+        td.save(update_fields=['usado'])
 
         content_type, _ = mimetypes.guess_type(nombre_archivo)
         content_type = content_type or 'application/octet-stream'
@@ -763,8 +782,11 @@ def debug_config(request):
 @csrf_exempt
 @require_POST
 def verificar_digitales(request):
-    data = json.loads(request.body)
-    ids = data.get('ids', [])
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsonResponse({'digitales': []})
+    ids = [int(i) for i in data.get('ids', []) if str(i).isdigit()][:50]
     digitales = list(Producto.objects.filter(id__in=ids, es_digital=True).values_list('id', flat=True))
     return JsonResponse({'digitales': digitales})
 
