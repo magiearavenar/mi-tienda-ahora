@@ -434,10 +434,10 @@ def _procesar_webhook_mp(data):
         logger.error(f'[MP] Error procesando webhook: {e}', exc_info=True)
 
 def _enviar_digitales(pedido, email_pago):
-    """Genera tokens de descarga y envía email con links al cliente."""
+    """Genera tokens de descarga y envia email con links al cliente via Resend."""
     import logging
     import secrets
-    from django.core.mail import EmailMultiAlternatives
+    import resend
     from django.template.loader import render_to_string
     from datetime import timedelta
     from .models import TokenDescarga
@@ -469,11 +469,8 @@ def _enviar_digitales(pedido, email_pago):
     for producto in digitales:
         logger.info(f'[DIGITAL] Procesando producto: {producto.nombre}')
 
-        # Idempotente: reutilizar token activo existente o crear uno nuevo
         token_obj = TokenDescarga.objects.filter(
-            producto=producto,
-            pedido=pedido,
-            usado=False
+            producto=producto, pedido=pedido, usado=False
         ).first()
 
         if not token_obj:
@@ -506,14 +503,14 @@ def _enviar_digitales(pedido, email_pago):
             'productos': items,
             'pedido': pedido,
         })
-        msg = EmailMultiAlternatives(
-            subject=f'✨ Tu descarga digital - Mundo Magie (Pedido #{pedido.id})',
-            body=f'Hola {nombre_usuario}, tu descarga está lista en: {items[0]["url"]}',
-            from_email=None,
-            to=[email],
-        )
-        msg.attach_alternative(html, 'text/html')
-        msg.send(fail_silently=False)
+
+        resend.api_key = os.environ.get('RESEND_API_KEY', '')
+        resend.Emails.send({
+            'from': os.environ.get('RESEND_FROM_EMAIL', 'Mundo Magie <noreply@mundomagie.cl>'),
+            'to': [email],
+            'subject': f'Tu descarga digital - Mundo Magie (Pedido #{pedido.id})',
+            'html': html,
+        })
         logger.info(f'[DIGITAL] Email enviado correctamente a {email}')
     except Exception as e:
         logger.error(f'[DIGITAL] Error enviando email pedido #{pedido.id}: {e}', exc_info=True)
