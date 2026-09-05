@@ -521,5 +521,259 @@
         });
     </script>
 {% block extra_js %}{% endblock %}
+
+<!-- FASE 5: Cursor personalizado -->
+<style>
+  @media (pointer: fine) {
+    *, *::before, *::after { cursor: none !important; }
+    #magie-cursor {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-primario);
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s ease, background 0.3s ease, width 0.2s ease, height 0.2s ease;
+      mix-blend-mode: multiply;
+    }
+    #magie-cursor.hovering {
+      width: 28px;
+      height: 28px;
+      background: var(--color-secundario);
+    }
+    .magie-trail {
+      position: fixed;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99998;
+      transform: translate(-50%, -50%);
+      animation: trail-fade 0.5s ease-out forwards;
+    }
+    @keyframes trail-fade {
+      0%   { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0;   transform: translate(-50%, -50%) scale(0.1); }
+    }
+  }
+</style>
+<script>
+  (function () {
+    if (window.matchMedia('(pointer: fine)').matches) {
+      const cursor = document.createElement('div');
+      cursor.id = 'magie-cursor';
+      document.body.appendChild(cursor);
+
+      const trailColors = [
+        'var(--color-primario)',
+        'var(--color-secundario)',
+        'var(--color-hover)'
+      ];
+      let trailIndex = 0;
+      let lastTrail = 0;
+
+      document.addEventListener('mousemove', function (e) {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top  = e.clientY + 'px';
+
+        const now = Date.now();
+        if (now - lastTrail > 40) {
+          lastTrail = now;
+          const dot = document.createElement('span');
+          dot.className = 'magie-trail';
+          dot.style.left = e.clientX + 'px';
+          dot.style.top  = e.clientY + 'px';
+          dot.style.background = trailColors[trailIndex % trailColors.length];
+          trailIndex++;
+          document.body.appendChild(dot);
+          dot.addEventListener('animationend', () => dot.remove());
+        }
+      });
+
+      document.addEventListener('mouseover', function (e) {
+        const hoverable = e.target.closest('a, button, .add-to-cart-btn, .cart-btn, .category-link, .product-card-carousel');
+        cursor.classList.toggle('hovering', !!hoverable);
+      });
+    }
+  })();
+</script>
+
+<!-- FASE 4: Cards hover degradado animado -->
+<style>
+  .product-card-carousel {
+    --angle: 0deg;
+    border: 2px solid transparent !important;
+    background-clip: padding-box;
+    position: relative;
+  }
+  .product-card-carousel::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: conic-gradient(
+      from var(--angle),
+      var(--color-primario),
+      var(--color-secundario),
+      var(--color-hover),
+      var(--color-primario)
+    );
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    z-index: 0;
+  }
+  .product-card-carousel > * {
+    position: relative;
+    z-index: 1;
+  }
+  .product-card-carousel:hover::before {
+    opacity: 1;
+    animation: border-spin 2.5s linear infinite;
+  }
+  @keyframes border-spin {
+    to { --angle: 360deg; }
+  }
+  @property --angle {
+    syntax: '<angle>';
+    initial-value: 0deg;
+    inherits: false;
+  }
+</style>
+
+<!-- FASE 3: Navbar Glassmorphism -->
+<style>
+  .header {
+    transition: background 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
+  }
+  .header.glass {
+    background: rgba(255, 255, 255, 0.55) !important;
+    backdrop-filter: blur(14px) saturate(1.6);
+    -webkit-backdrop-filter: blur(14px) saturate(1.6);
+    box-shadow: 0 4px 24px rgba(210, 168, 221, 0.18);
+    border-bottom: 1px solid rgba(255, 193, 234, 0.25);
+  }
+</style>
+<script>
+  window.addEventListener('scroll', function () {
+    const header = document.querySelector('.header');
+    if (!header) return;
+    header.classList.toggle('glass', window.scrollY > 60);
+  }, { passive: true });
+</script>
+
+<!-- FASE 2: Magic Sparkle -->
+<style>
+  .sparkle-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: sparkle-fly 0.7s ease-out forwards;
+  }
+  @keyframes sparkle-fly {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.2); }
+  }
+</style>
+<script>
+  function spawnSparkles(x, y) {
+    const colors = [
+      getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#ffc1ea',
+      getComputedStyle(document.documentElement).getPropertyValue('--color-secundario').trim() || '#d2a8dd',
+      getComputedStyle(document.documentElement).getPropertyValue('--color-hover').trim() || '#f4d875',
+      '#fff'
+    ];
+    const count = 14;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('span');
+      p.className = 'sparkle-particle';
+      const angle = (360 / count) * i;
+      const dist = 40 + Math.random() * 40;
+      const rad = angle * Math.PI / 180;
+      p.style.setProperty('--dx', Math.cos(rad) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(rad) * dist + 'px');
+      p.style.left = x - 4 + 'px';
+      p.style.top  = y - 4 + 'px';
+      p.style.background = colors[i % colors.length];
+      document.body.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.add-to-cart-btn, .cart-btn');
+    if (!btn) return;
+    const r = btn.getBoundingClientRect();
+    spawnSparkles(r.left + r.width / 2, r.top + r.height / 2);
+  });
+</script>
+
+<!-- FASE 1: Animaciones de entrada -->
+<style>
+  .magie-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .magie-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .magie-reveal-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .magie-reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .magie-reveal-right {
+    opacity: 0;
+    transform: translateX(32px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .magie-reveal-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Elementos a animar
+    const selectors = [
+      { sel: '.product-card-carousel',  cls: 'magie-reveal',       stagger: true },
+      { sel: '.split-banner-left',       cls: 'magie-reveal-left',  stagger: false },
+      { sel: '.split-banner-right',      cls: 'magie-reveal-right', stagger: false },
+      { sel: '.banner-item-home',        cls: 'magie-reveal',       stagger: true },
+      { sel: '.instagram-item',          cls: 'magie-reveal',       stagger: true },
+      { sel: '.footer .col',             cls: 'magie-reveal',       stagger: true },
+      { sel: 'h4',                       cls: 'magie-reveal',       stagger: false },
+    ];
+
+    selectors.forEach(({ sel, cls, stagger }) => {
+      document.querySelectorAll(sel).forEach((el, i) => {
+        el.classList.add(cls);
+        if (stagger) el.style.transitionDelay = (i % 8) * 80 + 'ms';
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.magie-reveal, .magie-reveal-left, .magie-reveal-right')
+      .forEach(el => observer.observe(el));
+  });
+</script>
 </body>
 </html>

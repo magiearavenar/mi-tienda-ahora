@@ -7,7 +7,7 @@ from productos.models import Producto
 
 logger = logging.getLogger(__name__)
 
-API_BASE = 'https://merchantapi.googleapis.com/products/v1beta'
+API_BASE = 'https://merchantapi.googleapis.com/merchant/v1'
 SCOPES = ['https://www.googleapis.com/auth/content']
 
 
@@ -92,6 +92,7 @@ def sync_product(producto):
 
     url = f'{API_BASE}/accounts/{merchant_id}/productInputs:insert'
     params = {'dataSource': f'accounts/{merchant_id}/dataSources/primary'}
+    data['name'] = f'accounts/{merchant_id}/productInputs/online~es~CL~{producto.id}'
 
     response = session.post(url, json=data, params=params)
 
