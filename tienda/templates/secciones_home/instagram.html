@@ -1,0 +1,24 @@
+{% if instagram_posts %}
+<section class="instagram-section mt-5 mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">
+            <i class="fab fa-instagram me-2" style="color: #e1306c;"></i>
+            {{ instagram_config.titulo|default:'Síguenos en Instagram' }}
+        </h4>
+        <a href="https://instagram.com/{{ instagram_config.usuario }}" target="_blank"
+           style="font-size:0.85rem; color:#888; text-decoration:none;">
+            @{{ instagram_config.usuario }} →
+        </a>
+    </div>
+    <div class="instagram-grid">
+        {% for post in instagram_posts %}
+        <a href="{{ post.permalink }}" target="_blank" class="instagram-item">
+            <img src="{{ post.image_url }}" alt="{{ post.caption }}" loading="lazy">
+            <div class="instagram-overlay">
+                <i class="fab fa-instagram"></i>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}

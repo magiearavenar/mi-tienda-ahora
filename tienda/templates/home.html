@@ -8,261 +8,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="home-sections-wrapper">
 
-<div class="home-sec" style="order:{{ o_slideshow }}">
-<div id="carouselSlides" class="carousel slide mb-4" data-bs-ride="carousel">
-    {% if slides %}
-        <div class="carousel-indicators">
-            {% for slide in slides %}
-            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></button>
-            {% endfor %}
-        </div>
-        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
-            {% for slide in slides %}
-            <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                <img src="{{ slide.imagen.url|cloudinary_slide }}" alt="{{ slide.titulo|default:'Mundo Magie - Tienda online' }}" class="d-block" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
-                {% if slide.titulo %}
-                <div class="carousel-caption d-none d-md-block">
-                    <h5>{{ slide.titulo }}</h5>
-                </div>
-                {% endif %}
-            </div>
-            {% endfor %}
-        </div>
-        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSlides" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#carouselSlides" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
-    {% else %}
-        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
-            <div class="carousel-item active">
-                <div class="d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
-                    <div class="text-center text-muted">
-                        <i class="fas fa-images fa-3x mb-3"></i>
-                        <h5>Slideshow</h5>
-                        <p>Agrega imágenes desde el panel de administración</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    {% endif %}
-</div>
-
-</div><!-- /sec-slideshow -->
-
-<div class="home-sec" style="order:{{ o_banners }}">
-{% if banners %}
-<section class="banners-fidelizacion-home mb-4">
-    <div class="container">
-        <div class="row justify-content-center">
-            {% for banner in banners %}
-            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
-                <div class="banner-item-home d-flex align-items-start">
-                    <i class="{{ banner.icono }}" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
-                    <div>
-                        <h6 style="color: {{ banner.color_texto|default:'#6c757d' }}; font-size: 12px; margin: 0; font-weight: 500;">{{ banner.titulo }}</h6>
-                        {% if banner.descripcion %}
-                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">{{ banner.descripcion }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-</section>
+{% for seccion in orden_secciones %}
+{% if seccion == 'slideshow' %}{% include 'secciones_home/slideshow.html' %}
+{% elif seccion == 'banners' %}{% include 'secciones_home/banners.html' %}
+{% elif seccion == 'recien_llegados' %}{% include 'secciones_home/recien_llegados.html' %}
+{% elif seccion == 'categorias' %}{% include 'secciones_home/categorias.html' %}
+{% elif seccion == 'agenda_mes' %}{% include 'secciones_home/agenda_mes.html' %}
+{% elif seccion == 'instagram' %}{% include 'secciones_home/instagram.html' %}
 {% endif %}
-
-</div><!-- /sec-banners -->
-
-<div class="home-sec" style="order:{{ o_recien }}">
-<div class="mb-5">
-    <h4 class="mb-4">RECIÉN LLEGADOS</h4>
-    {% if productos %}
-    <div class="position-relative">
-        <div class="carousel-container" id="carousel-recien-llegados">
-            <div class="carousel-track">
-                {% for producto in productos %}
-                <div class="carousel-item-custom">
-                    <div class="product-card-carousel">
-                        <div class="product-image-carousel">
-                            {% if producto.imagen_principal %}
-                            <a href="{% url 'detalle_producto' producto.slug %}">
-                                <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy" width="280" height="280">
-                            </a>
-                            {% else %}
-                            <div class="no-image">
-                                <i class="fas fa-image"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="product-info-carousel">
-                            <h6 class="product-name">{{ producto.nombre }}</h6>
-                            <div class="product-price-container">
-                                <p class="product-price">{% if producto.tiene_rango_precios %}<small style="font-weight:400;font-size:0.75rem;">Desde</small> {% endif %}${{ producto.precio_desde|floatformat:0 }}</p>
-                                <div class="quantity-controls-mini">
-                                    <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, -1)">-</div>
-                                    <span id="qty-{{ producto.id }}">1</span>
-                                    <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, 1)">+</div>
-                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }}, {{ producto.es_digital|yesno:'true,false' }})" title="Agregar al carrito">
-                                        <i class="fas fa-shopping-cart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-        
-        <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-recien-llegados', -1)">
-            <i class="fas fa-chevron-left"></i>
-        </button>
-        <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-recien-llegados', 1)">
-            <i class="fas fa-chevron-right"></i>
-        </button>
-        
-        <div class="carousel-dots" id="dots-recien-llegados">
-            {% for i in "12" %}
-            <span class="dot {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-recien-llegados', {{ forloop.counter }})"></span>
-            {% endfor %}
-        </div>
-    </div>
-    {% else %}
-    <div class="text-center py-5">
-        <p class="text-muted">No hay productos disponibles</p>
-    </div>
-    {% endif %}
-</div>
-
-</div><!-- /mb-5 -->
-</div><!-- /sec-recien -->
-
-<div class="home-sec" style="order:{{ o_categorias }}">
-{% for seccion_data in secciones_categorias %}
-<div class="split-banner-section mb-5">
-    <div class="split-banner-grid">
-
-        <!-- Columna izquierda: banner promo -->
-        <div class="split-banner-left">
-            {% if seccion_data.seccion.banner_imagen %}
-            <img src="{{ seccion_data.seccion.banner_imagen.url|cloudinary_banner }}" alt="{{ seccion_data.seccion.banner_titulo|default:seccion_data.seccion.categoria.nombre }}" class="split-banner-img" loading="lazy">
-            {% endif %}
-            <div class="split-banner-overlay">
-                {% if seccion_data.seccion.banner_titulo %}
-                <h2 class="split-banner-titulo">{{ seccion_data.seccion.banner_titulo }}</h2>
-                {% else %}
-                <h2 class="split-banner-titulo">{{ seccion_data.seccion.categoria.nombre }}</h2>
-                {% endif %}
-                {% if seccion_data.seccion.banner_subtitulo %}
-                <p class="split-banner-subtitulo">{{ seccion_data.seccion.banner_subtitulo }}</p>
-                {% endif %}
-                <a href="{% url 'productos_categoria' seccion_data.seccion.categoria.id %}" class="split-banner-btn">
-                    {{ seccion_data.seccion.banner_boton_texto|default:'Ver todo' }}
-                </a>
-            </div>
-        </div>
-
-        <!-- Columna derecha: carrusel de productos -->
-        <div class="split-banner-right">
-            <div class="position-relative">
-                <div class="carousel-container" id="carousel-{{ seccion_data.seccion.categoria.id }}">
-                    <div class="carousel-track">
-                        {% for producto in seccion_data.productos %}
-                        <div class="carousel-item-custom carousel-item-split">
-                            <div class="product-card-carousel">
-                                <div class="product-image-carousel">
-                                    {% if producto.imagen_principal %}
-                                    <a href="{% url 'detalle_producto' producto.slug %}">
-                                        <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy">
-                                    </a>
-                                    {% else %}
-                                    <div class="no-image"><i class="fas fa-image"></i></div>
-                                    {% endif %}
-                                </div>
-                                <div class="product-info-carousel">
-                                    <h6 class="product-name">{{ producto.nombre }}</h6>
-                                    <div class="product-price-container">
-                                        <p class="product-price">{% if producto.tiene_rango_precios %}<small style="font-weight:400;font-size:0.75rem;">Desde</small> {% endif %}${{ producto.precio_desde|floatformat:0 }}</p>
-                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }}, 1, '', null, {{ producto.es_digital|yesno:'true,false' }})" title="Agregar al carrito">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', -1)">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-{{ seccion_data.seccion.categoria.id }}', 1)">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-                <div class="carousel-dots" id="dots-{{ seccion_data.seccion.categoria.id }}">
-                    {% for i in "123" %}
-                    <span class="dot {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-{{ seccion_data.seccion.categoria.id }}', {{ forloop.counter }})"></span>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-    </div>
-</div>
 {% endfor %}
-
-</div><!-- /sec-categorias -->
-
-<div class="home-sec" style="order:{{ o_agenda }}">
-{% if agenda_mes and agenda_mes.producto %}
-{% with am=agenda_mes %}
-<section class="agenda-mes-section mb-5">
-  <div class="am-wrapper"
-    style="background:{% if am.banner_imagen %}#000{% else %}{{ am.color_fondo|default:'#f9e4f0' }}{% endif %};flex-direction:{% if am.imagen_posicion == 'izquierda' %}row-reverse{% else %}row{% endif %};">
-
-    {% if am.banner_imagen %}
-    <img src="{{ am.banner_imagen.url }}" alt="" class="am-bg-img">
-    <div class="am-bg-overlay"></div>
-    {% endif %}
-
-    <div class="am-col-text">
-      {% if am.badge %}<span class="am-badge">{{ am.badge }}</span>{% endif %}
-      <p class="am-eyebrow">Destacado del mes</p>
-      <h2 class="am-titulo" style="color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};">{{ am.producto.nombre }}</h2>
-      {% if am.subtitulo %}
-      <p class="am-subtitulo" style="color:{% if am.banner_imagen %}rgba(255,255,255,0.78){% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};opacity:{% if am.banner_imagen %}1{% else %}0.6{% endif %};">{{ am.subtitulo }}</p>
-      {% endif %}
-      <div class="am-precio-row">
-        <span class="am-precio" style="color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};">${{ am.producto.precio_desde|floatformat:0 }}</span>
-        {% if am.producto.tiene_rango_precios %}<span class="am-desde">desde</span>{% endif %}
-      </div>
-      <div class="am-acciones">
-        <a href="{% url 'detalle_producto' am.producto.slug %}" class="am-btn-ver"
-          style="background:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};color:{% if am.banner_imagen %}#2a2a2a{% else %}#fff{% endif %};">{{ am.texto_btn_ver|default:'Ver detalles' }}</a>
-        <button class="am-btn-carrito"
-          style="border-color:{% if am.banner_imagen %}rgba(255,255,255,0.5){% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};"
-          onclick="agregarAlCarrito({{ am.producto.id }}, '{{ am.producto.nombre }}', {{ am.producto.precio }}, 1, '', null, {{ am.producto.es_digital|yesno:'true,false' }})">
-          <i class="fas fa-shopping-bag"></i> {{ am.texto_btn_carrito|default:'Agregar' }}
-        </button>
-      </div>
-    </div>
-
-    <div class="am-col-img">
-      {% if am.producto.imagen_principal %}
-      <a href="{% url 'detalle_producto' am.producto.slug %}">
-        <img src="{{ am.producto.imagen_principal.url }}" alt="{{ am.producto.nombre }}" class="am-producto-img"
-          style="padding:{{ am.imagen_padding|default:24 }}px;">
-      </a>
-      {% endif %}
-    </div>
-
-  </div>
-</section>
 
 <style>
 .am-wrapper {
@@ -334,8 +89,6 @@
   line-height: 1.7;
   margin: 0 0 1.4rem;
   max-width: 360px;
-  text-transform: none;
-  letter-spacing: 0;
 }
 .am-precio-row {
   display: flex;
@@ -372,11 +125,7 @@
   transition: all 0.3s ease;
   border: none;
 }
-.am-btn-ver:hover {
-  opacity: 0.85;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-}
+.am-btn-ver:hover { opacity: 0.85; transform: translateY(-2px); }
 .am-btn-carrito {
   display: inline-flex;
   align-items: center;
@@ -394,10 +143,7 @@
   transition: all 0.3s ease;
   white-space: nowrap;
 }
-.am-btn-carrito:hover {
-  opacity: 0.75;
-  transform: translateY(-2px);
-}
+.am-btn-carrito:hover { opacity: 0.75; transform: translateY(-2px); }
 .am-producto-img {
   width: 100%;
   height: 100%;
@@ -421,41 +167,9 @@
   .am-col-text { padding: 1.8rem 1.4rem 1rem; }
   .am-titulo { font-size: 1.4rem; }
   .am-precio { font-size: 1.6rem; }
-  .am-acciones { gap: 0.6rem; }
   .am-btn-ver, .am-btn-carrito { font-size: 0.7rem; padding: 0.55rem 1.1rem; }
 }
-</style>
-{% endwith %}
-{% endif %}
 
-</div><!-- /sec-agenda -->
-
-<div class="home-sec" style="order:{{ o_instagram }}">
-{% if instagram_posts %}
-<section class="instagram-section mt-5 mb-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">
-            <i class="fab fa-instagram me-2" style="color: #e1306c;"></i>
-            {{ instagram_config.titulo|default:'Síguenos en Instagram' }}
-        </h4>
-        <a href="https://instagram.com/{{ instagram_config.usuario }}" target="_blank"
-           style="font-size:0.85rem; color:#888; text-decoration:none;">
-            @{{ instagram_config.usuario }} →
-        </a>
-    </div>
-    <div class="instagram-grid">
-        {% for post in instagram_posts %}
-        <a href="{{ post.permalink }}" target="_blank" class="instagram-item">
-            <img src="{{ post.image_url }}" alt="{{ post.caption }}" loading="lazy">
-            <div class="instagram-overlay">
-                <i class="fab fa-instagram"></i>
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-</section>
-
-<style>
 .instagram-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -468,12 +182,7 @@
     border-radius: 8px;
     display: block;
 }
-.instagram-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
+.instagram-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
 .instagram-item:hover img { transform: scale(1.05); }
 .instagram-overlay {
     position: absolute;
@@ -491,25 +200,8 @@
 @media (max-width: 768px) {
     .instagram-grid { grid-template-columns: repeat(3, 1fr); }
 }
-</style>
-{% endif %}
 
-</div><!-- /sec-instagram -->
-
-</div><!-- /home-sections-wrapper -->
-
-<style>
-.home-sections-wrapper { display: flex; flex-direction: column; }
-.home-sec { display: block; width: 100%; }
-.category-section {
-    margin-bottom: 3rem;
-}
-
-/* Split Banner Layout */
-.split-banner-section {
-    margin-bottom: 3rem;
-}
-
+.split-banner-section { margin-bottom: 3rem; }
 .split-banner-grid {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -517,7 +209,6 @@
     align-items: stretch;
     min-height: 380px;
 }
-
 .split-banner-left {
     position: relative;
     border-radius: 16px;
@@ -528,40 +219,15 @@
     flex-direction: column;
     justify-content: flex-end;
 }
-
-.split-banner-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
+.split-banner-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .split-banner-overlay {
     position: relative;
     z-index: 2;
     padding: 1.5rem;
     background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
 }
-
-.split-banner-titulo {
-    color: #fff;
-    font-size: 1.4rem;
-    font-weight: 800;
-    margin: 0 0 0.3rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
-}
-
-.split-banner-subtitulo {
-    color: rgba(255,255,255,0.85);
-    font-size: 0.82rem;
-    margin: 0 0 0.8rem;
-    line-height: 1.4;
-}
-
+.split-banner-titulo { color: #fff; font-size: 1.4rem; font-weight: 800; margin: 0 0 0.3rem; text-transform: uppercase; text-shadow: 0 1px 4px rgba(0,0,0,0.4); }
+.split-banner-subtitulo { color: rgba(255,255,255,0.85); font-size: 0.82rem; margin: 0 0 0.8rem; }
 .split-banner-btn {
     display: inline-block;
     background: #fff;
@@ -573,87 +239,23 @@
     text-decoration: none;
     transition: background 0.2s, color 0.2s;
 }
-
-.split-banner-btn:hover {
-    background: var(--color-primario, #495057);
-    color: #fff;
-}
-
-.split-banner-right {
-    overflow: hidden;
-    position: relative;
-}
-
-.carousel-item-split {
-    flex: 0 0 calc(25% - 0.75rem);
-    min-width: 160px;
-    max-width: 200px;
-}
-
+.split-banner-btn:hover { background: var(--color-primario, #495057); color: #fff; }
+.split-banner-right { overflow: hidden; position: relative; }
+.carousel-item-split { flex: 0 0 calc(25% - 0.75rem); min-width: 160px; max-width: 200px; }
 @media (max-width: 992px) {
-    .split-banner-grid {
-        grid-template-columns: 220px 1fr;
-    }
-    .carousel-item-split {
-        flex: 0 0 calc(33.33% - 0.67rem);
-    }
+    .split-banner-grid { grid-template-columns: 220px 1fr; }
+    .carousel-item-split { flex: 0 0 calc(33.33% - 0.67rem); }
 }
-
 @media (max-width: 768px) {
-    .split-banner-grid {
-        grid-template-columns: 1fr;
-    }
-    .split-banner-left {
-        min-height: 220px;
-    }
-    .carousel-item-split {
-        flex: 0 0 calc(50% - 0.5rem);
-    }
+    .split-banner-grid { grid-template-columns: 1fr; }
+    .split-banner-left { min-height: 220px; }
+    .carousel-item-split { flex: 0 0 calc(50% - 0.5rem); }
 }
 
-.category-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #333;
-    margin: 0;
-    border-bottom: 3px solid #007bff;
-    padding-bottom: 8px;
-    display: inline-block;
-}
-
-.ver-mas-link {
-    color: #666;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.3s ease;
-}
-
-.ver-mas-link:hover {
-    color: #007bff;
-}
-
-.carousel-container {
-    overflow: hidden;
-    position: relative;
-}
-
-.carousel-track {
-    display: flex;
-    transition: transform 0.3s ease;
-    gap: 1rem;
-}
-
-.carousel-item-custom {
-    flex: 0 0 calc(25% - 0.75rem);
-    min-width: 250px;
-}
-
-#carousel-recien-llegados .carousel-item-custom {
-    flex: 0 0 calc(25% - 0.75rem);
-    min-width: 200px;
-    max-width: 280px;
-}
-
+.carousel-container { overflow: hidden; position: relative; }
+.carousel-track { display: flex; transition: transform 0.3s ease; gap: 1rem; }
+.carousel-item-custom { flex: 0 0 calc(25% - 0.75rem); min-width: 250px; }
+#carousel-recien-llegados .carousel-item-custom { flex: 0 0 calc(25% - 0.75rem); min-width: 200px; max-width: 280px; }
 .product-card-carousel {
     background: var(--color-cards);
     border-radius: 20px;
@@ -662,222 +264,59 @@
     position: relative;
     border: 2px solid transparent;
 }
-
-
-
-.product-card-carousel:hover {
-    transform: translateY(-5px);
-}
-
+.product-card-carousel:hover { transform: translateY(-5px); }
 .product-image-carousel {
-    width: 100%;
-    height: 220px;
-    overflow: hidden;
+    width: 100%; height: 220px; overflow: hidden;
     background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-    aspect-ratio: 1;
-    border-radius: 20px 20px 0 0;
-    position: relative;
+    aspect-ratio: 1; border-radius: 20px 20px 0 0; position: relative;
 }
-
-.product-image-carousel img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    padding: 12px;
-    transition: transform 0.3s ease;
-}
-
-.product-card-carousel:hover .product-image-carousel img {
-    transform: scale(1.01);
-}
-
+.product-image-carousel img { width: 100%; height: 100%; object-fit: contain; padding: 12px; transition: transform 0.3s ease; }
+.product-card-carousel:hover .product-image-carousel img { transform: scale(1.01); }
 .no-image {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: var(--color-secundario);
-    font-size: 2.5rem;
+    display: flex; align-items: center; justify-content: center;
+    height: 100%; color: var(--color-secundario); font-size: 2.5rem;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border-radius: 15px;
-    margin: 10px;
-    opacity: 0.7;
-    transition: all 0.3s ease;
+    border-radius: 15px; margin: 10px; opacity: 0.7;
 }
-
-.no-image:hover {
-    opacity: 1;
-    transform: scale(1.05);
-}
-
-.product-info-carousel {
-    padding: 0.8rem;
-    text-align: center;
-}
-
-.product-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 0.8rem;
-    color: #333;
-    line-height: 1.3;
-}
-
-.product-price-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 0.8rem;
-    flex-direction: column;
-}
-
-.quantity-controls-mini {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    margin-top: 0.5rem;
-}
-
+.product-info-carousel { padding: 0.8rem; text-align: center; }
+.product-name { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.8rem; color: #333; line-height: 1.3; }
+.product-price-container { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 0.8rem; flex-direction: column; }
+.quantity-controls-mini { display: flex; align-items: center; gap: 0.3rem; margin-top: 0.5rem; }
 .quantity-btn-mini {
-    background: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
+    background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px;
+    width: 25px; height: 25px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 0.8rem; font-weight: 600;
 }
-
-.quantity-btn-mini:hover {
-    background: #e9ecef;
-    border-color: #adb5bd;
-}
-
-.quantity-controls-mini span {
-    font-size: 0.8rem;
-    font-weight: 600;
-    min-width: 20px;
-    text-align: center;
-}
-
-.product-price {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-primario);
-    margin: 0;
-}
-
+.quantity-btn-mini:hover { background: #e9ecef; }
+.quantity-controls-mini span { font-size: 0.8rem; font-weight: 600; min-width: 20px; text-align: center; }
+.product-price { font-size: 1.1rem; font-weight: 700; color: var(--color-primario); margin: 0; }
 .add-to-cart-btn {
-    background: var(--color-primario);
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
+    background: var(--color-primario); border: none; border-radius: 50%;
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    color: white; cursor: pointer; transition: all 0.3s ease; font-size: 0.8rem;
 }
-
-.add-to-cart-btn:hover {
-    background: var(--color-hover);
-    transform: scale(1.1);
-}
-
+.add-to-cart-btn:hover { background: var(--color-hover); transform: scale(1.1); }
 .carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255,255,255,0.9);
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
-    z-index: 10;
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.9); border: none; width: 40px; height: 40px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); z-index: 10;
 }
-
-.carousel-btn:hover {
-    background: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.carousel-prev {
-    left: -20px;
-}
-
-.carousel-next {
-    right: -20px;
-}
-
-.carousel-dots {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 1rem;
-}
-
-.dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #ddd;
-    cursor: pointer;
-    transition: background 0.3s ease;
-}
-
-.dot.active {
-    background: #333;
-}
-
+.carousel-btn:hover { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+.carousel-prev { left: -20px; }
+.carousel-next { right: -20px; }
+.carousel-dots { display: flex; justify-content: center; gap: 8px; margin-top: 1rem; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: #ddd; cursor: pointer; }
+.dot.active { background: #333; }
 @media (max-width: 768px) {
-    .carousel-item-custom {
-        flex: 0 0 calc(50% - 0.5rem);
-        min-width: 180px;
-    }
-    
-    #carousel-recien-llegados .carousel-item-custom {
-        flex: 0 0 calc(50% - 0.5rem);
-        min-width: 160px;
-    }
-    
-    .category-title {
-        font-size: 1.2rem;
-    }
-    
-    .carousel-btn {
-        width: 35px;
-        height: 35px;
-    }
+    .carousel-item-custom { flex: 0 0 calc(50% - 0.5rem); min-width: 180px; }
+    #carousel-recien-llegados .carousel-item-custom { flex: 0 0 calc(50% - 0.5rem); min-width: 160px; }
+    .carousel-btn { width: 35px; height: 35px; }
 }
-
 @media (max-width: 480px) {
-    .carousel-item-custom {
-        flex: 0 0 calc(100% - 0.5rem);
-        min-width: 200px;
-    }
-    
-    #carousel-recien-llegados .carousel-item-custom {
-        flex: 0 0 calc(100% - 0.5rem);
-        min-width: 180px;
-    }
+    .carousel-item-custom { flex: 0 0 calc(100% - 0.5rem); min-width: 200px; }
+    #carousel-recien-llegados .carousel-item-custom { flex: 0 0 calc(100% - 0.5rem); min-width: 180px; }
 }
-
-
 </style>
 
 <script>
@@ -888,15 +327,11 @@ function moveCarousel(carouselId, direction) {
     const track = container.querySelector('.carousel-track');
     const items = track.querySelectorAll('.carousel-item-custom');
     const itemWidth = items[0].offsetWidth + 16;
-    
     const isSplit = items[0].classList.contains('carousel-item-split');
     const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : (isSplit ? 4 : Math.floor(container.offsetWidth / itemWidth));
     const maxPosition = Math.max(0, Math.ceil(items.length / itemsPerPage) - 1);
-    
     if (!carouselPositions[carouselId]) carouselPositions[carouselId] = 0;
-    
     carouselPositions[carouselId] = Math.min(Math.max(carouselPositions[carouselId] + direction, 0), maxPosition);
-    
     track.style.transform = `translateX(${-carouselPositions[carouselId] * itemWidth * itemsPerPage}px)`;
     updateDots(carouselId);
 }
@@ -906,28 +341,18 @@ function currentSlide(carouselId, slideIndex) {
     const track = container.querySelector('.carousel-track');
     const items = track.querySelectorAll('.carousel-item-custom');
     const itemWidth = items[0].offsetWidth + 16;
-    
-    // Para recién llegados, mostrar 4 productos por página
     const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : 1;
-    
     carouselPositions[carouselId] = slideIndex - 1;
-    const translateX = -carouselPositions[carouselId] * itemWidth * itemsPerPage;
-    track.style.transform = `translateX(${translateX}px)`;
-    
+    track.style.transform = `translateX(${-carouselPositions[carouselId] * itemWidth * itemsPerPage}px)`;
     updateDots(carouselId);
 }
 
 function updateDots(carouselId) {
     const dotsContainer = document.getElementById('dots-' + carouselId.replace('carousel-', ''));
     if (!dotsContainer) return;
-    
-    const dots = dotsContainer.querySelectorAll('.dot');
-    
-    dots.forEach((dot, index) => {
+    dotsContainer.querySelectorAll('.dot').forEach((dot, index) => {
         dot.classList.toggle('active', index === carouselPositions[carouselId]);
     });
 }
-
-
 </script>
 {% endblock %}

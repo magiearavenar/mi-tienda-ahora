@@ -1,0 +1,55 @@
+<div class="mb-5">
+    <h4 class="mb-4">RECIÉN LLEGADOS</h4>
+    {% if productos %}
+    <div class="position-relative">
+        <div class="carousel-container" id="carousel-recien-llegados">
+            <div class="carousel-track">
+                {% for producto in productos %}
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            {% if producto.imagen_principal %}
+                            <a href="{% url 'detalle_producto' producto.slug %}">
+                                <img src="{{ producto.imagen_principal.url|cloudinary_card }}" alt="{{ producto.nombre }} - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            {% else %}
+                            <div class="no-image"><i class="fas fa-image"></i></div>
+                            {% endif %}
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">{{ producto.nombre }}</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">{% if producto.tiene_rango_precios %}<small style="font-weight:400;font-size:0.75rem;">Desde</small> {% endif %}${{ producto.precio_desde|floatformat:0 }}</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, -1)">-</div>
+                                    <span id="qty-{{ producto.id }}">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad({{ producto.id }}, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad({{ producto.id }}, '{{ producto.nombre }}', {{ producto.precio }}, {{ producto.es_digital|yesno:'true,false' }})" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-recien-llegados', -1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-recien-llegados', 1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="carousel-dots" id="dots-recien-llegados">
+            {% for i in "12" %}
+            <span class="dot {% if forloop.first %}active{% endif %}" onclick="currentSlide('carousel-recien-llegados', {{ forloop.counter }})"></span>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <p class="text-muted">No hay productos disponibles</p>
+    </div>
+    {% endif %}
+</div>

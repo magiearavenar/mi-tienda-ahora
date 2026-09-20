@@ -1,0 +1,46 @@
+{% if agenda_mes and agenda_mes.producto %}
+{% with am=agenda_mes %}
+<section class="agenda-mes-section mb-5">
+  <div class="am-wrapper"
+    style="background:{% if am.banner_imagen %}#000{% else %}{{ am.color_fondo|default:'#f9e4f0' }}{% endif %};flex-direction:{% if am.imagen_posicion == 'izquierda' %}row-reverse{% else %}row{% endif %};">
+
+    {% if am.banner_imagen %}
+    <img src="{{ am.banner_imagen.url }}" alt="" class="am-bg-img">
+    <div class="am-bg-overlay"></div>
+    {% endif %}
+
+    <div class="am-col-text">
+      {% if am.badge %}<span class="am-badge">{{ am.badge }}</span>{% endif %}
+      <p class="am-eyebrow">Destacado del mes</p>
+      <h2 class="am-titulo" style="color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};">{{ am.producto.nombre }}</h2>
+      {% if am.subtitulo %}
+      <p class="am-subtitulo" style="color:{% if am.banner_imagen %}rgba(255,255,255,0.78){% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};opacity:{% if am.banner_imagen %}1{% else %}0.6{% endif %};">{{ am.subtitulo }}</p>
+      {% endif %}
+      <div class="am-precio-row">
+        <span class="am-precio" style="color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};">${{ am.producto.precio_desde|floatformat:0 }}</span>
+        {% if am.producto.tiene_rango_precios %}<span class="am-desde">desde</span>{% endif %}
+      </div>
+      <div class="am-acciones">
+        <a href="{% url 'detalle_producto' am.producto.slug %}" class="am-btn-ver"
+          style="background:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};color:{% if am.banner_imagen %}#2a2a2a{% else %}#fff{% endif %};">{{ am.texto_btn_ver|default:'Ver detalles' }}</a>
+        <button class="am-btn-carrito"
+          style="border-color:{% if am.banner_imagen %}rgba(255,255,255,0.5){% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};"
+          onclick="agregarAlCarrito({{ am.producto.id }}, '{{ am.producto.nombre }}', {{ am.producto.precio }}, 1, '', null, {{ am.producto.es_digital|yesno:'true,false' }})">
+          <i class="fas fa-shopping-bag"></i> {{ am.texto_btn_carrito|default:'Agregar' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="am-col-img">
+      {% if am.producto.imagen_principal %}
+      <a href="{% url 'detalle_producto' am.producto.slug %}">
+        <img src="{{ am.producto.imagen_principal.url }}" alt="{{ am.producto.nombre }}" class="am-producto-img"
+          style="padding:{{ am.imagen_padding|default:24 }}px;">
+      </a>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endwith %}
+{% endif %}

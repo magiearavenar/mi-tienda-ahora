@@ -1,0 +1,2378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mundo Magie - Productos únicos y mágicos</title>
+    <meta name="description" content="Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor para hacer de cada momento algo mágico.">
+    <meta name="keywords" content="mundo magie, productos únicos, artículos especiales, tienda online, regalos">
+    <meta name="author" content="Mundo Magie">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.mundomagie.cl/">
+    <meta property="og:title" content="Mundo Magie - Productos únicos y mágicos">
+    <meta property="og:description" content="Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor para hacer de cada momento algo mágico.">
+    <meta property="og:image" content="https://www.mundomagie.cl/static/images/logo.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.mundomagie.cl/">
+    <meta property="twitter:title" content="Mundo Magie - Productos únicos y mágicos">
+    <meta property="twitter:description" content="Descubre productos únicos en Mundo Magie. Artículos especiales hechos con amor para hacer de cada momento algo mágico.">
+    <meta property="twitter:image" content="https://www.mundomagie.cl/static/images/logo.png">
+    
+    <link rel="canonical" href="https://www.mundomagie.cl/">
+    <link rel="icon" type="image/x-icon" href="/static/images/mariposalogo.ico">
+    <link rel="preload" href="/static/images/logo.png" as="image">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-FBC028RBYD"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-FBC028RBYD');
+    </script>
+
+    <!-- CSS crítico primero, resto diferido -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+
+    <!-- FontAwesome diferido -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></noscript>
+
+    <!-- Google Fonts diferido -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <style>
+        :root {
+            --moneda-simbolo: '$';
+            --color-primario: #495057;
+            --color-secundario: #FFFFFF;
+            --color-fondo: #DF2323;
+            --color-banner: #d7b9ff;
+            --color-cards: #ffffff;
+            --color-hover: #ffeaf4;
+            --color-nav: #D7B9FF;
+        }
+        .footer {
+            background-color: #ffe2f2;
+            color: #5b5b5b;
+            border-top: 1px solid #dee2e6;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 12px;
+            text-transform: none;
+        }
+        .footer-link {
+            color: #B93D95;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer-link:hover {
+            color: #c076fe;
+        }
+        .social-link {
+            color: #B93D95;
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        .social-link:hover {
+            transform: scale(1.2);
+        }
+        
+        /* WhatsApp Button Styles */
+        .whatsapp-float {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            bottom: 20px;
+            right: 20px;
+            background-color: #25d366;
+            color: white;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 30px;
+            box-shadow: 2px 2px 3px #999;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        
+        .whatsapp-float:hover {
+            background-color: #20ba5a;
+            transform: scale(1.1);
+            color: white;
+            text-decoration: none;
+        }
+        
+        .whatsapp-float i {
+            margin-top: 2px;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 25px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+        
+        /* Dropdown Menu Styles */
+        .nav-categories {
+            position: relative;
+        }
+        
+        .nav-categories .d-flex {
+            align-items: center;
+        }
+        
+        .dropdown {
+            position: relative;
+            display: inline-block;
+            vertical-align: top;
+        }
+        
+        .category-link {
+            display: inline-block;
+            vertical-align: middle;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: white;
+            min-width: 200px;
+            z-index: 1000;
+            border-radius: 8px;
+            top: 100%;
+            left: 0;
+        }
+        
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            transition: background-color 0.3s ease;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: var(--color-hover);
+            color: #333;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .category-link.has-dropdown {
+            position: relative;
+        }
+        
+        .category-link.has-dropdown::after {
+            content: ' ▼';
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        /* ── RESPONSIVE GLOBAL ── */
+        @media (max-width: 768px) {
+            .logo { width: 160px !important; }
+
+            /* Nav hamburguesa */
+            .nav-categories .d-flex { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start !important; gap: 0; padding: 0 4px; scrollbar-width: none; }
+            .nav-categories .d-flex::-webkit-scrollbar { display: none; }
+            .category-link { white-space: nowrap; font-size: 0.72rem; padding: 0.4rem 0.6rem; }
+
+            /* Footer columnas apiladas */
+            .footer .row { flex-direction: column; }
+            .footer .col { width: 100% !important; flex: none !important; }
+
+            /* Carrito responsive */
+            .cart-header { display: none !important; }
+            .cart-item { display: flex !important; flex-direction: column !important; gap: 0.5rem !important; padding: 1rem !important; }
+            .item-info { width: 100%; }
+            .item-quantity, .item-price, .item-subtotal, .item-remove { width: 100%; display: flex; align-items: center; gap: 0.5rem; }
+            .item-quantity::before { content: 'Cantidad: '; font-size: 0.8rem; color: #666; }
+            .item-price::before { content: 'Precio: '; font-size: 0.8rem; color: #666; }
+            .item-subtotal::before { content: 'Subtotal: '; font-size: 0.8rem; color: #666; }
+
+            /* Detalle producto */
+            .product-details { margin-top: 1.5rem; }
+
+            /* Tabla info producto */
+            .table td { font-size: 0.82rem; padding: 0.4rem 0.6rem; }
+
+            /* Main padding */
+            main.container { padding-left: 12px !important; padding-right: 12px !important; }
+        }
+
+        @media (max-width: 480px) {
+            .logo { width: 130px !important; }
+            .category-link { font-size: 0.65rem; padding: 0.35rem 0.5rem; }
+            h1, .h1 { font-size: 1.4rem !important; }
+            h2, .h2 { font-size: 1.2rem !important; }
+            .btn-lg { font-size: 0.9rem !important; padding: 0.5rem 1rem !important; }
+        }
+
+        .swal-magie { border-radius: 20px !important; font-family: 'Montserrat', sans-serif !important; }
+        .swal-magie-title { font-size: 1.3rem !important; color: #444 !important; }
+        .swal2-timer-progress-bar { background: var(--color-primario) !important; }
+        .swal2-icon.swal2-success .swal2-success-ring { border-color: var(--color-primario) !important; }
+        .swal2-icon.swal2-success [class^='swal2-success-line'] { background: var(--color-primario) !important; }
+    </style>
+</head>
+<body>
+    
+    <div class="banner-envio">
+        <div class="container">
+            <i class="fas fa-shipping-fast me-2"></i>Envíos a domicilio en 3 días hábiles
+        </div>
+    </div>
+    
+    <header class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    
+                    <a href="https://wa.me/56962609280?text=Hola%21%20Me%20interesa%20un%20producto" target="_blank" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                    
+                    
+                    
+                    <a href="https://tiktok.com/@mundomagie" target="_blank" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="TikTok">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    
+                    <a href="https://instagram.com/mundomagie.cl" target="_blank" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    
+                    <a href="https://facebook.com/mundomagie" target="_blank" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="Facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    
+                    
+                </div>
+                
+                <div class="text-center">
+                    <a href="/">
+                        <img src="/static/images/logo.png" alt="Mundo Magie - Tienda online" class="logo" width="300" height="80" fetchpriority="high" onerror="this.style.display='none'">
+                    </a>
+                </div>
+                
+                <div class="d-flex align-items-center">
+                    <a href="/buscar/" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="Buscar productos">
+                        <i class="fas fa-search"></i>
+                    </a>
+                    <a href="/carrito/" class="me-3 position-relative" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="Carrito de compras">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: #ffc1ea; color: white; font-size: 10px; display: none;">0</span>
+                    </a>
+                    
+                        <a href="/login/" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="Iniciar sesión">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <a href="/registro/" class="me-3" style="font-size: 1.2rem; text-decoration: none; color: #D8A7CA;" title="Registrarse">
+                            <i class="fas fa-user-plus"></i>
+                        </a>
+                    
+                    
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav-categories">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-center">
+                <a href="/" class="category-link">INICIO</a>
+                <a href="/portafolio/" class="category-link">PORTAFOLIO WEB</a>
+
+                
+                
+                
+                <a href="/categoria/33/" class="category-link">ACCESORIOS</a>
+                
+                
+                
+                
+                
+                <div class="dropdown">
+                    <a href="/categoria/21/" class="category-link has-dropdown">COTILLON</a>
+                    <div class="dropdown-content">
+                        
+                        
+                        <a href="/categoria/24/">banderin</a>
+                        
+                        
+                        
+                        <a href="/categoria/25/">Bolsas de dulces</a>
+                        
+                        
+                        
+                        <a href="/categoria/23/">Centro de mesa</a>
+                        
+                        
+                        
+                        <a href="/categoria/32/">Llaveros Personalizados</a>
+                        
+                        
+                        
+                        <a href="/categoria/22/">Piñatas</a>
+                        
+                        
+                        
+                        <a href="/categoria/28/">Topper Torta</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                <div class="dropdown">
+                    <a href="/categoria/17/" class="category-link has-dropdown">ESTAMPADOS</a>
+                    <div class="dropdown-content">
+                        
+                        
+                        <a href="/categoria/18/">Scrunchie</a>
+                        
+                        
+                        
+                        <a href="/categoria/20/">Totebag</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+                
+                
+                
+                <div class="dropdown">
+                    <a href="/categoria/15/" class="category-link has-dropdown">PAPELERÍA</a>
+                    <div class="dropdown-content">
+                        
+                        
+                        <a href="/categoria/29/">Agenda bebés</a>
+                        
+                        
+                        
+                        <a href="/categoria/16/">Agendas</a>
+                        
+                        
+                        
+                        <a href="/categoria/19/">Colorear</a>
+                        
+                        
+                        
+                        <a href="/categoria/31/">Digitales</a>
+                        
+                        
+                        
+                        <a href="/categoria/30/">Digitales</a>
+                        
+                        
+                        
+                        <a href="/categoria/26/">Profesiones</a>
+                        
+                        
+                    </div>
+                </div>
+                
+                
+                
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        
+<div class="home-sections-wrapper">
+
+<div class="home-sec" style="order:1">
+<div id="carouselSlides" class="carousel slide mb-4" data-bs-ride="carousel">
+    
+        <div class="carousel-indicators">
+            
+            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="0" class="active"></button>
+            
+            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="1" ></button>
+            
+            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="2" ></button>
+            
+            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="3" ></button>
+            
+            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="4" ></button>
+            
+        </div>
+        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
+            
+            <div class="carousel-item active">
+                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:best/v1/slides/1_bcdxzh" alt="Mundo Magie - Tienda online" class="d-block" fetchpriority="high" style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
+                
+            </div>
+            
+            <div class="carousel-item ">
+                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:best/v1/slides/2_yegw67" alt="Mundo Magie - Tienda online" class="d-block" loading="lazy" style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
+                
+            </div>
+            
+            <div class="carousel-item ">
+                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:best/v1/slides/3_amfhlf" alt="Mundo Magie - Tienda online" class="d-block" loading="lazy" style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
+                
+            </div>
+            
+            <div class="carousel-item ">
+                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:best/v1/slides/4_n2ityk" alt="Mundo Magie - Tienda online" class="d-block" loading="lazy" style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
+                
+            </div>
+            
+            <div class="carousel-item ">
+                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:best/v1/slides/6_d7onhe" alt="Mundo Magie - Tienda online" class="d-block" loading="lazy" style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
+                
+            </div>
+            
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSlides" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselSlides" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    
+</div>
+
+</div><!-- /sec-slideshow -->
+
+<div class="home-sec" style="order:2">
+
+<section class="banners-fidelizacion-home mb-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                <div class="banner-item-home d-flex align-items-start">
+                    <i class="fas fa-truck" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 style="color: #6c757d; font-size: 12px; margin: 0; font-weight: 500;">Envíos a todo Chile</h6>
+                        
+                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">Despachos seguros y protegidos</p>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                <div class="banner-item-home d-flex align-items-start">
+                    <i class="fas fa-heart" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 style="color: #6c757d; font-size: 12px; margin: 0; font-weight: 500;">Atención personalizada y cercana</h6>
+                        
+                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">Personaliza, crea y expresa tu propia magia</p>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                <div class="banner-item-home d-flex align-items-start">
+                    <i class="fa-solid fa-heart-pulse" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 style="color: #6c757d; font-size: 12px; margin: 0; font-weight: 500;">Hecho con amor en cada detalle</h6>
+                        
+                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">Cada pedido lleva un poquito de nuestro corazón</p>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                <div class="banner-item-home d-flex align-items-start">
+                    <i class="fa-solid fa-lightbulb" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 style="color: #6c757d; font-size: 12px; margin: 0; font-weight: 500;">Diseños originales y únicos</h6>
+                        
+                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">Tu historia merece un diseño especial</p>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                <div class="banner-item-home d-flex align-items-start">
+                    <i class="fa-solid fa-arrow-rotate-right" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 style="color: #6c757d; font-size: 12px; margin: 0; font-weight: 500;">Vuelve siempre: te esperan sorpresas y descuentos</h6>
+                        
+                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">Diseños que inspiran tu día a día</p>
+                        
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+
+</div><!-- /sec-banners -->
+
+<div class="home-sec" style="order:3">
+<div class="mb-5">
+    <h4 class="mb-4">RECIÉN LLEGADOS</h4>
+    
+    <div class="position-relative">
+        <div class="carousel-container" id="carousel-recien-llegados">
+            <div class="carousel-track">
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/libro-de-actividades-infantiles-corazon-de-campo/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/4_xzqdng" alt="Libro de Actividades Infantiles - Corazón de Campo - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Libro de Actividades Infantiles - Corazón de Campo</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">$8990</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(44, -1)">-</div>
+                                    <span id="qty-44">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(44, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(44, 'Libro de Actividades Infantiles - Corazón de Campo', 8990,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/libro-de-actividades-princesa/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/2_ymxcwh" alt="Libro de Actividades &quot;Princesa&quot; - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Libro de Actividades &quot;Princesa&quot;</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">$8990</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(43, -1)">-</div>
+                                    <span id="qty-43">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(43, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(43, 'Libro de Actividades &quot;Princesa&quot;', 8990,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/libro-de-actividades-buscando-tu-tesoro/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/3_xc4vj2" alt="Libro de Actividades “Buscando tu Tesoro” - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Libro de Actividades “Buscando tu Tesoro”</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">$8990</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(42, -1)">-</div>
+                                    <span id="qty-42">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(42, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(42, 'Libro de Actividades “Buscando tu Tesoro”', 8990,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/libro-de-actividades-infantil-tu-eres-maravilloso-saurio/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/5_ltvniz" alt="Libro de Actividades Infantil “Tú Eres Maravilloso Saurio” - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Libro de Actividades Infantil “Tú Eres Maravilloso Saurio”</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">$8990</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(41, -1)">-</div>
+                                    <span id="qty-41">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(41, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(41, 'Libro de Actividades Infantil “Tú Eres Maravilloso Saurio”', 8990,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/libro-actividades-estas-hecha-de-magia-1/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_dzv0kv" alt="Libro actividades Estas hecha de Magia - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Libro actividades Estas hecha de Magia</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">$8990</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(40, -1)">-</div>
+                                    <span id="qty-40">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(40, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(40, 'Libro actividades Estas hecha de Magia', 8990,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/topper-cupcake-personalizado/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_z7uobx" alt="Topper Cupcake personalizado - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Topper Cupcake personalizado</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">$4500</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(38, -1)">-</div>
+                                    <span id="qty-38">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(38, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(38, 'Topper Cupcake personalizado', 4500,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/llaveros-acrilicos-personalizados/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/ChatGPT_Image_12_jul_2026_07_36_26_p.m._zlijib" alt="Llaveros Acrílicos Personalizados - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Llaveros Acrílicos Personalizados</h6>
+                            <div class="product-price-container">
+                                <p class="product-price"><small style="font-weight:400;font-size:0.75rem;">Desde</small> $2500</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(37, -1)">-</div>
+                                    <span id="qty-37">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(37, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(37, 'Llaveros Acrílicos Personalizados', 17990,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="carousel-item-custom">
+                    <div class="product-card-carousel">
+                        <div class="product-image-carousel">
+                            
+                            <a href="/producto/agenda-enfermera/">
+                                <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/ChatGPT_Image_7_jul_2026_11_25_15_p.m._wfv6wm" alt="Agenda Enfermera - Mundo Magie" loading="lazy" width="280" height="280">
+                            </a>
+                            
+                        </div>
+                        <div class="product-info-carousel">
+                            <h6 class="product-name">Agenda Enfermera</h6>
+                            <div class="product-price-container">
+                                <p class="product-price">$13990</p>
+                                <div class="quantity-controls-mini">
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(36, -1)">-</div>
+                                    <span id="qty-36">1</span>
+                                    <div class="quantity-btn-mini" onclick="cambiarCantidad(36, 1)">+</div>
+                                    <button class="add-to-cart-btn" onclick="agregarAlCarritoConCantidad(36, 'Agenda Enfermera', 13990,00, false)" title="Agregar al carrito">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        
+        <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-recien-llegados', -1)">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-recien-llegados', 1)">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        
+        <div class="carousel-dots" id="dots-recien-llegados">
+            
+            <span class="dot active" onclick="currentSlide('carousel-recien-llegados', 1)"></span>
+            
+            <span class="dot " onclick="currentSlide('carousel-recien-llegados', 2)"></span>
+            
+        </div>
+    </div>
+    
+</div>
+
+</div><!-- /mb-5 -->
+</div><!-- /sec-recien -->
+
+<div class="home-sec" style="order:5">
+
+<div class="split-banner-section mb-5">
+    <div class="split-banner-grid">
+
+        <!-- Columna izquierda: banner promo -->
+        <div class="split-banner-left">
+            
+            <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_800/v1/banners/ChatGPT_Image_17_may_2026_10_21_34_p.m._mzzowr" alt="Papelería" class="split-banner-img" loading="lazy">
+            
+            <div class="split-banner-overlay">
+                
+                <h2 class="split-banner-titulo">Papelería</h2>
+                
+                
+                <a href="/categoria/15/" class="split-banner-btn">
+                    Ver todo
+                </a>
+            </div>
+        </div>
+
+        <!-- Columna derecha: carrusel de productos -->
+        <div class="split-banner-right">
+            <div class="position-relative">
+                <div class="carousel-container" id="carousel-15">
+                    <div class="carousel-track">
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/libro-de-actividades-infantiles-corazon-de-campo/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/4_xzqdng" alt="Libro de Actividades Infantiles - Corazón de Campo - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Libro de Actividades Infantiles - Corazón de Campo</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$8990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(44, 'Libro de Actividades Infantiles - Corazón de Campo', 8990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/libro-de-actividades-princesa/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/2_ymxcwh" alt="Libro de Actividades &quot;Princesa&quot; - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Libro de Actividades &quot;Princesa&quot;</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$8990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(43, 'Libro de Actividades &quot;Princesa&quot;', 8990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/libro-de-actividades-buscando-tu-tesoro/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/3_xc4vj2" alt="Libro de Actividades “Buscando tu Tesoro” - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Libro de Actividades “Buscando tu Tesoro”</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$8990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(42, 'Libro de Actividades “Buscando tu Tesoro”', 8990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/libro-de-actividades-infantil-tu-eres-maravilloso-saurio/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/5_ltvniz" alt="Libro de Actividades Infantil “Tú Eres Maravilloso Saurio” - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Libro de Actividades Infantil “Tú Eres Maravilloso Saurio”</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$8990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(41, 'Libro de Actividades Infantil “Tú Eres Maravilloso Saurio”', 8990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/libro-actividades-estas-hecha-de-magia-1/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_dzv0kv" alt="Libro actividades Estas hecha de Magia - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Libro actividades Estas hecha de Magia</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$8990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(40, 'Libro actividades Estas hecha de Magia', 8990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/agenda-enfermera/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/ChatGPT_Image_7_jul_2026_11_25_15_p.m._wfv6wm" alt="Agenda Enfermera - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Agenda Enfermera</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$13990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(36, 'Agenda Enfermera', 13990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/agenda-control-nino-sano-pediatrico-personalizada-carnet-pediatrico-personalizado/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/WhatsApp_Image_2026-06-14_at_21.58.44_wku88h" alt="Agenda Control Niño Sano Pediátrico Personalizada | Carnet Pediátrico Personalizado - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Agenda Control Niño Sano Pediátrico Personalizada | Carnet Pediátrico Personalizado</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$12000</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(32, 'Agenda Control Niño Sano Pediátrico Personalizada | Carnet Pediátrico Personalizado', 12000,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/turnario-personalizado/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/Turnario_-_organizate_Necesitas_llevar_el_orden_de_tus_turnos_Esto_es_ideal_para_ti.Todos_aquellos_que_hemos_trabajado_de_esa_manera_sabemos_lo_dif%C3%ADcil_que_es_llevar_el_orden_de_esto_o_es_m%C3%A1s_Anotar_el_n%C3%BAmero_de_ho_e46ia0" alt="Turnario personalizado - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Turnario personalizado</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$7500</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(30, 'Turnario personalizado', 7500,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/bitacora-de-docente/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/ChatGPT_Image_24_may_2026_11_46_28_p.m._hjecxk" alt="Bitácora de Docente - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Bitácora de Docente</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$17990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(26, 'Bitácora de Docente', 17990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/cambio-portada-control-nino-sano/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/ChatGPT_Image_24_may_2026_10_21_38_p.m._ge3ber" alt="Cambio portada control niño sano - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Cambio portada control niño sano</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$5000</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(25, 'Cambio portada control niño sano', 5000,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/cuaderno-control-veterinario/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/ChatGPT_Image_17_may_2026_11_44_18_p.m._pie0dv" alt="Cuaderno Control Veterinario - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Cuaderno Control Veterinario</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$7990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(24, 'Cuaderno Control Veterinario', 7990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/libro-buenos-deseos-baby-shower/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_kitilb" alt="Libro buenos deseos - Baby Shower - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Libro buenos deseos - Baby Shower</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$12990</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(22, 'Libro buenos deseos - Baby Shower', 12990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-15', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-15', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <div class="carousel-dots" id="dots-15">
+                    
+                    <span class="dot active" onclick="currentSlide('carousel-15', 1)"></span>
+                    
+                    <span class="dot " onclick="currentSlide('carousel-15', 2)"></span>
+                    
+                    <span class="dot " onclick="currentSlide('carousel-15', 3)"></span>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="split-banner-section mb-5">
+    <div class="split-banner-grid">
+
+        <!-- Columna izquierda: banner promo -->
+        <div class="split-banner-left">
+            
+            <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_800/v1/banners/ChatGPT_Image_17_may_2026_10_28_42_p.m._d18dfs" alt="Estampados" class="split-banner-img" loading="lazy">
+            
+            <div class="split-banner-overlay">
+                
+                <h2 class="split-banner-titulo">Estampados</h2>
+                
+                
+                <a href="/categoria/17/" class="split-banner-btn">
+                    Ver todo
+                </a>
+            </div>
+        </div>
+
+        <!-- Columna derecha: carrusel de productos -->
+        <div class="split-banner-right">
+            <div class="position-relative">
+                <div class="carousel-container" id="carousel-17">
+                    <div class="carousel-track">
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/totebag-stitch/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/2_fdabwf" alt="Totebag Stitch - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Totebag Stitch</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$3500</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(21, 'Totebag Stitch', 3500,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/totebag-snoopy/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_gk03h2" alt="Totebag Snoopy - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Totebag Snoopy</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$3500</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(20, 'Totebag Snoopy', 3500,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/scrunchies-las-guerreras-k-pop/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_1_ur5nts" alt="Scrunchies “Las Guerreras K-Pop” - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Scrunchies “Las Guerreras K-Pop”</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$1500</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(18, 'Scrunchies “Las Guerreras K-Pop”', 1500,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-17', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-17', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <div class="carousel-dots" id="dots-17">
+                    
+                    <span class="dot active" onclick="currentSlide('carousel-17', 1)"></span>
+                    
+                    <span class="dot " onclick="currentSlide('carousel-17', 2)"></span>
+                    
+                    <span class="dot " onclick="currentSlide('carousel-17', 3)"></span>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="split-banner-section mb-5">
+    <div class="split-banner-grid">
+
+        <!-- Columna izquierda: banner promo -->
+        <div class="split-banner-left">
+            
+            <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_800/v1/banners/ChatGPT_Image_26_may_2026_01_38_14_p.m._okfcdw" alt="Cotillon" class="split-banner-img" loading="lazy">
+            
+            <div class="split-banner-overlay">
+                
+                <h2 class="split-banner-titulo">Cotillon</h2>
+                
+                
+                <a href="/categoria/21/" class="split-banner-btn">
+                    Ver todo
+                </a>
+            </div>
+        </div>
+
+        <!-- Columna derecha: carrusel de productos -->
+        <div class="split-banner-right">
+            <div class="position-relative">
+                <div class="carousel-container" id="carousel-21">
+                    <div class="carousel-track">
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/topper-cupcake-personalizado/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_z7uobx" alt="Topper Cupcake personalizado - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Topper Cupcake personalizado</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$4500</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(38, 'Topper Cupcake personalizado', 4500,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/pinatas-personalizadas/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_vilpyj" alt="Piñatas Personalizadas - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Piñatas Personalizadas</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price"><small style="font-weight:400;font-size:0.75rem;">Desde</small> $9500</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(34, 'Piñatas Personalizadas', 13990,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/cajita-sorpresa-personalizada/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/1_ydjvsf" alt="Cajita Sorpresa Personalizada - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Cajita Sorpresa Personalizada</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price"><small style="font-weight:400;font-size:0.75rem;">Desde</small> $1700</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(33, 'Cajita Sorpresa Personalizada', 1700,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/topper-para-torta-3d-personalizado-decoracion-para-cumpleanos/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/Topper_de_PocahontasDescubre_la_magia_de_Pocahontas_en_tu_pr%C3%B3xima_celebraci%C3%B3n_Con_este_t_pbzf0t" alt="Topper para Torta 3D Personalizado – Decoración para Cumpleaños - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Topper para Torta 3D Personalizado – Decoración para Cumpleaños</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price">$9500</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(31, 'Topper para Torta 3D Personalizado – Decoración para Cumpleaños', 9500,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/pinata-giratoria/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/5_tpvqpy" alt="Piñata giratoria - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Piñata giratoria</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price"><small style="font-weight:400;font-size:0.75rem;">Desde</small> $15000</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(29, 'Piñata giratoria', 15000,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/cajas-de-dulces-personalizadas-tipo-lechera/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/Bolsas_de_sorpresa_y_dulcesEstilo_cajita_de_leche_las_nuevas_bolsitas_que_se_unen_a_nuestr_yiqgsb" alt="Cajas de dulces Personalizadas- Tipo Lechera - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Cajas de dulces Personalizadas- Tipo Lechera</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price"><small style="font-weight:400;font-size:0.75rem;">Desde</small> $1800</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(28, 'Cajas de dulces Personalizadas- Tipo Lechera', 15000,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-item-custom carousel-item-split">
+                            <div class="product-card-carousel">
+                                <div class="product-image-carousel">
+                                    
+                                    <a href="/producto/bolsas-para-dulces/">
+                                        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/f_auto,q_auto:good,w_400,h_400,c_pad/v1/productos/2_up05lv" alt="Bolsas para dulces - Mundo Magie" loading="lazy">
+                                    </a>
+                                    
+                                </div>
+                                <div class="product-info-carousel">
+                                    <h6 class="product-name">Bolsas para dulces</h6>
+                                    <div class="product-price-container">
+                                        <p class="product-price"><small style="font-weight:400;font-size:0.75rem;">Desde</small> $1000</p>
+                                        <button class="add-to-cart-btn" onclick="agregarAlCarrito(27, 'Bolsas para dulces', 9500,00, 1, '', null, false)" title="Agregar al carrito">
+                                            <i class="fas fa-shopping-cart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <button class="carousel-btn carousel-prev" onclick="moveCarousel('carousel-21', -1)">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-btn carousel-next" onclick="moveCarousel('carousel-21', 1)">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+                <div class="carousel-dots" id="dots-21">
+                    
+                    <span class="dot active" onclick="currentSlide('carousel-21', 1)"></span>
+                    
+                    <span class="dot " onclick="currentSlide('carousel-21', 2)"></span>
+                    
+                    <span class="dot " onclick="currentSlide('carousel-21', 3)"></span>
+                    
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</div><!-- /sec-categorias -->
+
+<div class="home-sec" style="order:4">
+
+
+<section class="agenda-mes-section mb-5">
+  <div class="am-wrapper"
+    style="background:#f9e4f0;flex-direction:row;">
+
+    
+
+    <div class="am-col-text">
+      <span class="am-badge">Día del profesor</span>
+      <p class="am-eyebrow">Destacado del mes</p>
+      <h2 class="am-titulo" style="color:#2a2a2a;">Planner Docente</h2>
+      
+      <p class="am-subtitulo" style="color:#2a2a2a;opacity:0.6;">Elige el mejor regalo para este día</p>
+      
+      <div class="am-precio-row">
+        <span class="am-precio" style="color:#2a2a2a;">$15990</span>
+        
+      </div>
+      <div class="am-acciones">
+        <a href="/producto/planner-docente/" class="am-btn-ver"
+          style="background:#2a2a2a;color:#fff;">Ver detalles</a>
+        <button class="am-btn-carrito"
+          style="border-color:#2a2a2a;color:#2a2a2a;"
+          onclick="agregarAlCarrito(4, 'Planner Docente', 15990,00, 1, '', null, false)">
+          <i class="fas fa-shopping-bag"></i> Agregar
+        </button>
+      </div>
+    </div>
+
+    <div class="am-col-img">
+      
+      <a href="/producto/planner-docente/">
+        <img src="https://res.cloudinary.com/dh5b20xez/image/upload/v1/productos/Planner_Docente_Ideal_para_regalar_en_este_d%C3%ADa_del_profesor_Especificaciones_-Tapa_dura10_khupby" alt="Planner Docente" class="am-producto-img"
+          style="padding:24px;">
+      </a>
+      
+    </div>
+
+  </div>
+</section>
+
+<style>
+.am-wrapper {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  min-height: 360px;
+  align-items: stretch;
+}
+.am-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+.am-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.42);
+  z-index: 1;
+}
+.am-col-text {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  padding: 3rem 2.5rem 3rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.am-col-img {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 380px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  overflow: hidden;
+}
+.am-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  opacity: 0.55;
+  margin-bottom: 0.5rem;
+}
+.am-eyebrow {
+  font-size: 0.68rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin: 0 0 0.4rem;
+  font-weight: 400;
+}
+.am-titulo {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  margin: 0 0 0.8rem;
+  letter-spacing: -0.5px;
+}
+.am-subtitulo {
+  font-size: 0.88rem;
+  font-weight: 300;
+  line-height: 1.7;
+  margin: 0 0 1.4rem;
+  max-width: 360px;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.am-precio-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 1.8rem;
+}
+.am-precio {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+.am-desde {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.5;
+}
+.am-acciones {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+.am-btn-ver {
+  display: inline-block;
+  padding: 0.65rem 1.8rem;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: none;
+}
+.am-btn-ver:hover {
+  opacity: 0.85;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+}
+.am-btn-carrito {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.62rem 1.4rem;
+  border-radius: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border-width: 1.5px;
+  border-style: solid;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+.am-btn-carrito:hover {
+  opacity: 0.75;
+  transform: translateY(-2px);
+}
+.am-producto-img {
+  width: 100%;
+  height: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 16px 32px rgba(0,0,0,0.15));
+  transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  transform-origin: bottom center;
+  box-sizing: border-box;
+}
+.am-producto-img:hover { transform: translateY(-6px) scale(1.02); }
+@media (max-width: 900px) {
+  .am-wrapper { flex-direction: column !important; min-height: auto; }
+  .am-col-img { flex: none; height: 260px; align-items: center; }
+  .am-producto-img { max-height: 240px; }
+  .am-col-text { padding: 2rem 1.8rem 1.2rem; }
+  .am-titulo { font-size: 1.7rem; }
+}
+@media (max-width: 480px) {
+  .am-col-text { padding: 1.8rem 1.4rem 1rem; }
+  .am-titulo { font-size: 1.4rem; }
+  .am-precio { font-size: 1.6rem; }
+  .am-acciones { gap: 0.6rem; }
+  .am-btn-ver, .am-btn-carrito { font-size: 0.7rem; padding: 0.55rem 1.1rem; }
+}
+</style>
+
+
+
+</div><!-- /sec-agenda -->
+
+<div class="home-sec" style="order:0">
+
+
+</div><!-- /sec-instagram -->
+
+</div><!-- /home-sections-wrapper -->
+
+<style>
+.home-sections-wrapper { display: flex; flex-direction: column; }
+.home-sec { display: block; width: 100%; }
+.category-section {
+    margin-bottom: 3rem;
+}
+
+/* Split Banner Layout */
+.split-banner-section {
+    margin-bottom: 3rem;
+}
+
+.split-banner-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1rem;
+    align-items: stretch;
+    min-height: 380px;
+}
+
+.split-banner-left {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #2c3e50, #4a6fa5);
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.split-banner-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.split-banner-overlay {
+    position: relative;
+    z-index: 2;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+}
+
+.split-banner-titulo {
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 0.3rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.split-banner-subtitulo {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.82rem;
+    margin: 0 0 0.8rem;
+    line-height: 1.4;
+}
+
+.split-banner-btn {
+    display: inline-block;
+    background: #fff;
+    color: #222;
+    padding: 0.4rem 1.1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.split-banner-btn:hover {
+    background: var(--color-primario, #495057);
+    color: #fff;
+}
+
+.split-banner-right {
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-item-split {
+    flex: 0 0 calc(25% - 0.75rem);
+    min-width: 160px;
+    max-width: 200px;
+}
+
+@media (max-width: 992px) {
+    .split-banner-grid {
+        grid-template-columns: 220px 1fr;
+    }
+    .carousel-item-split {
+        flex: 0 0 calc(33.33% - 0.67rem);
+    }
+}
+
+@media (max-width: 768px) {
+    .split-banner-grid {
+        grid-template-columns: 1fr;
+    }
+    .split-banner-left {
+        min-height: 220px;
+    }
+    .carousel-item-split {
+        flex: 0 0 calc(50% - 0.5rem);
+    }
+}
+
+.category-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+    border-bottom: 3px solid #007bff;
+    padding-bottom: 8px;
+    display: inline-block;
+}
+
+.ver-mas-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.ver-mas-link:hover {
+    color: #007bff;
+}
+
+.carousel-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.3s ease;
+    gap: 1rem;
+}
+
+.carousel-item-custom {
+    flex: 0 0 calc(25% - 0.75rem);
+    min-width: 250px;
+}
+
+#carousel-recien-llegados .carousel-item-custom {
+    flex: 0 0 calc(25% - 0.75rem);
+    min-width: 200px;
+    max-width: 280px;
+}
+
+.product-card-carousel {
+    background: var(--color-cards);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 2px solid transparent;
+}
+
+
+
+.product-card-carousel:hover {
+    transform: translateY(-5px);
+}
+
+.product-image-carousel {
+    width: 100%;
+    height: 220px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    aspect-ratio: 1;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+}
+
+.product-image-carousel img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 12px;
+    transition: transform 0.3s ease;
+}
+
+.product-card-carousel:hover .product-image-carousel img {
+    transform: scale(1.01);
+}
+
+.no-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--color-secundario);
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 15px;
+    margin: 10px;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.no-image:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.product-info-carousel {
+    padding: 0.8rem;
+    text-align: center;
+}
+
+.product-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    color: #333;
+    line-height: 1.3;
+}
+
+.product-price-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+    flex-direction: column;
+}
+
+.quantity-controls-mini {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+}
+
+.quantity-btn-mini {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.quantity-btn-mini:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.quantity-controls-mini span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 20px;
+    text-align: center;
+}
+
+.product-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-primario);
+    margin: 0;
+}
+
+.add-to-cart-btn {
+    background: var(--color-primario);
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.add-to-cart-btn:hover {
+    background: var(--color-hover);
+    transform: scale(1.1);
+}
+
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.carousel-btn:hover {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.carousel-prev {
+    left: -20px;
+}
+
+.carousel-next {
+    right: -20px;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 1rem;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ddd;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.dot.active {
+    background: #333;
+}
+
+@media (max-width: 768px) {
+    .carousel-item-custom {
+        flex: 0 0 calc(50% - 0.5rem);
+        min-width: 180px;
+    }
+    
+    #carousel-recien-llegados .carousel-item-custom {
+        flex: 0 0 calc(50% - 0.5rem);
+        min-width: 160px;
+    }
+    
+    .category-title {
+        font-size: 1.2rem;
+    }
+    
+    .carousel-btn {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-item-custom {
+        flex: 0 0 calc(100% - 0.5rem);
+        min-width: 200px;
+    }
+    
+    #carousel-recien-llegados .carousel-item-custom {
+        flex: 0 0 calc(100% - 0.5rem);
+        min-width: 180px;
+    }
+}
+
+
+</style>
+
+<script>
+let carouselPositions = {};
+
+function moveCarousel(carouselId, direction) {
+    const container = document.getElementById(carouselId);
+    const track = container.querySelector('.carousel-track');
+    const items = track.querySelectorAll('.carousel-item-custom');
+    const itemWidth = items[0].offsetWidth + 16;
+    
+    const isSplit = items[0].classList.contains('carousel-item-split');
+    const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : (isSplit ? 4 : Math.floor(container.offsetWidth / itemWidth));
+    const maxPosition = Math.max(0, Math.ceil(items.length / itemsPerPage) - 1);
+    
+    if (!carouselPositions[carouselId]) carouselPositions[carouselId] = 0;
+    
+    carouselPositions[carouselId] = Math.min(Math.max(carouselPositions[carouselId] + direction, 0), maxPosition);
+    
+    track.style.transform = `translateX(${-carouselPositions[carouselId] * itemWidth * itemsPerPage}px)`;
+    updateDots(carouselId);
+}
+
+function currentSlide(carouselId, slideIndex) {
+    const container = document.getElementById(carouselId);
+    const track = container.querySelector('.carousel-track');
+    const items = track.querySelectorAll('.carousel-item-custom');
+    const itemWidth = items[0].offsetWidth + 16;
+    
+    // Para recién llegados, mostrar 4 productos por página
+    const itemsPerPage = carouselId === 'carousel-recien-llegados' ? 4 : 1;
+    
+    carouselPositions[carouselId] = slideIndex - 1;
+    const translateX = -carouselPositions[carouselId] * itemWidth * itemsPerPage;
+    track.style.transform = `translateX(${translateX}px)`;
+    
+    updateDots(carouselId);
+}
+
+function updateDots(carouselId) {
+    const dotsContainer = document.getElementById('dots-' + carouselId.replace('carousel-', ''));
+    if (!dotsContainer) return;
+    
+    const dots = dotsContainer.querySelectorAll('.dot');
+    
+    dots.forEach((dot, index) => {
+        dot.classList.toggle('active', index === carouselPositions[carouselId]);
+    });
+}
+
+
+</script>
+
+    </main>
+
+    <footer class="footer mt-5">
+        <div class="container py-5">
+            <div class="row align-items-start">
+                
+                <div class="col mb-4">
+                    <h5>Sobre Mí</h5>
+                    <p class="small">En Mundo Magie creamos productos únicos y especiales para hacer de cada momento algo mágico. Cada artículo está hecho con amor y dedicación para ti.</p>
+                </div>
+                
+                
+                
+                <div class="col mb-4">
+                    <h5>Contacto</h5>
+                    <p class="small mb-1"><i class="fas fa-phone me-2"></i>+56 9 36317847</p>
+                    <p class="small mb-1"><i class="fas fa-envelope me-2"></i><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="f5969a9b819496819ab598809b919a9894929c90db9699">[email&#160;protected]</a></p>
+                    <p class="small mb-1"><i class="fas fa-map-marker-alt me-2"></i>Valparaíso, Chile</p>
+                    <p class="small"><i class="fas fa-clock me-2"></i>Lun - Vie: 9:00 - 18:00</p>
+                </div>
+                
+                
+                <!-- Logo en el centro -->
+                <div class="col mb-4 text-center">
+                    <a href="/">
+                        <img src="/static/images/logo.png" alt="Mundo Magie Logo" loading="lazy" style="max-width: 250px; height: auto; opacity: 0.8; margin-top: -20px;" onerror="this.style.display='none'">
+                    </a>
+                </div>
+                
+                
+                <div class="col mb-4">
+                    <h5>Información</h5>
+                    
+                    <p class="small mb-1"><a href="#" class="footer-link">Política de Privacidad</a></p>
+                    
+                    <p class="small mb-1"><a href="#" class="footer-link">Términos y Condiciones</a></p>
+                    
+                    <p class="small mb-1"><a href="#" class="footer-link">Envíos y Devoluciones</a></p>
+                    
+                    <p class="small mb-1"><a href="#" class="footer-link">Preguntas Frecuentes</a></p>
+                    
+                </div>
+                
+                
+                
+                <div class="col mb-4">
+                    <h5>Únete al Team Mundo Magie</h5>
+                    <p class="small mb-2">Suscríbete y recibe ofertas exclusivas, novedades y contenido …</p>
+                    <div class="input-group input-group-sm mb-2">
+                        <input type="email" class="form-control" placeholder="Tu email">
+                        <button class="btn btn-primary" type="button">Suscribir</button>
+                    </div>
+                    <div>
+                        
+                        <a href="https://wa.me/56962609280?text=Hola%21%20Me%20interesa%20un%20producto" target="_blank" class="me-2 social-link">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                        
+                        
+                        
+                        <a href="https://tiktok.com/@mundomagie" target="_blank" class="me-2 social-link">
+                            <i class="fab fa-tiktok"></i>
+                        </a>
+                        
+                        <a href="https://instagram.com/mundomagie.cl" target="_blank" class="me-2 social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        
+                        <a href="https://facebook.com/mundomagie" target="_blank" class="me-2 social-link">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+                
+            </div>
+            
+            <hr style="border-top: 1px solid #dee2e6; border-bottom: none; border-left: none; border-right: none; margin: 2rem 0 1rem 0;">
+            
+            <div class="row" style="margin-top: -20px;">
+                <div class="col-12 text-center">
+                    <p class="small mb-0">Diseñado por Mundo Magie 2025</p>
+                    <p class="small mb-0">Diseño & Desarrollo Web Personalizado ♥</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WhatsApp Button -->
+    
+    <a href="https://wa.me/56962609280?text=Hola%21%20Me%20interesa%20un%20producto" target="_blank" class="whatsapp-float" title="Contáctanos por WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+    
+
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Bloquear clic derecho
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        // Bloquear arrastre de imágenes
+        document.addEventListener('dragstart', function(e) { if (e.target.tagName === 'IMG') e.preventDefault(); });
+        // Bloquear Ctrl+S, Ctrl+U, Ctrl+Shift+I, F12
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && ['s','u','p'].includes(e.key.toLowerCase())) e.preventDefault();
+            if (e.key === 'F12') e.preventDefault();
+        });
+    </script>
+    <script>
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+        
+        let cantidades = {};
+        
+        function actualizarContadorCarrito() {
+            const totalItems = carrito.reduce((total, item) => total + item.cantidad, 0);
+            const contador = document.getElementById('cart-count');
+            if (totalItems > 0) {
+                contador.textContent = totalItems;
+                contador.style.display = 'inline-block';
+            } else {
+                contador.style.display = 'none';
+            }
+        }
+        
+        function cambiarCantidad(id, cambio) {
+            if (!cantidades[id]) cantidades[id] = 1;
+            cantidades[id] += cambio;
+            if (cantidades[id] < 1) cantidades[id] = 1;
+            document.getElementById('qty-' + id).textContent = cantidades[id];
+        }
+        
+        function agregarAlCarritoConCantidad(id, nombre, precio, esDigital = false, event) {
+            const cantidad = cantidades[id] || 1;
+            agregarAlCarrito(id, nombre, precio, cantidad, '', event, esDigital);
+            
+            cantidades[id] = 1;
+            const qtyElement = document.getElementById('qty-' + id);
+            if (qtyElement) {
+                qtyElement.textContent = 1;
+            }
+        }
+        
+        function agregarAlCarrito(id, nombre, precio, cantidad = 1, personalizacion = '', event = null, esDigital = false) {
+            const item = carrito.find(p => p.id === id && p.personalizacion === personalizacion);
+            if (item) {
+                item.cantidad += cantidad;
+            } else {
+                fetch(`/obtener-imagen/${id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.imagen) {
+                            const itemIndex = carrito.findIndex(p => p.id === id && p.personalizacion === personalizacion);
+                            if (itemIndex !== -1) {
+                                carrito[itemIndex].imagen = data.imagen;
+                                localStorage.setItem('carrito', JSON.stringify(carrito));
+                            }
+                        }
+                    })
+                    .catch(error => console.log('Error obteniendo imagen:', error));
+                
+                carrito.push({
+                    id: id,
+                    nombre: nombre,
+                    precio: precio,
+                    cantidad: cantidad,
+                    personalizacion: personalizacion,
+                    imagen: null,
+                    es_digital: esDigital || false
+                });
+            }
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            actualizarContadorCarrito();
+
+            const colorPrimario = getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#ffc1ea';
+            const colorSecundario = getComputedStyle(document.documentElement).getPropertyValue('--color-secundario').trim() || '#d2a8dd';
+
+            Swal.fire({
+                title: '¡Agregado! 💖',
+                html: `<b>${nombre}</b><br><span style="color:#888;font-size:0.9rem;">Cantidad: ${cantidad} &bull; $${Math.round(precio).toLocaleString('es-CL')}</span>`,
+                icon: 'success',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Ver carrito 🛒',
+                cancelButtonText: 'Seguir comprando',
+                confirmButtonColor: colorPrimario,
+                cancelButtonColor: colorSecundario,
+                timer: 4000,
+                timerProgressBar: true,
+                position: 'center',
+                customClass: {
+                    popup: 'swal-magie',
+                    title: 'swal-magie-title',
+                },
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/carrito/';
+                }
+            });
+        }
+        
+        // Actualizar contador al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarContadorCarrito();
+        });
+    </script>
+
+
+<!-- FASE 3: Navbar Glassmorphism -->
+<style>
+  .header {
+    transition: background 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
+  }
+  .header.glass {
+    background: rgba(255, 255, 255, 0.55) !important;
+    backdrop-filter: blur(14px) saturate(1.6);
+    -webkit-backdrop-filter: blur(14px) saturate(1.6);
+    box-shadow: 0 4px 24px rgba(210, 168, 221, 0.18);
+    border-bottom: 1px solid rgba(255, 193, 234, 0.25);
+  }
+</style>
+<script>
+  window.addEventListener('scroll', function () {
+    const header = document.querySelector('.header');
+    if (!header) return;
+    header.classList.toggle('glass', window.scrollY > 60);
+  }, { passive: true });
+</script>
+
+<!-- FASE 2: Magic Sparkle -->
+<style>
+  .sparkle-particle {
+    position: fixed;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    animation: sparkle-fly 0.7s ease-out forwards;
+  }
+  @keyframes sparkle-fly {
+    0%   { opacity: 1; transform: translate(0,0) scale(1); }
+    100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.2); }
+  }
+</style>
+<script>
+  function spawnSparkles(x, y) {
+    const colors = [
+      getComputedStyle(document.documentElement).getPropertyValue('--color-primario').trim() || '#ffc1ea',
+      getComputedStyle(document.documentElement).getPropertyValue('--color-secundario').trim() || '#d2a8dd',
+      getComputedStyle(document.documentElement).getPropertyValue('--color-hover').trim() || '#f4d875',
+      '#fff'
+    ];
+    const count = 14;
+    for (let i = 0; i < count; i++) {
+      const p = document.createElement('span');
+      p.className = 'sparkle-particle';
+      const angle = (360 / count) * i;
+      const dist = 40 + Math.random() * 40;
+      const rad = angle * Math.PI / 180;
+      p.style.setProperty('--dx', Math.cos(rad) * dist + 'px');
+      p.style.setProperty('--dy', Math.sin(rad) * dist + 'px');
+      p.style.left = x - 4 + 'px';
+      p.style.top  = y - 4 + 'px';
+      p.style.background = colors[i % colors.length];
+      document.body.appendChild(p);
+      p.addEventListener('animationend', () => p.remove());
+    }
+  }
+
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.add-to-cart-btn, .cart-btn');
+    if (!btn) return;
+    const r = btn.getBoundingClientRect();
+    spawnSparkles(r.left + r.width / 2, r.top + r.height / 2);
+  });
+</script>
+
+<!-- FASE 1: Animaciones de entrada -->
+<style>
+  .magie-reveal {
+    opacity: 0;
+    transform: translateY(28px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .magie-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .magie-reveal-left {
+    opacity: 0;
+    transform: translateX(-32px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .magie-reveal-left.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .magie-reveal-right {
+    opacity: 0;
+    transform: translateX(32px);
+    transition: opacity 0.6s cubic-bezier(0.4,0,0.2,1), transform 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  .magie-reveal-right.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+</style>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Elementos a animar
+    const selectors = [
+      { sel: '.product-card-carousel',  cls: 'magie-reveal',       stagger: true },
+      { sel: '.split-banner-left',       cls: 'magie-reveal-left',  stagger: false },
+      { sel: '.split-banner-right',      cls: 'magie-reveal-right', stagger: false },
+      { sel: '.banner-item-home',        cls: 'magie-reveal',       stagger: true },
+      { sel: '.instagram-item',          cls: 'magie-reveal',       stagger: true },
+      { sel: '.footer .col',             cls: 'magie-reveal',       stagger: true },
+      { sel: 'h4',                       cls: 'magie-reveal',       stagger: false },
+    ];
+
+    selectors.forEach(({ sel, cls, stagger }) => {
+      document.querySelectorAll(sel).forEach((el, i) => {
+        el.classList.add(cls);
+        if (stagger) el.style.transitionDelay = (i % 8) * 80 + 'ms';
+      });
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.magie-reveal, .magie-reveal-left, .magie-reveal-right')
+      .forEach(el => observer.observe(el));
+  });
+</script>
+</body>
+</html>

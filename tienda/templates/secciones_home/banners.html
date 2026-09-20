@@ -1,0 +1,21 @@
+{% if banners %}
+<section class="banners-fidelizacion-home mb-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            {% for banner in banners %}
+            <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+                <div class="banner-item-home d-flex align-items-start">
+                    <i class="{{ banner.icono }}" style="color: #ced4da; font-size: 1.5rem; margin-right: 12px; margin-top: 2px;"></i>
+                    <div>
+                        <h6 style="color: {{ banner.color_texto|default:'#6c757d' }}; font-size: 12px; margin: 0; font-weight: 500;">{{ banner.titulo }}</h6>
+                        {% if banner.descripcion %}
+                        <p style="color: #6c757d; font-size: 10px; margin: 2px 0 0 0; line-height: 1.2;">{{ banner.descripcion }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}

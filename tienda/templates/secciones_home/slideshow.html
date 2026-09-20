@@ -1,0 +1,39 @@
+<div id="carouselSlides" class="carousel slide mb-4" data-bs-ride="carousel">
+    {% if slides %}
+        <div class="carousel-indicators">
+            {% for slide in slides %}
+            <button type="button" data-bs-target="#carouselSlides" data-bs-slide-to="{{ forloop.counter0 }}" {% if forloop.first %}class="active"{% endif %}></button>
+            {% endfor %}
+        </div>
+        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
+            {% for slide in slides %}
+            <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <img src="{{ slide.imagen.url|cloudinary_slide }}" alt="{{ slide.titulo|default:'Mundo Magie - Tienda online' }}" class="d-block" {% if forloop.first %}fetchpriority="high"{% else %}loading="lazy"{% endif %} style="width: 100%; height: 300px; object-fit: contain; background-color: #f8f9fa;">
+                {% if slide.titulo %}
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>{{ slide.titulo }}</h5>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselSlides" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselSlides" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    {% else %}
+        <div class="carousel-inner" style="border-radius: 12px; overflow: hidden;">
+            <div class="carousel-item active">
+                <div class="d-flex align-items-center justify-content-center bg-light" style="height: 300px;">
+                    <div class="text-center text-muted">
+                        <i class="fas fa-images fa-3x mb-3"></i>
+                        <h5>Slideshow</h5>
+                        <p>Agrega imágenes desde el panel de administración</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
