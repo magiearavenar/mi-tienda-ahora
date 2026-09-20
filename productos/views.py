@@ -40,6 +40,9 @@ def home(request):
     SECCIONES_DEFAULT = ['slideshow', 'banners', 'recien_llegados', 'categorias', 'agenda_mes', 'instagram']
     orden_secciones = orden_obj.orden if orden_obj and orden_obj.orden else SECCIONES_DEFAULT
 
+    # Calcular order CSS para cada seccion
+    orden_css = {sec: i for i, sec in enumerate(orden_secciones)}
+
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
@@ -51,6 +54,12 @@ def home(request):
         'instagram_config': instagram_config,
         'agenda_mes': agenda_mes,
         'orden_secciones': orden_secciones,
+        'o_slideshow':      orden_css.get('slideshow', 0),
+        'o_banners':        orden_css.get('banners', 1),
+        'o_recien':         orden_css.get('recien_llegados', 2),
+        'o_categorias':     orden_css.get('categorias', 3),
+        'o_agenda':         orden_css.get('agenda_mes', 4),
+        'o_instagram':      orden_css.get('instagram', 5),
     })
 
 def productos_por_categoria(request, categoria_id):
