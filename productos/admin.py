@@ -683,20 +683,27 @@ class ResenaAdmin(admin.ModelAdmin):
 
 @admin.register(AgendaMes)
 class AgendaMesAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'badge', 'activo']
+    list_display = ['__str__', 'badge', 'imagen_posicion', 'activo']
     list_editable = ['activo']
     fieldsets = (
-        ('Producto destacado', {
+        ('Producto', {
             'fields': ('producto', 'badge', 'subtitulo', 'activo')
         }),
-        ('Apariencia', {
+        ('Fondo del banner', {
             'fields': ('color_fondo', 'banner_imagen'),
-            'description': 'El color de fondo se usa cuando no hay imagen. Si subes imagen, se muestra de fondo.'
+            'description': 'Si subes imagen de fondo, el color se ignora.'
+        }),
+        ('Colores y textos', {
+            'fields': ('color_texto', 'texto_btn_ver', 'texto_btn_carrito'),
+        }),
+        ('Imagen del producto', {
+            'fields': ('imagen_posicion', 'imagen_padding'),
+            'description': 'Controla dónde aparece la imagen y cuánto espacio tiene alrededor.'
         }),
     )
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
-        if db_field.name == 'color_fondo':
+        if db_field.name in ('color_fondo', 'color_texto'):
             kwargs['widget'] = ColorPickerWidget()
         return super().formfield_for_dbfield(db_field, request, **kwargs)
 

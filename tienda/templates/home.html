@@ -204,49 +204,48 @@
 {% endfor %}
 
 {% if agenda_mes and agenda_mes.producto %}
+{% with am=agenda_mes %}
 <section class="agenda-mes-section mb-5">
+  <div class="am-wrapper"
+    style="background:{% if am.banner_imagen %}#000{% else %}{{ am.color_fondo|default:'#f9e4f0' }}{% endif %};flex-direction:{% if am.imagen_posicion == 'izquierda' %}row-reverse{% else %}row{% endif %};">
 
-  <div class="am-wrapper" style="background: {% if agenda_mes.banner_imagen %}#000{% else %}{{ agenda_mes.color_fondo|default:'#f9e4f0' }}{% endif %};">
-
-    {% if agenda_mes.banner_imagen %}
-    <img src="{{ agenda_mes.banner_imagen.url }}" alt="" class="am-bg-img">
+    {% if am.banner_imagen %}
+    <img src="{{ am.banner_imagen.url }}" alt="" class="am-bg-img">
     <div class="am-bg-overlay"></div>
     {% endif %}
 
-    <!-- Columna izquierda: texto -->
     <div class="am-col-text">
-      {% if agenda_mes.badge %}
-      <span class="am-badge">✦ {{ agenda_mes.badge }} ✦</span>
-      {% endif %}
+      {% if am.badge %}<span class="am-badge">{{ am.badge }}</span>{% endif %}
       <p class="am-eyebrow">Destacado del mes</p>
-      <h2 class="am-titulo">{{ agenda_mes.producto.nombre }}</h2>
-      {% if agenda_mes.subtitulo %}
-      <p class="am-subtitulo">{{ agenda_mes.subtitulo }}</p>
+      <h2 class="am-titulo" style="color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};">{{ am.producto.nombre }}</h2>
+      {% if am.subtitulo %}
+      <p class="am-subtitulo" style="color:{% if am.banner_imagen %}rgba(255,255,255,0.78){% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};opacity:{% if am.banner_imagen %}1{% else %}0.6{% endif %};">{{ am.subtitulo }}</p>
       {% endif %}
       <div class="am-precio-row">
-        <span class="am-precio">${{ agenda_mes.producto.precio_desde|floatformat:0 }}</span>
-        {% if agenda_mes.producto.tiene_rango_precios %}<span class="am-desde">desde</span>{% endif %}
+        <span class="am-precio" style="color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};">${{ am.producto.precio_desde|floatformat:0 }}</span>
+        {% if am.producto.tiene_rango_precios %}<span class="am-desde">desde</span>{% endif %}
       </div>
       <div class="am-acciones">
-        <a href="{% url 'detalle_producto' agenda_mes.producto.slug %}" class="am-btn-ver">Ver detalles</a>
-        <button class="am-btn-carrito add-to-cart-btn"
-          onclick="agregarAlCarrito({{ agenda_mes.producto.id }}, '{{ agenda_mes.producto.nombre }}', {{ agenda_mes.producto.precio }}, 1, '', null, {{ agenda_mes.producto.es_digital|yesno:'true,false' }})">
-          <i class="fas fa-shopping-bag"></i> Agregar
+        <a href="{% url 'detalle_producto' am.producto.slug %}" class="am-btn-ver"
+          style="background:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};color:{% if am.banner_imagen %}#2a2a2a{% else %}#fff{% endif %};">{{ am.texto_btn_ver|default:'Ver detalles' }}</a>
+        <button class="am-btn-carrito"
+          style="border-color:{% if am.banner_imagen %}rgba(255,255,255,0.5){% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};color:{% if am.banner_imagen %}#fff{% else %}{{ am.color_texto|default:'#2a2a2a' }}{% endif %};"
+          onclick="agregarAlCarrito({{ am.producto.id }}, '{{ am.producto.nombre }}', {{ am.producto.precio }}, 1, '', null, {{ am.producto.es_digital|yesno:'true,false' }})">
+          <i class="fas fa-shopping-bag"></i> {{ am.texto_btn_carrito|default:'Agregar' }}
         </button>
       </div>
     </div>
 
-    <!-- Columna derecha: imagen producto -->
     <div class="am-col-img">
-      {% if agenda_mes.producto.imagen_principal %}
-      <a href="{% url 'detalle_producto' agenda_mes.producto.slug %}" class="am-img-link">
-        <img src="{{ agenda_mes.producto.imagen_principal.url }}" alt="{{ agenda_mes.producto.nombre }}" class="am-producto-img">
+      {% if am.producto.imagen_principal %}
+      <a href="{% url 'detalle_producto' am.producto.slug %}">
+        <img src="{{ am.producto.imagen_principal.url }}" alt="{{ am.producto.nombre }}" class="am-producto-img"
+          style="padding:{{ am.imagen_padding|default:24 }}px;">
       </a>
       {% endif %}
     </div>
 
   </div>
-
 </section>
 
 <style>
@@ -254,10 +253,9 @@
   position: relative;
   border-radius: 24px;
   overflow: hidden;
-  display: grid;
-  grid-template-columns: 1fr 420px;
-  min-height: 340px;
-  align-items: center;
+  display: flex;
+  min-height: 360px;
+  align-items: stretch;
 }
 .am-bg-img {
   position: absolute;
@@ -265,7 +263,6 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center;
   z-index: 0;
 }
 .am-bg-overlay {
@@ -277,38 +274,41 @@
 .am-col-text {
   position: relative;
   z-index: 2;
+  flex: 1;
   padding: 3rem 2.5rem 3rem 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .am-col-img {
   position: relative;
   z-index: 2;
+  flex: 0 0 380px;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding: 1.5rem 2rem 0;
-  height: 100%;
+  overflow: hidden;
 }
 .am-badge {
   display: inline-block;
   font-size: 0.65rem;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: {% if agenda_mes.banner_imagen %}rgba(255,255,255,0.7){% else %}rgba(0,0,0,0.4){% endif %};
-  margin-bottom: 0.6rem;
+  opacity: 0.55;
+  margin-bottom: 0.5rem;
 }
 .am-eyebrow {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  color: {% if agenda_mes.banner_imagen %}rgba(255,255,255,0.6){% else %}rgba(0,0,0,0.45){% endif %};
-  margin: 0 0 0.5rem;
+  opacity: 0.45;
+  margin: 0 0 0.4rem;
   font-weight: 400;
 }
 .am-titulo {
   font-size: 2.2rem;
   font-weight: 700;
   line-height: 1.15;
-  color: {% if agenda_mes.banner_imagen %}#fff{% else %}#2a2a2a{% endif %};
   margin: 0 0 0.8rem;
   letter-spacing: -0.5px;
 }
@@ -316,8 +316,7 @@
   font-size: 0.88rem;
   font-weight: 300;
   line-height: 1.7;
-  color: {% if agenda_mes.banner_imagen %}rgba(255,255,255,0.8){% else %}rgba(0,0,0,0.55){% endif %};
-  margin: 0 0 1.6rem;
+  margin: 0 0 1.4rem;
   max-width: 360px;
   text-transform: none;
   letter-spacing: 0;
@@ -331,19 +330,18 @@
 .am-precio {
   font-size: 2rem;
   font-weight: 700;
-  color: {% if agenda_mes.banner_imagen %}#fff{% else %}#2a2a2a{% endif %};
   letter-spacing: -1px;
 }
 .am-desde {
-  font-size: 0.75rem;
-  color: {% if agenda_mes.banner_imagen %}rgba(255,255,255,0.6){% else %}rgba(0,0,0,0.4){% endif %};
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 1px;
+  opacity: 0.5;
 }
 .am-acciones {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.8rem;
   flex-wrap: wrap;
 }
 .am-btn-ver {
@@ -356,61 +354,62 @@
   text-transform: uppercase;
   text-decoration: none;
   transition: all 0.3s ease;
-  background: {% if agenda_mes.banner_imagen %}#fff{% else %}#2a2a2a{% endif %};
-  color: {% if agenda_mes.banner_imagen %}#2a2a2a{% else %}#fff{% endif %};
+  border: none;
 }
 .am-btn-ver:hover {
+  opacity: 0.85;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-  color: {% if agenda_mes.banner_imagen %}#2a2a2a{% else %}#fff{% endif %};
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
 }
 .am-btn-carrito {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.65rem 1.4rem;
+  gap: 0.45rem;
+  padding: 0.62rem 1.4rem;
   border-radius: 30px;
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 1px;
   text-transform: uppercase;
-  border: 1.5px solid {% if agenda_mes.banner_imagen %}rgba(255,255,255,0.5){% else %}rgba(0,0,0,0.2){% endif %};
+  border-width: 1.5px;
+  border-style: solid;
   background: transparent;
-  color: {% if agenda_mes.banner_imagen %}#fff{% else %}#2a2a2a{% endif %};
-  width: auto;
-  height: auto;
-  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 .am-btn-carrito:hover {
-  background: {% if agenda_mes.banner_imagen %}rgba(255,255,255,0.15){% else %}rgba(0,0,0,0.06){% endif %};
+  opacity: 0.75;
   transform: translateY(-2px);
 }
-.am-img-link { display: block; }
 .am-producto-img {
   width: 100%;
-  max-width: 360px;
-  max-height: 320px;
+  height: 100%;
+  max-height: 360px;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.18));
+  filter: drop-shadow(0 16px 32px rgba(0,0,0,0.15));
   transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
   transform-origin: bottom center;
+  box-sizing: border-box;
 }
-.am-producto-img:hover { transform: translateY(-8px) scale(1.02); }
+.am-producto-img:hover { transform: translateY(-6px) scale(1.02); }
 @media (max-width: 900px) {
-  .am-wrapper { grid-template-columns: 1fr; min-height: auto; }
-  .am-col-img { padding: 0 2rem 2rem; justify-content: flex-start; }
-  .am-producto-img { max-width: 220px; max-height: 220px; }
-  .am-col-text { padding: 2.5rem 2rem 1.5rem; }
+  .am-wrapper { flex-direction: column !important; min-height: auto; }
+  .am-col-img { flex: none; height: 260px; align-items: center; }
+  .am-producto-img { max-height: 240px; }
+  .am-col-text { padding: 2rem 1.8rem 1.2rem; }
   .am-titulo { font-size: 1.7rem; }
 }
 @media (max-width: 480px) {
-  .am-col-text { padding: 2rem 1.5rem 1rem; }
+  .am-col-text { padding: 1.8rem 1.4rem 1rem; }
   .am-titulo { font-size: 1.4rem; }
   .am-precio { font-size: 1.6rem; }
-  .am-acciones { flex-direction: column; align-items: flex-start; }
+  .am-acciones { gap: 0.6rem; }
+  .am-btn-ver, .am-btn-carrito { font-size: 0.7rem; padding: 0.55rem 1.1rem; }
 }
 </style>
+{% endwith %}
 {% endif %}
 
 {% if instagram_posts %}

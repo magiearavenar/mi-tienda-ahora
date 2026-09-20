@@ -625,16 +625,31 @@ class TokenDescarga(models.Model):
 
 
 class AgendaMes(models.Model):
+    POSICION_IMAGEN = [
+        ('derecha', 'Imagen a la derecha'),
+        ('izquierda', 'Imagen a la izquierda'),
+    ]
+
     producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True, blank=True,
                                  help_text='Producto que se destacará como agenda del mes')
     badge = models.CharField(max_length=50, blank=True, default='',
-                             help_text='Ej: Agosto 2025')
+                             help_text='Ej: ✦ Agosto 2025 ✦')
     subtitulo = models.CharField(max_length=200, blank=True, default='',
-                                 help_text='Frase breve bajo el título')
+                                 help_text='Frase breve bajo el título del producto')
     banner_imagen = models.ImageField(upload_to='agenda_mes/', blank=True, null=True, max_length=500,
-                                      help_text='Imagen de fondo del banner (opcional)')
+                                      help_text='Imagen de fondo del banner (opcional). Si no subes, se usa el color de fondo.')
     color_fondo = models.CharField(max_length=7, default='#f9e4f0',
-                                   help_text='Color sólido de fondo cuando no hay imagen. Ej: #f9e4f0')
+                                   help_text='Color sólido de fondo (cuando no hay imagen de banner)')
+    color_texto = models.CharField(max_length=7, default='#2a2a2a',
+                                   help_text='Color del título, precio y textos principales')
+    imagen_posicion = models.CharField(max_length=10, choices=POSICION_IMAGEN, default='derecha',
+                                       help_text='¿Dónde aparece la imagen del producto?')
+    imagen_padding = models.IntegerField(default=24,
+                                         help_text='Espacio interior de la imagen en px (0 = sin espacio, 40 = mucho espacio)')
+    texto_btn_ver = models.CharField(max_length=50, default='Ver detalles',
+                                     help_text='Texto del botón principal')
+    texto_btn_carrito = models.CharField(max_length=50, default='Agregar',
+                                         help_text='Texto del botón de carrito')
     activo = models.BooleanField(default=True)
 
     def __str__(self):
