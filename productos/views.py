@@ -12,7 +12,7 @@ from django.db import models
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena, TokenDescarga, AgendaMes
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena, TokenDescarga, AgendaMes, OrdenHome
 from .services import MercadoPagoService
 from .instagram_service import InstagramService
 from .forms import RegistroForm
@@ -36,6 +36,10 @@ def home(request):
 
     agenda_mes = AgendaMes.objects.filter(activo=True).select_related('producto').first()
 
+    orden_obj = OrdenHome.objects.first()
+    SECCIONES_DEFAULT = ['slideshow', 'banners', 'recien_llegados', 'categorias', 'agenda_mes', 'instagram']
+    orden_secciones = orden_obj.orden if orden_obj and orden_obj.orden else SECCIONES_DEFAULT
+
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
@@ -46,6 +50,7 @@ def home(request):
         'instagram_posts': instagram_posts,
         'instagram_config': instagram_config,
         'agenda_mes': agenda_mes,
+        'orden_secciones': orden_secciones,
     })
 
 def productos_por_categoria(request, categoria_id):
@@ -678,6 +683,9 @@ def configurador(request):
     contacto = Contacto.objects.filter(activo=True).first()
     agenda_mes = AgendaMes.objects.filter(activo=True).select_related('producto').first()
     productos_lista = Producto.objects.filter(activo=True).values('id', 'nombre')
+    orden_obj = OrdenHome.objects.first()
+    SECCIONES_DEFAULT = ['slideshow', 'banners', 'recien_llegados', 'categorias', 'agenda_mes', 'instagram']
+    orden_secciones = orden_obj.orden if orden_obj and orden_obj.orden else SECCIONES_DEFAULT
     return render(request, 'configurador.html', {
         'config': config,
         'footer': footer,
@@ -685,6 +693,15 @@ def configurador(request):
         'contacto': contacto,
         'agenda_mes': agenda_mes,
         'productos_lista': productos_lista,
+        'orden_secciones': orden_secciones,
+        'secciones_labels': {
+            'slideshow': 'Slideshow',
+            'banners': 'Banners de confianza',
+            'recien_llegados': 'Recién llegados',
+            'categorias': 'Secciones de categorías',
+            'agenda_mes': 'Agenda del Mes',
+            'instagram': 'Instagram',
+        },
     })
 
 
@@ -750,6 +767,12 @@ def configurador_guardar(request):
                 if campo in data:
                     setattr(config, campo, data[campo])
             config.save()
+
+        elif seccion == 'orden_home':
+            orden = data.get('orden', [])
+            obj, _ = OrdenHome.objects.get_or_create(id=1)
+            obj.orden = orden
+            obj.save()
 
         elif seccion == 'agenda_mes':
             agenda, _ = AgendaMes.objects.get_or_create(activo=True)

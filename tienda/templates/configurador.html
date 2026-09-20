@@ -216,6 +216,10 @@
             border: none;
             width: 100%;
         }
+        .orden-ghost { opacity: 0.35; background: #ffc1ea !important; border-color: #ffc1ea !important; }
+        .orden-chosen { box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important; background: #fff !important; }
+        .orden-drag   { box-shadow: 0 8px 24px rgba(0,0,0,0.15) !important; }
+        .orden-item:hover { background: #fff !important; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
     </style>
 </head>
 <body>
@@ -256,6 +260,9 @@
             </div>
             <div class="panel-tab" onclick="switchTab('agenda', this)">
                 <i class="fas fa-book"></i>Agenda
+            </div>
+            <div class="panel-tab" onclick="switchTab('orden', this)">
+                <i class="fas fa-bars"></i>Orden
             </div>
         </div>
 
@@ -504,6 +511,29 @@
             </div>
         </div>
 
+        <!-- ORDEN DEL HOME -->
+        <div class="panel-section" id="tab-orden">
+            <p style="font-size:0.78rem;color:#888;margin-bottom:14px;line-height:1.5;">
+                Arrastra las secciones para cambiar su orden en el home.
+            </p>
+            <ul id="sortable-secciones" style="list-style:none;padding:0;margin:0;">
+                {% for seccion in orden_secciones %}
+                <li class="orden-item" data-id="{{ seccion }}" style="
+                    display:flex;align-items:center;gap:10px;
+                    background:#f8f8f8;border:1px solid #e8e8e8;
+                    border-radius:10px;padding:12px 14px;
+                    margin-bottom:8px;cursor:grab;user-select:none;
+                    transition:box-shadow 0.2s,background 0.2s;">
+                    <i class="fas fa-grip-vertical" style="color:#ccc;font-size:0.9rem;"></i>
+                    <span style="font-size:0.82rem;font-weight:500;color:#444;">{{ secciones_labels|default:seccion }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <div style="margin-top:14px;padding:10px 12px;background:#fff8e1;border-radius:8px;border:1px solid #ffe082;font-size:0.75rem;color:#7a6000;">
+                <i class="fas fa-info-circle me-1"></i> Guarda para aplicar el nuevo orden.
+            </div>
+        </div>
+
     </div><!-- fin panel -->
     <div class="preview">
         <div class="preview-toolbar">
@@ -521,6 +551,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
 <script>
     const csrfToken = '{{ csrf_token }}';
@@ -651,6 +682,12 @@
                 seo_descripcion: document.getElementById('seo_descripcion').value,
                 moneda_simbolo: document.getElementById('moneda_simbolo').value,
             };
+        } else if (tabActual === 'orden') {
+            const items = document.querySelectorAll('#sortable-secciones .orden-item');
+            return {
+                seccion: 'orden_home',
+                orden: Array.from(items).map(el => el.dataset.id),
+            };
         } else if (tabActual === 'agenda') {
             return {
                 seccion: 'agenda_mes',
@@ -666,7 +703,6 @@
             };
         }
     }
-
     async function guardarActual() {
         setStatus('saving', 'Guardando...');
         try {
@@ -701,6 +737,18 @@
         crearPickr('pickr_footer_color_redes',   'footer_color_redes',   '{{ footer.color_redes|default:"#ffc1e3" }}');
         crearPickr('pickr_agenda_color_fondo',    'agenda_color_fondo',   '{{ agenda_mes.color_fondo|default:"#f9e4f0" }}');
         crearPickr('pickr_agenda_color_texto',    'agenda_color_texto',   '{{ agenda_mes.color_texto|default:"#2a2a2a" }}');
+
+        // SortableJS para reordenar secciones
+        const sortableEl = document.getElementById('sortable-secciones');
+        if (sortableEl) {
+            Sortable.create(sortableEl, {
+                animation: 180,
+                ghostClass: 'orden-ghost',
+                chosenClass: 'orden-chosen',
+                dragClass: 'orden-drag',
+                onEnd: () => previewChange(),
+            });
+        }
     });
 </script>
 </body>

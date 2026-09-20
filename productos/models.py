@@ -660,6 +660,18 @@ class AgendaMes(models.Model):
         verbose_name_plural = 'Agenda del Mes'
 
 
+class OrdenHome(models.Model):
+    """Guarda el orden de las secciones del home como lista JSON."""
+    orden = models.JSONField(default=list, help_text='Lista ordenada de secciones')
+
+    def __str__(self):
+        return 'Orden del Home'
+
+    class Meta:
+        verbose_name = 'Orden del Home'
+        verbose_name_plural = 'Orden del Home'
+
+
 class InstagramConfig(models.Model):
     usuario = models.CharField(max_length=100, help_text='Usuario de Instagram (sin @)')
     titulo = models.CharField(max_length=100, default='Síguenos en Instagram')
