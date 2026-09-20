@@ -203,6 +203,185 @@
 </div>
 {% endfor %}
 
+{% if agenda_mes and agenda_mes.producto %}
+<section class="agenda-mes-section mb-5">
+  <div class="agenda-mes-banner {% if not agenda_mes.banner_imagen %}agenda-mes-css-bg{% endif %}">
+    {% if agenda_mes.banner_imagen %}
+    <img src="{{ agenda_mes.banner_imagen.url }}" alt="Agenda del mes" class="agenda-mes-bg-img">
+    {% endif %}
+    <div class="agenda-mes-overlay">
+      <div class="agenda-mes-content">
+        <div class="agenda-mes-left">
+          {% if agenda_mes.badge %}
+          <span class="agenda-mes-badge">{{ agenda_mes.badge }}</span>
+          {% endif %}
+          <h2 class="agenda-mes-titulo">Agenda del Mes</h2>
+          {% if agenda_mes.subtitulo %}
+          <p class="agenda-mes-subtitulo">{{ agenda_mes.subtitulo }}</p>
+          {% endif %}
+          <a href="{% url 'detalle_producto' agenda_mes.producto.slug %}" class="agenda-mes-btn">Ver agenda</a>
+        </div>
+        <div class="agenda-mes-right">
+          {% if agenda_mes.producto.imagen_principal %}
+          <a href="{% url 'detalle_producto' agenda_mes.producto.slug %}">
+            <img src="{{ agenda_mes.producto.imagen_principal.url }}" alt="{{ agenda_mes.producto.nombre }}" class="agenda-mes-producto-img">
+          </a>
+          {% endif %}
+          <div class="agenda-mes-info">
+            <p class="agenda-mes-nombre">{{ agenda_mes.producto.nombre }}</p>
+            <p class="agenda-mes-precio">${{ agenda_mes.producto.precio_desde|floatformat:0 }}</p>
+            <button class="add-to-cart-btn agenda-mes-carrito"
+              onclick="agregarAlCarrito({{ agenda_mes.producto.id }}, '{{ agenda_mes.producto.nombre }}', {{ agenda_mes.producto.precio }}, 1, '', null, {{ agenda_mes.producto.es_digital|yesno:'true,false' }})">
+              <i class="fas fa-shopping-cart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.agenda-mes-banner {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+}
+.agenda-mes-css-bg {
+  background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 60%, var(--color-hover) 100%);
+}
+.agenda-mes-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.agenda-mes-overlay {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 2.5rem 3rem;
+  background: linear-gradient(to right, rgba(0,0,0,0.18) 0%, transparent 100%);
+}
+.agenda-mes-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+.agenda-mes-left {
+  flex: 1;
+}
+.agenda-mes-badge {
+  display: inline-block;
+  background: rgba(255,255,255,0.25);
+  color: #fff;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 0.3rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.4);
+  margin-bottom: 0.8rem;
+  backdrop-filter: blur(4px);
+}
+.agenda-mes-titulo {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0 0 0.5rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.agenda-mes-subtitulo {
+  color: rgba(255,255,255,0.85);
+  font-size: 0.85rem;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+  margin: 0 0 1.5rem;
+  max-width: 320px;
+  line-height: 1.6;
+}
+.agenda-mes-btn {
+  display: inline-block;
+  background: #fff;
+  color: #333;
+  padding: 0.55rem 1.6rem;
+  border-radius: 30px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.agenda-mes-btn:hover {
+  background: var(--color-hover);
+  color: #333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+.agenda-mes-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-shrink: 0;
+}
+.agenda-mes-producto-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.15);
+  padding: 10px;
+  backdrop-filter: blur(4px);
+  transition: transform 0.3s ease;
+}
+.agenda-mes-producto-img:hover { transform: scale(1.04); }
+.agenda-mes-info {
+  text-align: center;
+}
+.agenda-mes-nombre {
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0 0 0.3rem;
+  max-width: 140px;
+  line-height: 1.3;
+}
+.agenda-mes-precio {
+  color: #fff;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.8rem;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.agenda-mes-carrito {
+  width: 38px;
+  height: 38px;
+  font-size: 0.9rem;
+}
+@media (max-width: 768px) {
+  .agenda-mes-overlay { padding: 1.8rem 1.5rem; }
+  .agenda-mes-titulo { font-size: 1.4rem; }
+  .agenda-mes-producto-img { width: 110px; height: 110px; }
+  .agenda-mes-content { gap: 1rem; }
+}
+@media (max-width: 480px) {
+  .agenda-mes-content { flex-direction: column; text-align: center; }
+  .agenda-mes-subtitulo { max-width: 100%; }
+  .agenda-mes-right { justify-content: center; }
+}
+</style>
+{% endif %}
+
 {% if instagram_posts %}
 <section class="instagram-section mt-5 mb-4">
     <div class="d-flex justify-content-between align-items-center mb-3">

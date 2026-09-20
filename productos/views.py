@@ -12,7 +12,7 @@ from django.db import models
 import json
 import requests
 import os
-from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena, TokenDescarga
+from .models import Producto, Categoria, Tag, Pedido, DetallePedido, Pago, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, ProyectoPortafolio, InstagramConfig, Descuento, Resena, TokenDescarga, AgendaMes
 from .services import MercadoPagoService
 from .instagram_service import InstagramService
 from .forms import RegistroForm
@@ -34,6 +34,8 @@ def home(request):
         productos_seccion = Producto.objects.filter(categoria=seccion.categoria, activo=True)[:12]
         secciones_con_productos.append({'seccion': seccion, 'productos': productos_seccion})
 
+    agenda_mes = AgendaMes.objects.filter(activo=True).select_related('producto').first()
+
     return render(request, 'home.html', {
         'productos': productos,
         'categorias': categorias,
@@ -43,6 +45,7 @@ def home(request):
         'secciones_categorias': secciones_con_productos,
         'instagram_posts': instagram_posts,
         'instagram_config': instagram_config,
+        'agenda_mes': agenda_mes,
     })
 
 def productos_por_categoria(request, categoria_id):

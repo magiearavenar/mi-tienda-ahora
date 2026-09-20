@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.contrib.admin.models import LogEntry
 from PIL import Image
 import io
-from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento, ImagenInterior, Resena
+from .models import Producto, Categoria, Tag, Slide, ConfiguracionSitio, SeccionCategoria, BannerFidelizacion, FooterConfig, SobreMi, Contacto, Informacion, Suscripcion, RedSocial, ImagenProducto, OpcionProducto, Pago, Pedido, DetallePedido, InstagramConfig, ProyectoPortafolio, VarianteAtributo, VarianteValor, Descuento, ImagenInterior, Resena, AgendaMes
 from .widgets import ColorPickerWidget
 from .image_widgets import DragDropImageWidget
 
@@ -679,6 +679,24 @@ class ResenaAdmin(admin.ModelAdmin):
         queryset.update(aprobada=True)
         self.message_user(request, f'{queryset.count()} reseña(s) aprobada(s).')
     aprobar_resenas.short_description = '✅ Aprobar reseñas seleccionadas'
+
+
+@admin.register(AgendaMes)
+class AgendaMesAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'badge', 'activo']
+    list_editable = ['activo']
+    fieldsets = (
+        ('Producto destacado', {
+            'fields': ('producto', 'badge', 'subtitulo', 'activo')
+        }),
+        ('Banner', {
+            'fields': ('banner_imagen',),
+            'description': 'Opcional. Si no subes imagen, se mostrará un fondo degradado con los colores de la tienda.'
+        }),
+    )
+
+    def has_add_permission(self, request):
+        return not AgendaMes.objects.exists()
 
 
 @admin.register(InstagramConfig)

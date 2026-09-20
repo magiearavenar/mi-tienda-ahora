@@ -624,6 +624,25 @@ class TokenDescarga(models.Model):
         ]
 
 
+class AgendaMes(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True, blank=True,
+                                 help_text='Producto que se destacará como agenda del mes')
+    badge = models.CharField(max_length=50, blank=True, default='',
+                             help_text='Ej: Agosto 2025')
+    subtitulo = models.CharField(max_length=200, blank=True, default='',
+                                 help_text='Frase breve bajo el título')
+    banner_imagen = models.ImageField(upload_to='agenda_mes/', blank=True, null=True, max_length=500,
+                                      help_text='Imagen de fondo del banner (opcional)')
+    activo = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'Agenda del Mes — {self.badge or (self.producto.nombre if self.producto else "Sin producto")}'
+
+    class Meta:
+        verbose_name = 'Agenda del Mes'
+        verbose_name_plural = 'Agenda del Mes'
+
+
 class InstagramConfig(models.Model):
     usuario = models.CharField(max_length=100, help_text='Usuario de Instagram (sin @)')
     titulo = models.CharField(max_length=100, default='Síguenos en Instagram')

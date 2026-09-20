@@ -383,7 +383,10 @@ document.addEventListener('DOMContentLoaded', function() {
   "name": "{{ producto.nombre }}",
   "description": "{{ producto.descripcion|truncatewords:50|escapejs }}",
   "brand": { "@type": "Brand", "name": "Mundo Magie" },
-  {% if producto.imagenes.all %}"image": "{{ producto.imagenes.first.imagen.url }}",{% endif %}
+  {% if producto.imagenes.all %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ producto.imagenes.first.imagen.url }}",
+  {% elif producto.imagen %}"image": "{{ request.scheme }}://{{ request.get_host }}{{ producto.imagen.url }}",
+  {% elif producto.imagen_url %}"image": "{{ producto.imagen_url }}",
+  {% endif %}
   {% if promedio_resenas %}"aggregateRating": {
     "@type": "AggregateRating",
     "ratingValue": "{{ promedio_resenas|floatformat:1 }}",
