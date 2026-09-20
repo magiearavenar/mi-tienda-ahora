@@ -689,11 +689,16 @@ class AgendaMesAdmin(admin.ModelAdmin):
         ('Producto destacado', {
             'fields': ('producto', 'badge', 'subtitulo', 'activo')
         }),
-        ('Banner', {
-            'fields': ('banner_imagen',),
-            'description': 'Opcional. Si no subes imagen, se mostrará un fondo degradado con los colores de la tienda.'
+        ('Apariencia', {
+            'fields': ('color_fondo', 'banner_imagen'),
+            'description': 'El color de fondo se usa cuando no hay imagen. Si subes imagen, se muestra de fondo.'
         }),
     )
+
+    def formfield_for_dbfield(self, db_field, request, **kwargs):
+        if db_field.name == 'color_fondo':
+            kwargs['widget'] = ColorPickerWidget()
+        return super().formfield_for_dbfield(db_field, request, **kwargs)
 
     def has_add_permission(self, request):
         return not AgendaMes.objects.exists()

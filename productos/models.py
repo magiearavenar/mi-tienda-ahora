@@ -633,6 +633,8 @@ class AgendaMes(models.Model):
                                  help_text='Frase breve bajo el título')
     banner_imagen = models.ImageField(upload_to='agenda_mes/', blank=True, null=True, max_length=500,
                                       help_text='Imagen de fondo del banner (opcional)')
+    color_fondo = models.CharField(max_length=7, default='#f9e4f0',
+                                   help_text='Color sólido de fondo cuando no hay imagen. Ej: #f9e4f0')
     activo = models.BooleanField(default=True)
 
     def __str__(self):
