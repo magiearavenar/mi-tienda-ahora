@@ -525,7 +525,7 @@
                     margin-bottom:8px;cursor:grab;user-select:none;
                     transition:box-shadow 0.2s,background 0.2s;">
                     <i class="fas fa-grip-vertical" style="color:#ccc;font-size:0.9rem;"></i>
-                    <span style="font-size:0.82rem;font-weight:500;color:#444;">{{ secciones_labels|default:seccion }}</span>
+                    <span style="font-size:0.82rem;font-weight:500;color:#444;">{% if seccion == 'slideshow' %}Slideshow{% elif seccion == 'banners' %}Banners de confianza{% elif seccion == 'recien_llegados' %}Recién llegados{% elif seccion == 'categorias' %}Secciones de categorías{% elif seccion == 'agenda_mes' %}Agenda del Mes{% elif seccion == 'instagram' %}Instagram{% else %}{{ seccion }}{% endif %}</span>
                 </li>
                 {% endfor %}
             </ul>
