@@ -676,11 +676,15 @@ def configurador(request):
     footer = FooterConfig.objects.filter(activo=True).first()
     sobre_mi = SobreMi.objects.filter(activo=True).first()
     contacto = Contacto.objects.filter(activo=True).first()
+    agenda_mes = AgendaMes.objects.filter(activo=True).select_related('producto').first()
+    productos_lista = Producto.objects.filter(activo=True).values('id', 'nombre')
     return render(request, 'configurador.html', {
         'config': config,
         'footer': footer,
         'sobre_mi': sobre_mi,
         'contacto': contacto,
+        'agenda_mes': agenda_mes,
+        'productos_lista': productos_lista,
     })
 
 
@@ -746,6 +750,19 @@ def configurador_guardar(request):
                 if campo in data:
                     setattr(config, campo, data[campo])
             config.save()
+
+        elif seccion == 'agenda_mes':
+            agenda, _ = AgendaMes.objects.get_or_create(activo=True)
+            for campo in ['badge', 'subtitulo', 'color_fondo', 'color_texto',
+                          'imagen_posicion', 'imagen_padding', 'texto_btn_ver', 'texto_btn_carrito']:
+                if campo in data:
+                    setattr(agenda, campo, data[campo])
+            if 'producto_id' in data and data['producto_id']:
+                try:
+                    agenda.producto = Producto.objects.get(id=int(data['producto_id']))
+                except Producto.DoesNotExist:
+                    pass
+            agenda.save()
 
         return JsonResponse({'ok': True})
     except Exception as e:

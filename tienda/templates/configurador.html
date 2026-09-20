@@ -254,6 +254,9 @@
             <div class="panel-tab" onclick="switchTab('seo', this)">
                 <i class="fas fa-search"></i>SEO
             </div>
+            <div class="panel-tab" onclick="switchTab('agenda', this)">
+                <i class="fas fa-book"></i>Agenda
+            </div>
         </div>
 
         <!-- COLORES -->
@@ -424,6 +427,83 @@
             </div>
         </div>
 
+        <!-- AGENDA DEL MES -->
+        <div class="panel-section" id="tab-agenda">
+            <div class="section-title">Producto destacado</div>
+            <div class="field-group">
+                <span class="field-label">Producto</span>
+                <select class="field-input" id="agenda_producto_id" onchange="previewChange()">
+                    <option value="">-- Seleccionar --</option>
+                    {% for p in productos_lista %}
+                    <option value="{{ p.id }}" {% if agenda_mes.producto.id == p.id %}selected{% endif %}>{{ p.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Badge</span>
+                <input type="text" class="field-input" id="agenda_badge"
+                    placeholder="Ej: ✦ Agosto 2025 ✦"
+                    value="{{ agenda_mes.badge|default:'' }}" oninput="previewChange()">
+            </div>
+            <div class="field-group">
+                <span class="field-label">Subtítulo</span>
+                <input type="text" class="field-input" id="agenda_subtitulo"
+                    placeholder="Frase breve bajo el nombre"
+                    value="{{ agenda_mes.subtitulo|default:'' }}" oninput="previewChange()">
+            </div>
+
+            <div class="section-title">Apariencia</div>
+            <div class="color-row">
+                <div class="pickr" id="pickr_agenda_color_fondo"></div>
+                <div class="color-info">
+                    <div class="color-name">Color de fondo</div>
+                    <input class="color-hex-input" id="hex_agenda_color_fondo"
+                        value="{{ agenda_mes.color_fondo|default:'#f9e4f0' }}" maxlength="7"
+                        oninput="hexInputChange(this, 'agenda_color_fondo')">
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="pickr" id="pickr_agenda_color_texto"></div>
+                <div class="color-info">
+                    <div class="color-name">Color de texto</div>
+                    <input class="color-hex-input" id="hex_agenda_color_texto"
+                        value="{{ agenda_mes.color_texto|default:'#2a2a2a' }}" maxlength="7"
+                        oninput="hexInputChange(this, 'agenda_color_texto')">
+                </div>
+            </div>
+
+            <div class="section-title">Imagen del producto</div>
+            <div class="field-group">
+                <span class="field-label">Posición</span>
+                <select class="field-input" id="agenda_imagen_posicion" onchange="previewChange()">
+                    <option value="derecha" {% if agenda_mes.imagen_posicion != 'izquierda' %}selected{% endif %}>Derecha</option>
+                    <option value="izquierda" {% if agenda_mes.imagen_posicion == 'izquierda' %}selected{% endif %}>Izquierda</option>
+                </select>
+            </div>
+            <div class="field-group">
+                <span class="field-label">Espacio interior (padding)</span>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <input type="range" id="agenda_imagen_padding" min="0" max="60" step="4"
+                        value="{{ agenda_mes.imagen_padding|default:24 }}"
+                        oninput="document.getElementById('agenda_padding_val').textContent=this.value+'px';previewChange();"
+                        style="flex:1;accent-color:#ffc1ea;">
+                    <span id="agenda_padding_val" style="font-size:0.78rem;color:#666;min-width:36px;">{{ agenda_mes.imagen_padding|default:24 }}px</span>
+                </div>
+            </div>
+
+            <div class="section-title">Botones</div>
+            <div class="field-group">
+                <span class="field-label">Texto botón principal</span>
+                <input type="text" class="field-input" id="agenda_texto_btn_ver"
+                    value="{{ agenda_mes.texto_btn_ver|default:'Ver detalles' }}" oninput="previewChange()">
+            </div>
+            <div class="field-group">
+                <span class="field-label">Texto botón carrito</span>
+                <input type="text" class="field-input" id="agenda_texto_btn_carrito"
+                    value="{{ agenda_mes.texto_btn_carrito|default:'Agregar' }}" oninput="previewChange()">
+            </div>
+        </div>
+
     </div><!-- fin panel -->
     <div class="preview">
         <div class="preview-toolbar">
@@ -571,6 +651,19 @@
                 seo_descripcion: document.getElementById('seo_descripcion').value,
                 moneda_simbolo: document.getElementById('moneda_simbolo').value,
             };
+        } else if (tabActual === 'agenda') {
+            return {
+                seccion: 'agenda_mes',
+                producto_id: document.getElementById('agenda_producto_id').value,
+                badge: document.getElementById('agenda_badge').value,
+                subtitulo: document.getElementById('agenda_subtitulo').value,
+                color_fondo: getColor('agenda_color_fondo'),
+                color_texto: getColor('agenda_color_texto'),
+                imagen_posicion: document.getElementById('agenda_imagen_posicion').value,
+                imagen_padding: parseInt(document.getElementById('agenda_imagen_padding').value),
+                texto_btn_ver: document.getElementById('agenda_texto_btn_ver').value,
+                texto_btn_carrito: document.getElementById('agenda_texto_btn_carrito').value,
+            };
         }
     }
 
@@ -606,6 +699,8 @@
         crearPickr('pickr_footer_color_texto',   'footer_color_texto',   '{{ footer.color_texto|default:"#4a4a4a" }}');
         crearPickr('pickr_footer_color_enlaces', 'footer_color_enlaces', '{{ footer.color_enlaces|default:"#d7b9ff" }}');
         crearPickr('pickr_footer_color_redes',   'footer_color_redes',   '{{ footer.color_redes|default:"#ffc1e3" }}');
+        crearPickr('pickr_agenda_color_fondo',    'agenda_color_fondo',   '{{ agenda_mes.color_fondo|default:"#f9e4f0" }}');
+        crearPickr('pickr_agenda_color_texto',    'agenda_color_texto',   '{{ agenda_mes.color_texto|default:"#2a2a2a" }}');
     });
 </script>
 </body>
