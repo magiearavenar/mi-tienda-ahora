@@ -9,6 +9,7 @@
 
 {% block content %}
 
+{% load cloudinary_tags %}
 {% for seccion in orden_secciones %}
 {% if seccion == 'slideshow' %}{% include 'secciones_home/slideshow.html' %}
 {% elif seccion == 'banners' %}{% include 'secciones_home/banners.html' %}
